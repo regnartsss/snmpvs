@@ -1,0 +1,14 @@
+certifi==2020.4.5.1
+chardet==3.0.4
+idna==2.9
+ply==3.11
+pyasn1==0.4.8
+pycryptodomex==3.9.7
+pysmi==0.3.4
+pysnmp==4.4.12
+pysnmp-mibs==0.1.6
+PySocks==1.7.1
+pyTelegramBotAPI==3.6.7
+requests==2.23.0
+six==1.14.0
+urllib3==1.25.8
