@@ -1,0 +1,135 @@
+
+
+
+Bindings from all pools not associated with VRF:
+IP address      Client-ID/ 		Lease expiration 	Type       State      Interface
+		Hardware address/
+		User name
+
+Bindings from VRF pool 100:
+IP address      Client-ID/ 		Lease expiration 	Type       State      Interface
+		Hardware address/
+		User name
+10.96.45.14     00d8.6135.3ea6          Infinite                Manual     Active     Vlan100
+10.96.45.15     e0d5.5e34.6a19          Apr 17 2020 11:21 AM    Automatic  Active     Vlan100
+10.96.45.16     00d8.61a5.8514          Apr 17 2020 11:20 AM    Automatic  Active     Vlan100
+10.96.45.17     3860.7735.f06c          Apr 17 2020 11:20 AM    Automatic  Active     Vlan100
+10.96.45.19     b897.5a8c.0a63          Apr 17 2020 11:17 AM    Automatic  Active     Vlan100
+10.96.45.20     50e5.492f.4fa7          Apr 17 2020 11:17 AM    Automatic  Active     Vlan100
+10.96.45.21     e0d5.5e3a.f01e          Apr 17 2020 11:17 AM    Automatic  Active     Vlan100
+10.96.45.22     b897.5a8a.9a49          Apr 17 2020 11:17 AM    Automatic  Active     Vlan100
+10.96.45.23     4ccc.6a00.7710          Apr 17 2020 11:17 AM    Automatic  Active     Vlan100
+10.96.45.24     b897.5a8c.03d1          Apr 17 2020 11:20 AM    Automatic  Active     Vlan100
+10.96.45.25     18f0.e4fc.92e5          Apr 17 2020 11:41 AM    Automatic  Active     Vlan100
+10.96.45.26     00d8.61a5.862b          Apr 17 2020 11:18 AM    Automatic  Active     Vlan100
+10.96.45.27     0060.377f.bd5a          Apr 17 2020 11:50 AM    Automatic  Active     Vlan100
+10.96.45.28     6c2b.5935.b1f2          Apr 17 2020 12:53 PM    Automatic  Active     Vlan100
+10.96.45.29     00d8.61a5.85f2          Apr 17 2020 11:20 AM    Automatic  Active     Vlan100
+10.96.45.30     e0d5.5e74.b12c          Apr 17 2020 11:21 AM    Automatic  Active     Vlan100
+10.96.45.31     0060.37a3.63a8          Apr 17 2020 11:21 AM    Automatic  Active     Vlan100
+10.96.45.32     a483.e7a6.ae1c          Apr 17 2020 11:26 AM    Automatic  Active     Vlan100
+10.96.45.33     80fa.5b07.b4a3          Apr 17 2020 11:27 AM    Automatic  Active     Vlan100
+10.96.45.34     44d9.e7d0.a09d          Apr 17 2020 11:28 AM    Automatic  Active     Vlan100
+10.96.45.35     fc45.9669.11a6          Apr 17 2020 11:50 AM    Automatic  Active     Vlan100
+10.96.45.36     0060.375c.a05f          Apr 17 2020 11:37 AM    Automatic  Active     Vlan100
+10.96.45.37     d43d.7e33.a3f9          Apr 17 2020 11:41 AM    Automatic  Active     Vlan100
+10.96.45.39     38fb.1403.a43c          Apr 17 2020 02:03 PM    Automatic  Active     Vlan100
+10.96.45.40     309c.2341.8d02          Apr 17 2020 12:24 PM    Automatic  Active     Vlan100
+10.96.45.41     d4c9.ef6f.a9bb          Apr 17 2020 12:32 PM    Automatic  Active     Vlan100
+10.96.45.42     e4aa.eab0.c30f          Apr 17 2020 02:21 PM    Automatic  Active     Vlan100
+10.96.45.60     0050.c262.1eec          Infinite                Manual     Active     Vlan100
+10.96.45.61     0050.c262.1eed          Infinite                Manual     Active     Vlan100
+10.96.45.62     0050.c262.1eeb          Infinite                Manual     Active     Vlan100
+10.96.45.63     0050.c262.1eee          Infinite                Manual     Active     Vlan100
+10.96.45.64     7c2f.809e.9050          Infinite                Manual     Selecting  Unknown
+10.96.45.65     7c2f.809e.8fd8          Infinite                Manual     Active     Vlan100
+10.96.45.66     7c2f.809e.9003          Infinite                Manual     Active     Vlan100
+10.96.45.67     7c2f.809e.9101          Infinite                Manual     Active     Vlan100
+10.96.45.68     7c2f.809e.8dc2          Infinite                Manual     Active     Vlan100
+10.96.45.69     7c2f.809e.8ff3          Infinite                Manual     Selecting  Unknown
+10.96.45.70     0c11.0502.a27c          Infinite                Manual     Selecting  Unknown
+10.96.45.80     7c2f.809e.9fa9          Infinite                Manual     Active     Vlan100
+10.96.45.82     b897.5a8c.019e          Infinite                Manual     Active     Vlan100
+10.96.45.83     b897.5a8c.04d9          Infinite                Manual     Active     Vlan100
+10.96.45.85     b897.5a8a.91f8          Infinite                Manual     Active     Vlan100
+10.96.45.86     b897.5a8a.8a11          Infinite                Manual     Active     Vlan100
+10.96.45.90     b897.5a8a.8bf8          Infinite                Manual     Active     Vlan100
+10.96.45.96     b897.5a8a.8dd7          Infinite                Manual     Active     Vlan100
+10.96.45.118    b897.5a8c.01ba          Infinite                Manual     Active     Vlan100
+10.96.45.229    0060.3719.9945          Infinite                Manual     Active     Vlan100
+10.96.45.230    0060.374c.8326          Infinite                Manual     Active     Vlan100
+10.96.45.240    74da.38e9.ee86          Infinite                Manual     Active     Vlan100
+10.96.45.241    08be.ac05.5e70          Infinite                Manual     Active     Vlan100
+10.96.45.242    08be.ac05.5e62          Infinite                Manual     Active     Vlan100
+10.96.45.243    74da.38e9.f2c4          Infinite                Manual     Active     Vlan100
+10.96.46.10     b4a3.82e2.947b          Infinite                Manual     Active     Vlan400
+10.96.46.11     b4a3.82e2.a6ae          Infinite                Manual     Active     Vlan400
+10.96.46.101    bcad.2865.4557          Infinite                Manual     Active     Vlan400
+10.96.46.102    c42f.9079.fd6c          Infinite                Manual     Active     Vlan400
+10.96.46.103    c42f.9079.ff93          Infinite                Manual     Active     Vlan400
+10.96.46.104    c42f.9070.8ed9          Infinite                Manual     Active     Vlan400
+10.96.46.105    c42f.9079.ff25          Infinite                Manual     Active     Vlan400
+10.96.46.106    c42f.9079.fd58          Infinite                Manual     Active     Vlan400
+10.96.46.107    c42f.907a.01a1          Infinite                Manual     Active     Vlan400
+10.96.46.108    c42f.9070.9353          Infinite                Manual     Active     Vlan400
+10.96.46.109    bcad.287c.54a1          Infinite                Manual     Selecting  Unknown
+10.96.46.110    c42f.9079.ffb4          Infinite                Manual     Active     Vlan400
+10.96.46.111    c056.e394.f326          Infinite                Manual     Active     Vlan400
+10.96.46.112    c42f.907a.019a          Infinite                Manual     Active     Vlan400
+10.96.46.113    c42f.9079.fd44          Infinite                Manual     Active     Vlan400
+10.96.46.114    c42f.9079.fde3          Infinite                Manual     Active     Vlan400
+10.96.46.115    c42f.9079.ffe7          Infinite                Manual     Active     Vlan400
+10.96.46.116    c42f.9079.fef1          Infinite                Manual     Active     Vlan400
+10.96.46.117    c42f.9079.ffd9          Infinite                Manual     Active     Vlan400
+10.96.46.118    c42f.907a.0198          Infinite                Manual     Active     Vlan400
+10.96.46.119    c42f.9079.fe26          Infinite                Manual     Active     Vlan400
+10.96.46.120    bcad.287c.53a6          Infinite                Manual     Active     Vlan400
+10.96.46.121    c42f.9079.fd40          Infinite                Manual     Active     Vlan400
+10.96.46.122    c42f.9079.fcbe          Infinite                Manual     Active     Vlan400
+10.96.46.123    4447.cc86.65b1          Infinite                Manual     Active     Vlan400
+10.96.46.124    4447.ccac.85b0          Infinite                Manual     Active     Vlan400
+10.96.46.201    4447.cc86.4dd1          Infinite                Manual     Active     Vlan400
+10.96.46.202    a414.374f.b83f          Infinite                Manual     Active     Vlan400
+10.96.46.203    a414.374f.b877          Infinite                Manual     Active     Vlan400
+10.96.46.204    a414.374f.b87d          Infinite                Manual     Active     Vlan400
+10.96.46.205    4447.cc86.3e9f          Infinite                Manual     Active     Vlan400
+10.96.46.206    a414.374f.b7ef          Infinite                Manual     Active     Vlan400
+10.96.46.207    a414.374f.b862          Infinite                Manual     Active     Vlan400
+10.96.46.208    a414.374f.b852          Infinite                Manual     Active     Vlan400
+10.96.46.209    a414.374f.b7ba          Infinite                Manual     Active     Vlan400
+10.96.46.210    a414.374f.c0d1          Infinite                Manual     Active     Vlan400
+10.96.46.211    a414.375e.4b30          Infinite                Manual     Active     Vlan400
+10.96.46.212    4447.cc86.3e9b          Infinite                Manual     Active     Vlan400
+10.96.46.213    bcad.287c.53cc          Infinite                Manual     Active     Vlan400
+10.96.46.214    c42f.9070.9361          Infinite                Manual     Active     Vlan400
+10.96.46.215    4447.cc86.65a7          Infinite                Manual     Active     Vlan400
+10.96.46.216    b4a3.8252.133d          Infinite                Manual     Active     Vlan400
+10.96.46.217    c42f.907b.bd10          Infinite                Manual     Active     Vlan400
+10.96.46.218    c42f.907b.bd09          Infinite                Manual     Active     Vlan400
+10.96.46.219    f023.b945.5555          Infinite                Manual     Active     Vlan400
+10.96.46.220    f023.b945.5561          Infinite                Manual     Active     Vlan400
+
+Bindings from VRF pool 200:
+IP address      Client-ID/ 		Lease expiration 	Type       State      Interface
+		Hardware address/
+		User name
+
+Bindings from VRF pool 300:
+IP address      Client-ID/ 		Lease expiration 	Type       State      Interface
+		Hardware address/
+		User name
+10.103.225.66   6c2b.5935.b1f2          Apr 17 2020 12:57 PM    Automatic  Active     Vlan300
+10.103.225.67   a85c.2cd3.3b46          Apr 17 2020 01:00 PM    Automatic  Active     Vlan300
+10.103.225.68   c8d7.b0e9.3048          Apr 17 2020 01:01 PM    Automatic  Active     Vlan300
+
+Bindings from VRF pool 330:
+IP address      Client-ID/ 		Lease expiration 	Type       State      Interface
+		Hardware address/
+		User name
+192.168.10.2    c8d7.b0e9.3048          Apr 17 2020 01:19 PM    Automatic  Active     Vlan330
+192.168.10.3    a85c.2cd3.3b46          Apr 17 2020 01:02 PM    Automatic  Active     Vlan330
+
+Bindings from VRF pool 6:
+IP address      Client-ID/ 		Lease expiration 	Type       State      Interface
+		Hardware address/
+		User name
