@@ -12,6 +12,8 @@ import telebot
 import socket
 import paramiko
 import time
+import russian_kod
+import threading
 
 
 def find_location():
@@ -754,13 +756,18 @@ def info_market(call):
         text = "Выберите подсеть. Запрос может занять несколько секунд"
         try:
             if call.data.split("_")[2] == "LAN":
-                text = ssh_lease(kod, "Vlan100")
+#                text = ssh_lease(kod, "Vlan100")
+                text = thread_ssh_lease(kod, "Vlan100")
+
             elif call.data.split("_")[2] == "CAM":
-                text = ssh_lease(kod, "Vlan400")
+#                text = ssh_lease(kod, "Vlan400")
+                text = thread_ssh_lease(kod, "Vlan400")
             elif call.data.split("_")[2] == "SC":
-                text = ssh_lease(kod, "Vlan500")
+#                text = ssh_lease(kod, "Vlan500")
+                text = thread_ssh_lease(kod, "Vlan500")
             elif call.data.split("_")[2] == "KIOSK":
-                text = ssh_lease(kod, "Vlan200")
+#                text = ssh_lease(kod, "Vlan200")
+                text = thread_ssh_lease(kod, "Vlan200")
         except:
             pass
 
@@ -777,8 +784,11 @@ def info_market(call):
             bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=text,
                                   reply_markup=keyboard)
         except:
-            bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text="Нет лизов",
-                                  reply_markup=keyboard)
+            try:
+                bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text="Нет лизов",
+                                      reply_markup=keyboard)
+            except:
+                bot.send_message(call.message.chat.id, text="Нет лизов")
         # try:
         #     print(call.data.split("_")[2])
         #     text, index = info_lease(call)
@@ -1042,26 +1052,31 @@ def ssh(message, call=""):
            "isp gateway - ping 'ip address'"
 
 
-#    bot.send_message(chat_id=message.chat.id, text=text)
-
 # "show ip dhcp binding"
 def ssh_lease(kod, lea):
+    print("ssh_lease_start")
     loopback = dat[kod]["loopback"]
     command = "show ip dhcp binding"
     user = 'operator'
     secret = '71LtkJnrYjn'
     port = 22
-    print("ssh_err_1")
+    print("ssh_lease_command_1")
     client = paramiko.SSHClient()
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     client.connect(hostname=loopback, username=user, password=secret, port=port)
     stdin, stdout, stderr = client.exec_command(command)
-    # #    print(stderr.read())
-    print("ssh_err_2")
+    print("ssh_lease_command_read")
     t = stdout.read()
     client.close()
     open(PATH + 't.txt', 'wb').write(t)
-    time.sleep(1)
+    print("ssh_lease_end")
+
+def thread_ssh_lease(kod, lea):
+    print("thread_ssh_lease_start")
+    t = threading.Thread(target=ssh_lease, args=(kod, lea))
+    t.start()
+    t.join()
+
     text = ""
     with open(PATH + 't.txt') as f:
         lines = f.readlines()
@@ -1074,10 +1089,10 @@ def ssh_lease(kod, lea):
                 else:
                     pass
             pass
+    print("thread_ssh_lease_end")
     return text
 
 
-# "show ip dhcp binding"
 def leas_print(t):
     ip = t[0]
     mac = "%s%s%s" % (t[1].split(".")[0], t[1].split(".")[1], t[1].split(".")[2])
@@ -1095,6 +1110,7 @@ def leas_print(t):
     return "%s /%s %s\n" % (ip, mac, data)
 
 
+
 def snmp_cisco_mac(message):
     print(message.text)
     mac = message.text.split("/")[1]
@@ -1110,7 +1126,11 @@ def snmp_cisco_mac(message):
         print("ssh_err_mac_1")
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        client.connect(hostname=ip, username=user, password=secret, port=port)
+        try:
+            client.connect(hostname=ip, username=user, password=secret, port=port)
+        except:
+            bot.send_message(chat_id=message.chat.id, text="Установлена циска 3550")
+            break
         stdin, stdout, stderr = client.exec_command(command)
         #        print(stderr.read())
         print("ssh_err_mac_2")
@@ -1132,16 +1152,56 @@ def snmp_cisco_mac(message):
                         #                        print(line.split()[3])
                         text = "Mac на порту %s" % line.split()[3]
                         #                        bot.send_message(message.chat.id, text)
-                        return text
+                        bot.send_message(chat_id=message.chat.id, text=text)
+                        return
 
         bot.send_message(message.chat.id, "Не найдено на %s" % v)
 
+def thread_snmp_cisco_mac(message):
+    print("thread_ssh_lease_start")
 
-#                    print(line.split()[3])
-#                    print(mac)
-#                    print(line.split())
+    t = threading.Thread(target=snmp_cisco_mac, args=(message, ))
+    t.start()
+    t.join()
+
 
 # snmp_cisco_mac()
+
+
+def search_kod(message):
+    print("sea_1")
+    if message.text == "Нет" or message.text == "нет":
+        users[str(message.chat.id)]["new_filial"] = 0
+        users[str(message.chat.id)]["search_kod"] = 0
+        bot.send_message(message.chat.id, "Отмена")
+    elif message.text == "Найти по коду":
+        users[str(message.chat.id)]["search_kod"] = 1
+        #        bot.send_message(message.chat.id, "Ожидайте, идет опрос устройства")
+        bot.send_message(message.chat.id, "Введите код филиала или наберите Нет для отмены")
+    elif users[str(message.chat.id)]["search_kod"] == 1:
+        print("sea_err")
+        for kod, value in russian_kod.full_filial.items():
+            if kod == message.text:
+                print("поиск завершен")
+                for k, v in dat.items():
+                    print("kod %s" % k)
+                    print(message.text)
+                    if k == message.text:
+                        print("rrrr")
+                        text = info_filial(kod)
+                        break
+                    else:
+                        text = "Филиал %s\n Город %s\n Регион %s" % \
+                               (russian_kod.full_filial[kod]["name"],
+                                russian_kod.full_filial[kod]["city"],
+                                russian_kod.full_filial[kod]["region"])
+
+        bot.send_message(message.chat.id, text)
+        users[str(message.chat.id)]["search_kod"] = 0
+
+def thread_search_kod(message):
+    threading.Thread(target=search_kod, args=(message,)).start()
+
 
 @bot.message_handler(commands=['start', 'ssh'])
 def start_message(message):
@@ -1153,13 +1213,7 @@ def start_message(message):
 
 @bot.message_handler(content_types=['text'])
 def send_text(message):
-    try:
-        #         print(message.text)
-        #         print(users[str(message.chat.id)])
-        if users[str(message.chat.id)]["kod"] != "null":
-            bot.send_message(chat_id=message.chat.id, text=snmp_cisco_mac(message))
-    except:
-        pass
+
 
     try:
         if users[str(message.chat.id)]["new_filial"] == 1 or users[str(message.chat.id)]["new_filial"] == 2 or \
@@ -1192,10 +1246,13 @@ def send_text(message):
         kod = message.text.split("_")[1]
         dat.pop(kod)
         lease.pop(kod)
+    elif message.text == "Найти по коду":
+        search_kod(message)
+    elif users[str(message.chat.id)]["search_kod"] == 1:
+        search_kod(message)
+    elif users[str(message.chat.id)]["kod"] != "null":
+            thread_snmp_cisco_mac(message)
 
-
-    else:
-        pass
 
 
 @bot.callback_query_handler(func=lambda call: True)
