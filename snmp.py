@@ -1128,34 +1128,34 @@ def snmp_cisco_mac(message):
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         try:
             client.connect(hostname=ip, username=user, password=secret, port=port)
-        except:
-            bot.send_message(chat_id=message.chat.id, text="Установлена циска 3550")
-            break
-        stdin, stdout, stderr = client.exec_command(command)
-        #        print(stderr.read())
-        print("ssh_err_mac_2")
-        t = stdout.read()
-        client.close()
-        open(PATH + 'l.txt', 'wb').write(t)
-        time.sleep(1)
-        text = ""
-        with open(PATH + 'l.txt') as f:
-            lines = f.readlines()
-            for line in lines:
-                if line.split()[0] == "100" or line.split()[0] == "200" or line.split()[0] == "300" or line.split()[
-                    0] == "400":
-                    mac_old = "%s%s%s" % (
-                    line.split()[1].split(".")[0], line.split()[1].split(".")[1], line.split()[1].split(".")[2])
-                    #                    print(mac)
-                    #                    print(mac_old)
-                    if mac == mac_old:
-                        #                        print(line.split()[3])
-                        text = "Mac на порту %s" % line.split()[3]
-                        #                        bot.send_message(message.chat.id, text)
-                        bot.send_message(chat_id=message.chat.id, text=text)
-                        return
+            stdin, stdout, stderr = client.exec_command(command)
+            print("ssh_err_mac_2")
+            t = stdout.read()
+            client.close()
+            open(PATH + 'l.txt', 'wb').write(t)
+            time.sleep(1)
+            text = ""
+            with open(PATH + 'l.txt') as f:
+                lines = f.readlines()
+                for line in lines:
+                    if line.split()[0] == "100" or line.split()[0] == "200" or line.split()[0] == "300" or line.split()[
+                        0] == "400":
+                        mac_old = "%s%s%s" % (
+                            line.split()[1].split(".")[0], line.split()[1].split(".")[1], line.split()[1].split(".")[2])
+                        #                    print(mac)
+                        #                    print(mac_old)
+                        if mac == mac_old:
+                            #                        print(line.split()[3])
+                            text = "Mac на порту %s" % line.split()[3]
+                            #                        bot.send_message(message.chat.id, text)
+                            bot.send_message(chat_id=message.chat.id, text=text)
+                            return
 
-        bot.send_message(message.chat.id, "Не найдено на %s" % v)
+            bot.send_message(message.chat.id, "Не найдено на %s" % v)
+        except:
+            bot.send_message(chat_id=message.chat.id, text="Установлена cisco 3550. Проверить порт не возможно")
+
+
 
 def thread_snmp_cisco_mac(message):
     print("thread_ssh_lease_start")
