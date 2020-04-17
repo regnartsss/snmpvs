@@ -25,6 +25,7 @@ mib_all = {"ifInOctets_isp1": "1.3.6.1.2.1.31.1.1.1.6.1",
            "ifInOctets_isp2_tunnel": "1.3.6.1.2.1.31.1.1.1.6.26",
            "ifOutOctets_isp2_tunnel": "1.3.6.1.2.1.31.1.1.1.10.26"
            }
+pref = ["ABK", "KRA", "IRK", "ULN", "YKT", "CHT", "kra","abk"]
 
 region = {0: "РРС ВС Бурятия, Южная Якутия",
           1:"РРС ВС Забайкальский край",

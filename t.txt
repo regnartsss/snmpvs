@@ -15,45 +15,42 @@ IP address      Client-ID/ 		Lease expiration 	Type       State      Interface
 10.96.25.16     f44d.30ae.aeea          Infinite                Manual     Active     Vlan100
 10.96.25.17     b897.5a34.89db          Infinite                Manual     Selecting  Unknown
 10.96.25.18     448a.5b96.7df4          Infinite                Manual     Active     Vlan100
-10.96.25.19     503e.aa78.245d          Apr 17 2020 10:32 AM    Automatic  Active     Vlan100
-10.96.25.20     94de.80c1.d33b          Apr 17 2020 09:42 AM    Automatic  Active     Vlan100
-10.96.25.21     3052.cb36.17b9          Apr 17 2020 01:10 PM    Automatic  Active     Vlan100
-10.96.25.22     dc85.de0a.202b          Apr 17 2020 04:20 PM    Automatic  Active     Vlan100
-10.96.25.23     b886.8722.4eb5          Apr 17 2020 01:18 PM    Automatic  Active     Vlan100
-10.96.25.24     283b.82c7.e9dd          Apr 17 2020 07:32 PM    Automatic  Active     Vlan100
-10.96.25.25     94c6.915a.2ba6          Apr 17 2020 09:43 AM    Automatic  Active     Vlan100
-10.96.25.26     b897.5acc.cbef          Apr 17 2020 07:16 PM    Automatic  Active     Vlan100
-10.96.25.27     74ba.db70.5a4b          Apr 17 2020 07:58 PM    Automatic  Active     Vlan100
-10.96.25.28     5448.10c8.680b          Apr 17 2020 09:49 AM    Automatic  Active     Vlan100
-10.96.25.29     0025.22fe.f271          Apr 17 2020 02:09 PM    Automatic  Active     Vlan100
-10.96.25.30     a85e.4512.e4b3          Apr 17 2020 01:51 PM    Automatic  Active     Vlan100
-10.96.25.31     4ccc.6a2d.c2d1          Apr 17 2020 09:52 AM    Automatic  Active     Vlan100
+10.96.25.19     d4ca.6d52.7690          Apr 19 2020 02:25 PM    Automatic  Active     Vlan100
+10.96.25.20     3052.cb36.17b9          Apr 19 2020 03:25 PM    Automatic  Active     Vlan100
+10.96.25.21     6872.510c.8dce          Apr 19 2020 02:25 PM    Automatic  Active     Vlan100
+10.96.25.22     dc9f.db54.8931          Apr 19 2020 02:25 PM    Automatic  Active     Vlan100
+10.96.25.23     74ba.db70.5a4b          Apr 19 2020 02:45 PM    Automatic  Active     Vlan100
+10.96.25.24     283b.82c7.e9dd          Apr 19 2020 06:48 PM    Automatic  Active     Vlan100
+10.96.25.25     94c6.915a.2ba6          Apr 19 2020 09:33 AM    Automatic  Active     Vlan100
+10.96.25.26     b897.5acc.cbef          Apr 19 2020 06:43 PM    Automatic  Active     Vlan100
+10.96.25.27     94de.80c1.d33b          Apr 19 2020 09:34 AM    Automatic  Active     Vlan100
+10.96.25.28     044a.6c9f.eaec          Apr 19 2020 09:43 AM    Automatic  Active     Vlan100
+10.96.25.29     5448.10c8.680b          Apr 19 2020 09:57 AM    Automatic  Active     Vlan100
+10.96.25.30     0025.22fe.f271          Apr 19 2020 01:50 PM    Automatic  Active     Vlan100
+10.96.25.31     4ccc.6a2d.c2d1          Apr 19 2020 06:45 PM    Automatic  Active     Vlan100
 10.96.25.32     00d8.61a5.8632          Infinite                Manual     Active     Unknown
-10.96.25.33     b897.5a50.adb2          Apr 17 2020 10:03 AM    Automatic  Active     Vlan100
-10.96.25.34     3c91.8055.b451          Apr 17 2020 10:06 AM    Automatic  Active     Vlan100
-10.96.25.35     94de.80d2.0028          Apr 17 2020 03:19 PM    Automatic  Active     Vlan100
-10.96.25.38     ac16.2d57.9f8a          Apr 17 2020 07:55 PM    Automatic  Active     Vlan100
-10.96.25.40     d4ca.6d52.7690          Apr 17 2020 01:19 PM    Automatic  Active     Vlan100
-10.96.25.41     dc9f.db54.8931          Apr 17 2020 03:57 PM    Automatic  Active     Vlan100
-10.96.25.42     6872.510c.8dce          Apr 17 2020 04:11 PM    Automatic  Active     Vlan100
-10.96.25.43     c03f.d5a8.ad85          Apr 17 2020 10:23 AM    Automatic  Active     Vlan100
-10.96.25.44     84a9.3e06.0747          Apr 17 2020 05:51 PM    Automatic  Active     Vlan100
-10.96.25.45     240a.64d9.49eb          Apr 17 2020 10:32 AM    Automatic  Active     Vlan100
-10.96.25.46     80c5.f2ef.f17b          Apr 17 2020 09:45 AM    Automatic  Active     Vlan100
-10.96.25.47     044a.6c9f.eaec          Apr 17 2020 11:40 AM    Automatic  Active     Vlan100
+10.96.25.33     b897.5a50.adb2          Apr 19 2020 09:57 AM    Automatic  Active     Vlan100
+10.96.25.34     a85e.4512.e4b3          Apr 19 2020 10:28 AM    Automatic  Active     Vlan100
+10.96.25.35     e024.8144.c659          Apr 19 2020 12:06 PM    Automatic  Active     Vlan100
+10.96.25.36     94de.80d0.7d17          Apr 19 2020 09:58 AM    Automatic  Active     Vlan100
+10.96.25.37     80c5.f2ef.f17b          Apr 19 2020 03:38 PM    Automatic  Active     Vlan100
+10.96.25.38     ac16.2d57.9f8a          Apr 19 2020 06:17 PM    Automatic  Active     Vlan100
+10.96.25.39     3065.ec95.0928          Apr 19 2020 03:31 PM    Automatic  Active     Vlan100
+10.96.25.40     d89e.616b.63ab          Apr 19 2020 06:41 PM    Automatic  Active     Vlan100
+10.96.25.41     bc75.74e9.1227          Apr 19 2020 06:41 PM    Automatic  Active     Vlan100
+10.96.25.43     c03f.d5a8.ad85          Apr 19 2020 10:34 AM    Automatic  Active     Vlan100
 10.96.25.50     0050.c262.1084          Infinite                Manual     Active     Vlan100
-10.96.25.51     80ad.1662.44e1          Apr 17 2020 05:37 PM    Automatic  Active     Vlan100
-10.96.25.52     868c.4ffc.fe17          Apr 17 2020 03:16 PM    Automatic  Active     Vlan100
 10.96.25.65     0c11.0502.a3b4          Infinite                Manual     Selecting  Unknown
 10.96.25.66     7c2f.809e.8e87          Infinite                Manual     Active     Vlan100
 10.96.25.67     7c2f.809e.90ad          Infinite                Manual     Active     Vlan100
 10.96.25.68     7c2f.809e.8e98          Infinite                Manual     Active     Vlan100
 10.96.25.69     7c2f.809e.8ece          Infinite                Manual     Active     Vlan100
 10.96.25.95     0017.c874.500d          Infinite                Manual     Active     Vlan100
-10.96.25.110    9829.a69b.48fa          Infinite                Manual     Active     Vlan100
+10.96.25.110    9829.a69b.48fa          Infinite                Manual     Active     Unknown
 10.96.25.229    0060.37d6.00f3          Infinite                Manual     Active     Vlan100
 10.96.25.230    0060.37c1.f751          Infinite                Manual     Active     Vlan100
 10.96.25.231    0060.37de.fb45          Infinite                Manual     Active     Vlan100
+10.96.26.2      f07d.680c.b688          Apr 19 2020 02:25 PM    Automatic  Active     Vlan400
 10.96.26.10     8ce7.489e.d0b0          Infinite                Manual     Selecting  Unknown
 10.96.26.101    2857.beda.976a          Infinite                Manual     Active     Vlan400
 10.96.26.102    2857.beda.96cd          Infinite                Manual     Active     Vlan400

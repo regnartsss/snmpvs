@@ -1,4 +1,0 @@
-pyTelegramBotAPI
-pysocks
-pysnmp
-paramiko
