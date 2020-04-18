@@ -2,7 +2,7 @@ from pysnmp.hlapi import *
 from pprint import pprint
 import json
 import os
-from config import bot
+from config import bot, AD_USER, AD_PASSWORD
 import keyboard
 import data
 from datetime import datetime, timedelta
@@ -1275,8 +1275,6 @@ def thread_check():
     threading.Thread(target=check).start()
 
 def ldap_move(message):
-    AD_USER = 'podkopaev.k@partner.ru'
-    AD_PASSWORD = 'z15X3vdy'
     # AD_SEARCH_TREE = 'OU=02. Восточная Сибирь,OU=1. Розничная Сеть (ДНС),OU=DNS Users,DC=partner,DC=ru'
     AD_SEARCH_TREE = 'CN=Computers,DC=partner,DC=ru'
     # server = "partner.ru"
