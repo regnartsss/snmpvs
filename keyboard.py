@@ -11,7 +11,7 @@ def main_menu():
     keyboard.row("Меню")
     keyboard.row("Регистраторы")
     keyboard.row("Найти по коду", "Найти по названию")
-    keyboard.row("Выбор региона")
+    keyboard.row("Подписаться на уведомления")
     return keyboard
 def filial():
     keyboard = telebot.types.ReplyKeyboardMarkup(True, False)
@@ -21,5 +21,5 @@ def filial():
 
 def main_menu_user():
     keyboard = telebot.types.ReplyKeyboardMarkup(True, False)
-    keyboard.row("Выбор региона")
+    keyboard.row("Подписаться на уведомления")
     return keyboard

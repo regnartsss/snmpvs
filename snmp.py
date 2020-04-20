@@ -881,7 +881,7 @@ def work(message, call=""):
     elif call.data.split("_")[0] == "region":
         for key, value in dat.items():
             if value["region"] == int(call.data.split("_")[1]):
-                keyboard.row(telebot.types.InlineKeyboardButton(text=dat[key]["name"],
+                keyboard.row(telebot.types.InlineKeyboardButton(text="%s %s" %(key, dat[key]["name"]),
                                                                 callback_data="market_%s" % dat[key]["kod"]))
         keyboard.row(telebot.types.InlineKeyboardButton(text="Назад", callback_data="back_back"))
         try:
@@ -1244,12 +1244,10 @@ def search_name(message):
         users[str(message.chat.id)]["search_name"] = 0
 
 
-
-
 def subscribe(message, call = ""):
     keyboard = telebot.types.InlineKeyboardMarkup()
     print("subscribe_start")
-    if  message.text == "Выбор региона":
+    if  message.text == "Подписаться на уведомления":
         for k, v in data.region.items():
             keyboard.row(telebot.types.InlineKeyboardButton(text="%s" % v, callback_data="subscribe_%s" % k))
         try:
@@ -1370,7 +1368,7 @@ def thread_ldap_move(message):
 
 thread_check()
 
-@bot.message_handler(commands=['start', 'ssh'])
+@bot.message_handler(commands=['start'])
 def start_message(message):
     if message.text == "/start":
         new_user(message)
@@ -1390,7 +1388,7 @@ def send_text(message):
         print("Mess_err")
         pass
 
-    if message.text == "Выбор региона":
+    if message.text == "Подписаться на уведомления":
         print("Выбор региона")
         subscribe(message)
     elif message.text == "444":
@@ -1402,6 +1400,7 @@ def send_text(message):
     elif message.text == "Добавить":
         new_filial(message)
     elif message.text == "Меню":
+        bot.send_message(message.chat.id, "Меню", reply_markup=keyboard.main_menu())
         users[str(message.chat.id)]["kod"] = "null"
         work(message)
     elif message.text == "Регистраторы":
