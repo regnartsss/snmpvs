@@ -1389,7 +1389,6 @@ def send_text(message):
         pass
 
     if message.text == "Подписаться на уведомления":
-        print("Выбор региона")
         subscribe(message)
     elif message.text == "444":
         users[str(message.chat.id)]["ssh"] = 0
