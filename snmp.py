@@ -357,45 +357,53 @@ class Snmp():
             for line in lines:
                 if line.split() != []:
                     #                    print(line.split())
-                    if line.split()[0] == 'GigabitEthernet0/0/0':
-                        dat[self.kod]["ISP1"] = line.split()[1]
+                    try:
+                        if line.split()[0] == 'GigabitEthernet0/0/0':
+                            dat[self.kod]["ISP1"] = line.split()[1]
 
-                    elif line.split()[0] == 'GigabitEthernet0/0/1':
-                        dat[self.kod]["ISP2"] = line.split()[1]
+                        elif line.split()[0] == 'GigabitEthernet0/0/1':
+                            dat[self.kod]["ISP2"] = line.split()[1]
 
-                    elif line.split()[0] == 'Loopback0':
-                        dat[self.kod]["loopback"] = line.split()[1]
+                        elif line.split()[0] == 'Loopback0':
+                            dat[self.kod]["loopback"] = line.split()[1]
 
-                    elif line.split()[0] == 'Vlan100':
+                        elif line.split()[0] == 'Vlan100':
 
-                        if line.split()[1].split(".")[0] == "169":
-                            dat[self.kod]["Vlan100"] = "null"
-                        else:
-                            dat[self.kod]["Vlan100"] = line.split()[1]
+                            if line.split()[1].split(".")[0] == "169":
+                                dat[self.kod]["Vlan100"] = "null"
+                            else:
+                                dat[self.kod]["Vlan100"] = line.split()[1]
 
-                    elif line.split()[0] == 'Vlan200':
-                        if line.split()[1].split(".")[0] == "169":
-                            dat[self.kod]["Vlan200"] = "null"
-                        else:
-                            dat[self.kod]["Vlan200"] = line.split()[1]
+                        elif line.split()[0] == 'Vlan200':
+                            if line.split()[1].split(".")[0] == "169":
+                                dat[self.kod]["Vlan200"] = "null"
+                            else:
+                                dat[self.kod]["Vlan200"] = line.split()[1]
 
-                    elif line.split()[0] == 'Vlan300':
-                        if line.split()[1].split(".")[0] == "169":
-                            dat[self.kod]["Vlan300"] = "null"
-                        else:
-                            dat[self.kod]["Vlan300"] = line.split()[1]
+                        elif line.split()[0] == 'Vlan300':
+                            if line.split()[1].split(".")[0] == "169":
+                                dat[self.kod]["Vlan300"] = "null"
+                            else:
+                                dat[self.kod]["Vlan300"] = line.split()[1]
 
-                    elif line.split()[0] == 'Vlan400':
-                        if line.split()[1].split(".")[0] == "169":
-                            dat[self.kod]["Vlan400"] = "null"
-                        else:
-                            dat[self.kod]["Vlan400"] = line.split()[1]
+                        elif line.split()[0] == 'Vlan400':
+                            if line.split()[1].split(".")[0] == "169":
+                                dat[self.kod]["Vlan400"] = "null"
+                            else:
+                                dat[self.kod]["Vlan400"] = line.split()[1]
 
-                    elif line.split()[0] == 'Vlan500':
-                        if line.split()[1].split(".")[0] == "169":
-                            dat[self.kod]["Vlan500"] = "null"
-                        else:
-                            dat[self.kod]["Vlan500"] = line.split()[1]
+                        elif line.split()[0] == 'Vlan500':
+                            if line.split()[1].split(".")[0] == "169":
+                                dat[self.kod]["Vlan500"] = "null"
+                            else:
+                                dat[self.kod]["Vlan500"] = line.split()[1]
+
+                        elif line.split()[0] == 'Dialer100':
+                            if dat[self.kod]["ISP2"] == "unassigned":
+                                dat[self.kod]["ISP2"] = line.split()[1]
+                    except Exception as n:
+                        print(n)
+                        pass
 
 
 #                print(line.split())
@@ -1188,8 +1196,53 @@ def search_kod(message):
         bot.send_message(message.chat.id, text)
         users[str(message.chat.id)]["search_kod"] = 0
 
+
 def thread_search_kod(message):
     threading.Thread(target=search_kod, args=(message,)).start()
+
+
+def search_name(message):
+    print("sea_1")
+    if message.text == "Нет" or message.text == "нет":
+        users[str(message.chat.id)]["new_filial"] = 0
+        users[str(message.chat.id)]["search_name"] = 0
+        bot.send_message(message.chat.id, "Отмена")
+    elif message.text == "Найти по названию":
+        users[str(message.chat.id)]["search_name"] = 1
+        #        bot.send_message(message.chat.id, "Ожидайте, идет опрос устройства")
+        bot.send_message(message.chat.id, "Введите название филиала или наберите Нет для отмены")
+    elif users[str(message.chat.id)]["search_name"] == 1:
+        print("sea_err")
+        text = ""
+        for kod, value in russian_kod.full_filial.items():
+#            print(value["name"].find(message.text))
+            if len(message.text) < 5:
+                bot.send_message(message.chat.id, "Мало символов для поиска")
+            elif value["name"].lower().find(message.text.lower()) >= 0:
+                print(value["name"])
+                text += "%s %s\n" %(kod, value["name"])
+
+
+#            if value["name"].find(message.text):
+
+#            if kod == message.text:
+#                print("поиск завершен")
+#                 for k, v in dat.items():
+#                     print("kod %s" % k)
+#                     print(message.text)
+#                     if k == message.text:
+#                         print("rrrr")
+#                         text = info_filial(kod)
+#                         break
+#                     else:
+#                         text = "Филиал %s\n Город %s\n Регион %s" % \
+#                                (russian_kod.full_filial[kod]["name"],
+#                                 russian_kod.full_filial[kod]["city"],
+#                                 russian_kod.full_filial[kod]["region"])
+#
+        bot.send_message(message.chat.id, text)
+        users[str(message.chat.id)]["search_name"] = 0
+
 
 
 
@@ -1326,7 +1379,7 @@ def start_message(message):
 
 @bot.message_handler(content_types=['text'])
 def send_text(message):
-
+    print(message.text)
 
     try:
         if users[str(message.chat.id)]["new_filial"] == 1 or users[str(message.chat.id)]["new_filial"] == 2 or \
@@ -1366,6 +1419,12 @@ def send_text(message):
         search_kod(message)
     elif users[str(message.chat.id)]["search_kod"] == 1:
         search_kod(message)
+
+    elif message.text == "Найти по названию":
+        search_name(message)
+    elif users[str(message.chat.id)]["search_name"] == 1:
+        search_name(message)
+
     elif users[str(message.chat.id)]["kod"] != "null":
             thread_snmp_cisco_mac(message)
     elif message.text == "Проверить ад":

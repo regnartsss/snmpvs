@@ -10,7 +10,8 @@ def main_menu():
     keyboard = telebot.types.ReplyKeyboardMarkup(True, False)
     keyboard.row("Меню")
     keyboard.row("Регистраторы")
-    keyboard.row("Найти по коду", "Выбор региона")
+    keyboard.row("Найти по коду", "Найти по названию")
+    keyboard.row("Выбор региона")
     return keyboard
 def filial():
     keyboard = telebot.types.ReplyKeyboardMarkup(True, False)
