@@ -98,11 +98,19 @@ class Snmp():
         for varBind in varBinds:
             sysName = ' = '.join([x.prettyPrint() for x in varBind])
         self.kod = sysName.split("= ")[1].split("-")[2]
+        try:
+            self.kod = self.kod.split(".")[0]
+        except Exception as n:
+            print(n)
+            pass
         print("Создаем карточку")
         dat[self.kod] = {}
         lease[self.kod] = {"cisco": {}, "registrator": {}}
-        dat[self.kod]["sysName"] = sysName.split("= ")[1]
-        dat[self.kod]["kod"] = sysName.split("= ")[1].split("-")[2]
+        try:
+            dat[self.kod]["sysName"] = sysName.split("= ")[1].split(".")[0]
+        except:
+            dat[self.kod]["sysName"] = sysName.split("= ")[1]
+        dat[self.kod]["kod"] = self.kod
         print("Получаем все айпи на интерфейса")
         self.ssh_ip_int()
         print("Получаем шлюз провайдера")
@@ -230,7 +238,7 @@ class Snmp():
             else:
 
                 for varBind in varBinds:
-                    print(' = '.join([x.prettyPrint() for x in varBind]))
+#                    print(' = '.join([x.prettyPrint() for x in varBind]))
                     ip = ' = '.join([x.prettyPrint() for x in varBind]).split("= ")[1]
                     #                    print(ip.split(".")[3])
                     if ip == "No more variables left in this MIB View":
@@ -399,8 +407,9 @@ class Snmp():
                                 dat[self.kod]["Vlan500"] = line.split()[1]
 
                         elif line.split()[0] == 'Dialer100':
-                            if dat[self.kod]["ISP2"] == "unassigned":
+                            #if dat[self.kod]["ISP2"] == "unassigned":
                                 dat[self.kod]["ISP2"] = line.split()[1]
+
                     except Exception as n:
                         print(n)
                         pass
@@ -852,7 +861,6 @@ def info_filial(kod, st="all"):
 
 
 def work(message, call=""):
-    print(333)
     keyboard = telebot.types.InlineKeyboardMarkup()
     if message.text == "Меню":
         for k, v in data.region.items():
