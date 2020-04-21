@@ -1296,11 +1296,11 @@ def key(message, region):
             if stat[kod]["status_t1"] == 1:
                 ch1 = "🔵"
             elif stat[kod]["status_t1"] == 0:
-                ch1 == "🔴"
+                ch1 = "🔴"
             if stat[kod]["status_t2"] == 1:
                 ch2 = "🔵"
             elif stat[kod]["status_t2"] == 0:
-                ch2 == "🔴"
+                ch2 = "🔴"
             try:
                 if subscrib[kod].count(message.chat.id) == 1:
                     status = "✅"
