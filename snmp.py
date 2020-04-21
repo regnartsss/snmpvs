@@ -1073,6 +1073,7 @@ def ssh_lease(kod, lea):
     open(PATH + 't.txt', 'wb').write(t)
     print("ssh_lease_end")
 
+
 def thread_ssh_lease(kod, lea):
     print("thread_ssh_lease_start")
     t = threading.Thread(target=ssh_lease, args=(kod, lea))
@@ -1455,7 +1456,8 @@ def callback_inline(call):
         text = "Введите команду SSH для отправки на циску или 444 для отмены\n" \
                "vlan 100 - ping vrf 100 'ip address'\nvlan 200 - ping vrf 200 'ip address'\n" \
                "vlan 400 - ping vrf 100 'ip address'\nvlan 500 - ping vrf 6 'ip address'\n" \
-               "isp gateway - ping 'ip address'"
+               "isp gateway - ping 'ip address'\n" \
+               "sh ip int br"
         bot.send_message(call.message.chat.id, text=text)
     elif call.data.split("_")[0] == "subscribe" or call.data.split("_")[0] == "subscribefilial":
         subscribe(call.message, call)
