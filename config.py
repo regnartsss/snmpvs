@@ -1,8 +1,8 @@
 import telebot
 from telebot import apihelper
 import socks
-TOKEN = '1225386946:AAEzxslBD9BNeEnS_aoyfgsgnfiBD55hBtA'
-#TOKEN = '1245176676:AAEq3HN4Ob5Zuo94oD0FDfPaKKc0iVlsLFo' #test
+#TOKEN = '1225386946:AAEzxslBD9BNeEnS_aoyfgsgnfiBD55hBtA'
+TOKEN = '1245176676:AAEq3HN4Ob5Zuo94oD0FDfPaKKc0iVlsLFo' #test
 AD_USER = 'podkopaev.k@partner.ru'
 AD_PASSWORD = 'z15X3vdy'
 

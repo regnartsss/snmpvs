@@ -86,7 +86,7 @@ class Snmp():
 
     # Начальная информация о филиале
     def snmp_sysName(self):
-
+        print("Hostname")
         errorIndication, errorStatus, errorIndex, varBinds = next(getCmd(SnmpEngine(),
                                                                          UsmUserData(userName='dvsnmp',
                                                                                      authKey='55GjnJwtPfk',
@@ -98,15 +98,16 @@ class Snmp():
         for varBind in varBinds:
             sysName = ' = '.join([x.prettyPrint() for x in varBind])
         self.kod = sysName.split("= ")[1].split("-")[2]
+        print("Создаем карточку")
         dat[self.kod] = {}
         lease[self.kod] = {"cisco": {}, "registrator": {}}
         dat[self.kod]["sysName"] = sysName.split("= ")[1]
         dat[self.kod]["kod"] = sysName.split("= ")[1].split("-")[2]
-        # Получаем все айпи на интерфейсах
+        print("Получаем все айпи на интерфейса")
         self.ssh_ip_int()
-        # Получаем шлюз провайдера
+        print("Получаем шлюз провайдера")
         self.ssh_gateway()
-        # hostname cisco registrator
+        print("hostname cisco registrator")
         self.snmp_ipNetToMediaNEtAddress()
         #        self.snmp_ifEntry()
         #        print(dat)
@@ -118,7 +119,6 @@ class Snmp():
         #         if dat[self.kod]["Vlan400"] != "null":
         #             self.snmp_ipNetToMediaNEtAddress(dat[self.kod]["Vlan400"], 1)
 
-        print(dat)
 
         save_d()
 
@@ -697,14 +697,11 @@ def new_filial(message):
         #       try:
         print("Добавить")
         for kod, value in dat.items():
-            print(kod)
             if dat[kod]["loopback"] == message.text:
                 users[str(message.chat.id)]["new_filial"] = 0
                 bot.send_message(message.chat.id, "Филиал уже добавлен")
-                break
 
         users[str(message.chat.id)]["new_filial"] = 2
-        #        dat[message.text {}}
         bot.send_message(message.chat.id, "Ожидайте, идет опрос устройства")
         Snmp(message=message).snmp_sysName()
         bot.send_message(message.chat.id, "Loopback: %s\nВведите название филиала как в карточке 1С" % message.text)
