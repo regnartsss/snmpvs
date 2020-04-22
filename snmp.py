@@ -1117,7 +1117,6 @@ def leas_print(t):
 def snmp_cisco_mac(message):
     print(message.text)
     mac = message.text.split("/")[1]
-    print(users[str(message.chat.id)])
     kod = users[str(message.chat.id)]["kod"]
     print("sh port add")
     for ip, v in lease[kod]["cisco"].items():
