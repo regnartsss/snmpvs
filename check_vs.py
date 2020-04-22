@@ -156,6 +156,7 @@ def check():
         for kod, v in dat.items():
             snmp(kod)
             try:
+                #"No SNMP response received before timeout"
                 Intunnel1 = int(stat[kod]["1"]["ifInOctets_isp1_tunnel"]) - int(stat[kod]["0"]["ifInOctets_isp1_tunnel"])
                 Intunnel2 = int(stat[kod]["1"]["ifInOctets_isp2_tunnel"]) - int(stat[kod]["0"]["ifInOctets_isp2_tunnel"])
                 Outtunnel1 = int(stat[kod]["1"]["ifOutOctets_isp1_tunnel"]) - int(stat[kod]["0"]["ifOutOctets_isp1_tunnel"])

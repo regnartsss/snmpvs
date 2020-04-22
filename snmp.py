@@ -1403,7 +1403,6 @@ def send_text(message):
         users[str(message.chat.id)]["kod"] = "null"
         users[str(message.chat.id)]["ssh"] = 0
         ssh(message)
-
     elif message.text == "Добавить":
         new_filial(message)
     elif message.text == "Меню":
@@ -1421,20 +1420,19 @@ def send_text(message):
         kod = message.text.split("_")[1]
         dat.pop(kod)
         lease.pop(kod)
+    elif users[str(message.chat.id)]["kod"] != "null":
+            print("Ищем мак")
+            thread_snmp_cisco_mac(message)
+    elif message.text == "Проверить ад":
+        thread_ldap_move(message)
     elif message.text == "Найти по коду":
         search_kod(message)
     elif users[str(message.chat.id)]["search_kod"] == 1:
         search_kod(message)
-
     elif message.text == "Найти по названию":
         search_name(message)
     elif users[str(message.chat.id)]["search_name"] == 1:
         search_name(message)
-
-    elif users[str(message.chat.id)]["kod"] != "null":
-            thread_snmp_cisco_mac(message)
-    elif message.text == "Проверить ад":
-        thread_ldap_move(message)
 
 
 
