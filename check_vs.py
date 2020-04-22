@@ -107,16 +107,18 @@ def oid(kod):
 # oid("3615")
 
 def snmp(kod):
-    try:
-        print(stat[kod]["oid"])
-    except:
-        stat[kod]["oid"] = {}
-        oid(kod)
+
     try:
         stat[kod]["0"]
     except:
         stat[kod] = {"0": {},
                           "1": {}}
+    try:
+        stat[kod]["oid"]
+    except:
+        stat[kod]["oid"] = {}
+        oid(kod)
+
     d = {}
 #    print("филиал %s" % kod)
     for i, v in stat[kod]["oid"].items():
