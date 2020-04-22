@@ -524,11 +524,11 @@ class traffic():
         self.snmp()
         self.uptime()
         Intunnel1 = int(stat[self.kod]["1"]["ifInOctets_isp1_tunnel"]) - int(
-            stat[self.kod]["0"]["ifInOctets_isp1_tunnel"])
+            stat[self.kod]["0"]["ifInOctets_unnel"])
         Intunnel2 = int(stat[self.kod]["1"]["ifInOctets_isp2_tunnel"]) - int(
             stat[self.kod]["0"]["ifInOctets_isp2_tunnel"])
         Outtunnel1 = int(stat[self.kod]["1"]["ifOutOctets_isp1_tunnel"]) - int(
-            stat[self.kod]["0"]["ifOutOctets_isp1_tunnel"])
+            stat[self.kod]["0"]["ifOutOctets_isp1_tunneisp1_tl"])
         Outtunnel2 = int(stat[self.kod]["1"]["ifOutOctets_isp2_tunnel"]) - int(
             stat[self.kod]["0"]["ifOutOctets_isp2_tunnel"])
         t = "%s\n%s\n" % (dat[self.kod]["name"], dat[self.kod]["sysName"])
@@ -963,11 +963,11 @@ def update_registrator():
 
 
 def update_gateway():
-    print(dat)
+    # print(dat)
     for kod, value in dat.items():
-        print(kod)
+        # print(kod)
         try:
-            print(dat)
+            # print(dat)
             loopback = dat[kod]["loopback"]
 
         except KeyError:
@@ -998,10 +998,10 @@ def update_gateway():
                     elif line.split()[0] == '[1/0]':
                         isp_2 = line.split()[2]
 
-        print(dat[kod]["ISP1"])
-        print(isp_1)
-        print(dat[kod]["ISP2"])
-        print(isp_2)
+        # print(dat[kod]["ISP1"])
+        # print(isp_1)
+        # print(dat[kod]["ISP2"])
+        # print(isp_2)
 
         try:
             if dat[kod]["ISP1"].split(".")[0:2] == isp_1.split(".")[0:2]:
@@ -1043,7 +1043,7 @@ def ssh(message, call=""):
     t = stdout.read()
     #    print(stderr.read())
     #    print(stdin.read())
-    print(t)
+#    print(t)
     #    data = stdout.read() + stderr.read()
     #    print(data)
     bot.send_message(message.chat.id, t)
@@ -1401,7 +1401,9 @@ def send_text(message):
         bot.send_message(chat_id=message.chat.id, text="Отмена")
     elif users[str(message.chat.id)]["ssh"] == 1:
         users[str(message.chat.id)]["kod"] = "null"
+        users[str(message.chat.id)]["ssh"] = 0
         ssh(message)
+
     elif message.text == "Добавить":
         new_filial(message)
     elif message.text == "Меню":

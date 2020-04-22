@@ -12,10 +12,10 @@ mib = { #   "ifInOctets_isp1": "1.3.6.1.2.1.31.1.1.1.6.1",
         #   "ifInOctets_isp2": "1.3.6.1.2.1.31.1.1.1.6.2",
         #   "ifOutOctets_isp2": "1.3.6.1.2.1.31.1.1.1.10.2",
 
-           "ifInOctets_isp1_tunnel": "1.3.6.1.2.1.31.1.1.1.6.25",
-           "ifOutOctets_isp1_tunnel": "1.3.6.1.2.1.31.1.1.1.10.25",
-           "ifInOctets_isp2_tunnel": "1.3.6.1.2.1.31.1.1.1.6.26",
-           "ifOutOctets_isp2_tunnel": "1.3.6.1.2.1.31.1.1.1.10.26"
+           "ifInOctets_isp1_tunnel": "1.3.6.1.2.1.31.1.1.1.6.%s",
+           "ifOutOctets_isp1_tunnel": "1.3.6.1.2.1.31.1.1.1.10.%s",
+           "ifInOctets_isp2_tunnel": "1.3.6.1.2.1.31.1.1.1.6",
+           "ifOutOctets_isp2_tunnel": "1.3.6.1.2.1.31.1.1.1.10"
            }
 
 def find_location():
@@ -61,8 +61,57 @@ def save_stat():
     #     lease = json.load(f)
 
 
+def oid(kod):
+    oid = "1.3.6.1.2.1.31.1.1.1.1"
+    i = 0
+    print(kod)
+    while i < 35:
+        i+=1
+        errorIndication, errorStatus, errorIndex, varBinds = next(
+            getCmd(SnmpEngine(),
+                   UsmUserData(userName='dvsnmp', authKey='55GjnJwtPfk',
+
+                               authProtocol=usmHMACSHAAuthProtocol
+                               ),
+                   UdpTransportTarget((dat[kod]["loopback"], 161)),
+                   ContextData(),
+                   ObjectType(ObjectIdentity("%s.%s" %(oid, i)))
+        ))
+
+        if errorIndication:
+            print(errorIndication)
+        elif errorStatus:
+            print('%s at %s' % (errorStatus.prettyPrint(),
+                                errorIndex and varBinds[int(errorIndex) - 1][0] or '?'))
+        else:
+            for varBind in varBinds:
+
+
+#                print(' = '.join([x.prettyPrint() for x in varBind]))
+                oi = (' = '.join([x.prettyPrint() for x in varBind]).split("= ")[1])
+#                print(oi)
+                if oi == "Tu0":
+                    numoid = (' = '.join([x.prettyPrint() for x in varBind]).split("= ")[0].split(".")[6])
+#                    print(numoid)
+                    stat[kod]["oid"]["ifInOctets_isp1_tunnel"] = "1.3.6.1.2.1.31.1.1.1.6.%s" % numoid
+                    stat[kod]["oid"]["ifOutOctets_isp1_tunnel"] = "1.3.6.1.2.1.31.1.1.1.10.%s" % numoid
+                elif oi == "Tu1":
+                    numoid = (' = '.join([x.prettyPrint() for x in varBind]).split("= ")[0].split(".")[6])
+#                    print(numoid)
+                    stat[kod]["oid"]["ifInOctets_isp2_tunnel"] = "1.3.6.1.2.1.31.1.1.1.6.%s" % numoid
+                    stat[kod]["oid"]["ifOutOctets_isp2_tunnel"] = "1.3.6.1.2.1.31.1.1.1.10.%s" % numoid
+                else:
+                    pass
+#    print(stat[kod])
+# open_all()
+# oid("3615")
 
 def snmp(kod):
+    try:
+        print(stat[kod]["oid"])
+    except:
+        stat[kod]["oid"] = {}
+        oid(kod)
     try:
         stat[kod]["0"]
     except:
@@ -70,7 +119,7 @@ def snmp(kod):
                           "1": {}}
     d = {}
 #    print("филиал %s" % kod)
-    for i, v in mib.items():
+    for i, v in stat[kod]["oid"].items():
         errorIndication, errorStatus, errorIndex, varBinds = next(
             getCmd(SnmpEngine(),
                    UsmUserData(userName='dvsnmp', authKey='55GjnJwtPfk',
@@ -110,11 +159,6 @@ def check():
                 Outtunnel1 = int(stat[kod]["1"]["ifOutOctets_isp1_tunnel"]) - int(stat[kod]["0"]["ifOutOctets_isp1_tunnel"])
                 Outtunnel2 = int(stat[kod]["1"]["ifOutOctets_isp2_tunnel"]) - int(stat[kod]["0"]["ifOutOctets_isp2_tunnel"])
                 t = "%s\n%s\n" % (dat[kod]["name"], dat[kod]["sysName"])
-                #         print("%s нет траффика" % t)
-                # print("Входящий 1 - %s" % Intunnel1)
-                # print("Исходящий 1 - %s" % Outtunnel1)
-                # print("Входящий 2 - %s" % Intunnel2)
-                # print("Исходящий 2 - %s" % Outtunnel2)
                 text = "Филиал %s\n" % kod
                 try:
                     stat[kod]["status_t1"]
@@ -171,23 +215,5 @@ def check():
                 pass
         save_stat()
 
- #        t += "\nUptime %s\n\n" % (GetTime(stat[kod]["1"]["sysUpTime"]))
-#          t += "🔵 Основной провайдер\n⬇️ In %s MB |⬆️ Out %s MB\n\n🔴 Резервный провайдер\n ⬇️ In %s MB |⬆️ Out %s MB\n" % \
-#               (int(int(stat[kod]["1"]["ifInOctets_isp1"]) / 1048576),
-#                int(int(stat[kod]["1"]["ifOutOctets_isp1"]) / 1048576),
-#                int(int(stat[kod]["1"]["ifInOctets_isp2"]) / 1048576),
-#                int(int(stat[kod]["1"]["ifOutOctets_isp2"]) / 1048576))
-#
-#          t += "\n🔵 Tunnel 1\n ⬇️ In %s MB | ⬆️ Out %s MB\n ⏬ In %.2f MB | ⏫ Out %.2f MB \n" % (
-#              int(int(stat[kod]["1"]["ifInOctets_isp1_tunnel"]) / 1048576),
-#              int(int(stat[kod]["1"]["ifOutOctets_isp1_tunnel"]) / 1048576),
-#              Intunnel1 / 1048576, Outtunnel1 / 1048576)
-# #
-#          t += "\n🔴 Tunnel 2\n ⬇️ In %s MB | ⬆️ Out %s MB\n ⏬ In %.2f MB | ⏫ Out %.2f MB" % (
-#              int(int(stat[kod]["1"]["ifInOctets_isp2_tunnel"]) / 1048576),
-#              int(int(stat[kod]["1"]["ifOutOctets_isp2_tunnel"]) / 1048576),
-#              Intunnel2 / 1048576, Outtunnel2 / 1048576)
-#
-#         bot.send_message(chat_id=765333440, text=t)
 
 
