@@ -135,6 +135,9 @@ def snmp(kod):
 
         if errorIndication:
             print(errorIndication)
+            text = "Не доступен"
+            for k in subscrib[kod]:
+                bot.send_message(chat_id=k, text="%s\n  %s" % (dat[kod]["name"], text))
         elif errorStatus:
             print('%s at %s' % (errorStatus.prettyPrint(),
                                 errorIndex and varBinds[int(errorIndex) - 1][0] or '?'))
@@ -156,6 +159,7 @@ def check():
         for kod, v in dat.items():
             snmp(kod)
             try:
+
                 #"No SNMP response received before timeout"
                 Intunnel1 = int(stat[kod]["1"]["ifInOctets_isp1_tunnel"]) - int(stat[kod]["0"]["ifInOctets_isp1_tunnel"])
                 Intunnel2 = int(stat[kod]["1"]["ifInOctets_isp2_tunnel"]) - int(stat[kod]["0"]["ifInOctets_isp2_tunnel"])

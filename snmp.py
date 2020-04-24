@@ -783,8 +783,11 @@ def info_market(call):
         keyboard.row(telebot.types.InlineKeyboardButton(text="ssh", callback_data="ssh_%s" % kod))
         keyboard.row(telebot.types.InlineKeyboardButton(text="Назад", callback_data="region_%s" % dat[kod]["region"]))
 
-        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=info_filial(kod),
-                              reply_markup=keyboard)
+        try:
+            bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=info_filial(kod),
+                                  reply_markup=keyboard)
+        except:
+            pass
 
     elif call.data.split("_")[0] == "lease":
         text = "Выберите подсеть. Запрос может занять несколько секунд"
@@ -1394,6 +1397,7 @@ def send_text(message):
         pass
 
     if message.text == "Подписаться на уведомления":
+        users[str(message.chat.id)]["kod"] = "null"
         subscribe(message)
     elif message.text == "444":
         users[str(message.chat.id)]["ssh"] = 0
@@ -1419,12 +1423,12 @@ def send_text(message):
         kod = message.text.split("_")[1]
         dat.pop(kod)
         lease.pop(kod)
-    elif users[str(message.chat.id)]["kod"] != "null":
-            print("Ищем мак")
-            thread_snmp_cisco_mac(message)
+
     elif message.text == "Проверить ад":
+        users[str(message.chat.id)]["kod"] = "null"
         thread_ldap_move(message)
     elif message.text == "Найти по коду":
+        users[str(message.chat.id)]["kod"] = "null"
         search_kod(message)
     elif users[str(message.chat.id)]["search_kod"] == 1:
         search_kod(message)
@@ -1432,6 +1436,9 @@ def send_text(message):
         search_name(message)
     elif users[str(message.chat.id)]["search_name"] == 1:
         search_name(message)
+    elif users[str(message.chat.id)]["kod"] != "null":
+        print("Ищем мак")
+        thread_snmp_cisco_mac(message)
 
 
 
@@ -1456,7 +1463,8 @@ def callback_inline(call):
                "vlan 100 - ping vrf 100 'ip address'\nvlan 200 - ping vrf 200 'ip address'\n" \
                "vlan 400 - ping vrf 100 'ip address'\nvlan 500 - ping vrf 6 'ip address'\n" \
                "isp gateway - ping 'ip address'\n" \
-               "sh ip int br"
+               "sh ip int br - 'Посмотреть айпи на интерфейсе'\n" \
+               "sh ip route - 'Посмотреть роуты'"
         bot.send_message(call.message.chat.id, text=text)
     elif call.data.split("_")[0] == "subscribe" or call.data.split("_")[0] == "subscribefilial":
         subscribe(call.message, call)
