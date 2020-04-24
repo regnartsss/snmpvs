@@ -1396,50 +1396,55 @@ def send_text(message):
         print("Mess_err")
         pass
 
-    if message.text == "Подписаться на уведомления":
-        users[str(message.chat.id)]["kod"] = "null"
-        subscribe(message)
-    elif message.text == "444":
-        users[str(message.chat.id)]["ssh"] = 0
-        bot.send_message(chat_id=message.chat.id, text="Отмена")
-    elif users[str(message.chat.id)]["ssh"] == 1:
-        users[str(message.chat.id)]["kod"] = "null"
-        users[str(message.chat.id)]["ssh"] = 0
-        ssh(message)
-    elif message.text == "Добавить":
-        new_filial(message)
-    elif message.text == "Меню":
-        bot.send_message(message.chat.id, "Меню", reply_markup=keyboard.main_menu())
-        users[str(message.chat.id)]["kod"] = "null"
-        work(message)
-    elif message.text == "Регистраторы":
-        users[str(message.chat.id)]["kod"] = "null"
-        registrator(message)
-    elif message.text == "Проверка":
-        update_cisco()
-        update_registrator()
-        bot.send_message(chat_id=message.chat.id, text="Завершено")
-    elif message.text.split("_")[0] == "Удалить":
-        kod = message.text.split("_")[1]
-        dat.pop(kod)
-        lease.pop(kod)
+    try:
+        if message.text == "Подписаться на уведомления":
+            users[str(message.chat.id)]["kod"] = "null"
+            subscribe(message)
+        elif message.text == "444":
+            users[str(message.chat.id)]["ssh"] = 0
+            bot.send_message(chat_id=message.chat.id, text="Отмена")
+        elif users[str(message.chat.id)]["ssh"] == 1:
+            users[str(message.chat.id)]["kod"] = "null"
+            users[str(message.chat.id)]["ssh"] = 0
+            ssh(message)
+        elif message.text == "Добавить":
+            new_filial(message)
+        elif message.text == "Меню":
+            bot.send_message(message.chat.id, "Меню", reply_markup=keyboard.main_menu())
+            users[str(message.chat.id)]["kod"] = "null"
+            work(message)
+        elif message.text == "Регистраторы":
+            users[str(message.chat.id)]["kod"] = "null"
+            registrator(message)
+        elif message.text == "Проверка":
+            update_cisco()
+            update_registrator()
+            bot.send_message(chat_id=message.chat.id, text="Завершено")
+        elif message.text.split("_")[0] == "Удалить":
+            kod = message.text.split("_")[1]
+            dat.pop(kod)
+            lease.pop(kod)
 
-    elif message.text == "Проверить ад":
+        elif message.text == "Проверить ад":
+            users[str(message.chat.id)]["kod"] = "null"
+            thread_ldap_move(message)
+        elif message.text == "Найти по коду":
+            users[str(message.chat.id)]["kod"] = "null"
+            search_kod(message)
+        elif users[str(message.chat.id)]["search_kod"] == 1:
+            search_kod(message)
+        elif message.text == "Найти по названию":
+            search_name(message)
+        elif users[str(message.chat.id)]["search_name"] == 1:
+            search_name(message)
+        elif users[str(message.chat.id)]["kod"] != "null":
+            print("Ищем мак")
+            thread_snmp_cisco_mac(message)
+    except:
+        users[str(message.chat.id)]["search_kod"] = 0
+        users[str(message.chat.id)]["search_name"] = 0
         users[str(message.chat.id)]["kod"] = "null"
-        thread_ldap_move(message)
-    elif message.text == "Найти по коду":
-        users[str(message.chat.id)]["kod"] = "null"
-        search_kod(message)
-    elif users[str(message.chat.id)]["search_kod"] == 1:
-        search_kod(message)
-    elif message.text == "Найти по названию":
-        search_name(message)
-    elif users[str(message.chat.id)]["search_name"] == 1:
-        search_name(message)
-    elif users[str(message.chat.id)]["kod"] != "null":
-        print("Ищем мак")
-        thread_snmp_cisco_mac(message)
-
+        users[str(message.chat.id)]["ssh"] = 0
 
 
 
