@@ -86,23 +86,23 @@ def oid(kod):
         else:
             for varBind in varBinds:
 
-
-#                print(' = '.join([x.prettyPrint() for x in varBind]))
                 oi = (' = '.join([x.prettyPrint() for x in varBind]).split("= ")[1])
 #                print(oi)
                 if oi == "Tu0":
                     numoid = (' = '.join([x.prettyPrint() for x in varBind]).split("= ")[0].split(".")[6])
-#                    print(numoid)
+                    print(numoid)
                     stat[kod]["oid"]["ifInOctets_isp1_tunnel"] = "1.3.6.1.2.1.31.1.1.1.6.%s" % numoid
                     stat[kod]["oid"]["ifOutOctets_isp1_tunnel"] = "1.3.6.1.2.1.31.1.1.1.10.%s" % numoid
                 elif oi == "Tu1":
                     numoid = (' = '.join([x.prettyPrint() for x in varBind]).split("= ")[0].split(".")[6])
-#                    print(numoid)
+                    print(numoid)
                     stat[kod]["oid"]["ifInOctets_isp2_tunnel"] = "1.3.6.1.2.1.31.1.1.1.6.%s" % numoid
                     stat[kod]["oid"]["ifOutOctets_isp2_tunnel"] = "1.3.6.1.2.1.31.1.1.1.10.%s" % numoid
                 else:
+
                     pass
-#    print(stat[kod])
+    save_stat()
+    #    print(stat[kod])
 # open_all()
 # oid("3615")
 
@@ -120,7 +120,7 @@ def snmp(kod):
         oid(kod)
 
     d = {}
-#    print("филиал %s" % kod)
+    print("филиал %s" % kod)
     for i, v in stat[kod]["oid"].items():
         errorIndication, errorStatus, errorIndex, varBinds = next(
             getCmd(SnmpEngine(),
@@ -135,9 +135,11 @@ def snmp(kod):
 
         if errorIndication:
             print(errorIndication)
-            text = "Не доступен"
-            for k in subscrib[kod]:
-                bot.send_message(chat_id=k, text="%s\n  %s" % (dat[kod]["name"], text))
+            # "No SNMP response received before timeout"
+            d = stat[kod]["1"]
+            break
+#            for k in subscrib[kod]:
+#                bot.send_message(chat_id=k, text="%s\n  %s" % (dat[kod]["name"], text))
         elif errorStatus:
             print('%s at %s' % (errorStatus.prettyPrint(),
                                 errorIndex and varBinds[int(errorIndex) - 1][0] or '?'))
@@ -146,7 +148,6 @@ def snmp(kod):
 #                print(' = '.join([x.prettyPrint() for x in varBind]))
                 m = (' = '.join([x.prettyPrint() for x in varBind]).split("= ")[1])
                 d[i] = m
-
     stat[kod]["0"] = stat[kod]["1"]
     stat[kod]["1"] = d
 
@@ -159,7 +160,6 @@ def check():
         for kod, v in dat.items():
             snmp(kod)
             try:
-
                 #"No SNMP response received before timeout"
                 Intunnel1 = int(stat[kod]["1"]["ifInOctets_isp1_tunnel"]) - int(stat[kod]["0"]["ifInOctets_isp1_tunnel"])
                 Intunnel2 = int(stat[kod]["1"]["ifInOctets_isp2_tunnel"]) - int(stat[kod]["0"]["ifInOctets_isp2_tunnel"])
@@ -179,42 +179,42 @@ def check():
                      if stat[kod]["status_t1"] ==  status:
                          pass
                      else:
-                         text +="🔵 Основной провайдер работает"
+                         text +="🔵 Основной провайдер работает\n"
                          stat[kod]["status_t1"] = 1
                 if Intunnel2 > 0 and Outtunnel2 > 0:
                     status = 1
                     if stat[kod]["status_t2"] == status:
                        pass
                     else:
-                       text += "🔵 Резервный провайдер работает"
+                       text += "🔵 Резервный провайдер работает\n"
                        stat[kod]["status_t2"] = 1
                 if Intunnel1 == 0 and Outtunnel1 == 0:
                     status = 0
                     if stat[kod]["status_t1"] == status:
                         pass
                     else:
-                        text += "🔴 🔵 Основной провайдер не работает"
+                        text += "🔴 🔵 Основной провайдер не работает\n"
                         stat[kod]["status_t1"] = 0
                 if Intunnel2 == 0 and Outtunnel2 == 0:
                     status = 0
                     if stat[kod]["status_t2"] == status:
                         pass
                     else:
-                        text += "🔵 🔴 Резервный провайдер не работает"
+                        text += "🔵 🔴 Резервный провайдер не работает\n"
                         stat[kod]["status_t2"] = 0
 
                 # if stat[kod]["status_t1"] == 0 and stat[kod]["status_t2"] == 0:
                 #     text += "🔴 🔴 не доступен"
                 # if stat[kod]["status_t1"] == 1 and stat[kod]["status_t2"] == 1:
                 #     text += "🔵 🔵 доступен"
-
+                print(text)
 
                 if text == "Филиал %s\n" % kod:
-                    pass
+                     pass
                 else:
-                    for k in subscrib[kod]:
+                     for k in subscrib[kod]:
 
-                        bot.send_message(chat_id=k, text="%s\n  %s" %(dat[kod]["name"], text))
+                         bot.send_message(chat_id=k, text="%s\n  %s" %(dat[kod]["name"], text))
 
             except Exception as n:
                 print(n)

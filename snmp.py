@@ -1206,8 +1206,9 @@ def search_kod(message):
 
 
 def thread_search_kod(message):
-    threading.Thread(target=search_kod, args=(message,)).start()
-
+    th = threading.Thread(target=search_kod, args=(message,))
+    th.start()
+    th.join()
 
 def search_name(message):
     print("sea_1")
@@ -1440,6 +1441,8 @@ def send_text(message):
         elif users[str(message.chat.id)]["kod"] != "null":
             print("Ищем мак")
             thread_snmp_cisco_mac(message)
+            users[str(message.chat.id)]["kod"]="null"
+        else: print("Не известная команда")
     except:
         users[str(message.chat.id)]["search_kod"] = 0
         users[str(message.chat.id)]["search_name"] = 0
