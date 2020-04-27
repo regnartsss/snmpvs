@@ -1377,17 +1377,15 @@ def thread_ldap_move(message):
 
 thread_check()
 
+
 @bot.message_handler(commands=['start'])
 def start_message(message):
     if message.text == "/start":
         new_user(message)
 
 
-
 @bot.message_handler(content_types=['text'])
 def send_text(message):
-    print(message.text)
-
     try:
         if users[str(message.chat.id)]["new_filial"] == 1 or users[str(message.chat.id)]["new_filial"] == 2 or \
                 users[str(message.chat.id)]["new_filial"] == 3:
