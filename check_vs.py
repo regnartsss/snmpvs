@@ -226,32 +226,35 @@ def data_monitor():
 
 def monitoring():
 
-    keyboard = telebot.types.InlineKeyboardMarkup()
-    i = 1
-    tab = []
-    null = telebot.types.InlineKeyboardButton(text="   ", callback_data="sub")
-#    tab.append(telebot.types.InlineKeyboardButton(text="мониторинг", callback_data="sub"))
-#    keyboard.row(null,null,null,null,null,null,null)
-    tab = []
-    colum = [4,8,12,16,20,24,28,32,36,40,44,48,52,56,60]
-    for kod, value in dat.items():
-        ch1 = "🔵"
-        ch2 = "🔵"
-        if stat[str(kod)]["status_t1"] == 1:
-             ch1 = "🔵"
-        elif stat[str(kod)]["status_t1"] == 0:
-             ch1 = "🔴"
-        if stat[str(kod)]["status_t2"] == 1:
+    try:
+        keyboard = telebot.types.InlineKeyboardMarkup()
+        i = 1
+        tab = []
+        null = telebot.types.InlineKeyboardButton(text="   ", callback_data="sub")
+        #    tab.append(telebot.types.InlineKeyboardButton(text="мониторинг", callback_data="sub"))
+        #    keyboard.row(null,null,null,null,null,null,null)
+        tab = []
+        colum = [4,8,12,16,20,24,28,32,36,40,44,48,52,56,60]
+        for kod, value in dat.items():
+            ch1 = "🔵"
             ch2 = "🔵"
-        elif stat[str(kod)]["status_t2"] == 0:
-            ch2 = "🔴"
-        tab.append(telebot.types.InlineKeyboardButton(text="%s %s%s " % (kod, ch1, ch2),callback_data="sub_%s"%kod))
-        if i == 4 or i == 8 or i == 12 or i == 16 or i == 20 or i == 24 or i == 28 or i == 32:
-            keyboard.row(*tab)
-            tab = []
-        i += 1
-    keyboard.row(*tab)
-    bot.edit_message_text(chat_id="@sdwan_monitoring", message_id=21, text="<---------------->\n Время проверки %s" % data_monitor(), reply_markup=keyboard)
+            if stat[str(kod)]["status_t1"] == 1:
+                 ch1 = "🔵"
+            elif stat[str(kod)]["status_t1"] == 0:
+                 ch1 = "🔴"
+            if stat[str(kod)]["status_t2"] == 1:
+                ch2 = "🔵"
+            elif stat[str(kod)]["status_t2"] == 0:
+                ch2 = "🔴"
+            tab.append(telebot.types.InlineKeyboardButton(text="%s %s%s " % (kod, ch1, ch2),callback_data="sub_%s"%kod))
+            if i == 4 or i == 8 or i == 12 or i == 16 or i == 20 or i == 24 or i == 28 or i == 32:
+                keyboard.row(*tab)
+                tab = []
+            i += 1
+        keyboard.row(*tab)
+        bot.edit_message_text(chat_id="@sdwan_monitoring", message_id=21, text="<---------------->\n Время проверки %s" % data_monitor(), reply_markup=keyboard)
+    except:
+        pass
     # bot.edit_message_text(chat_id="-462518174", message_id=567 ,text="<---------------->\n Время проверки %s" % data_monitor(), reply_markup=keyboard)
     # bot.send_message(chat_id="765333440", text="<---------------->\n Время проверки %s" % data_monitor(),
     #                  reply_markup=keyboard)
