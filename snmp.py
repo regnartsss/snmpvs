@@ -1386,7 +1386,7 @@ def start_message(message):
 
 @bot.message_handler(content_types=['text'])
 def send_text(message):
-    print(message)
+
     try:
         if users[str(message.chat.id)]["new_filial"] == 1 or users[str(message.chat.id)]["new_filial"] == 2 or \
                 users[str(message.chat.id)]["new_filial"] == 3:
@@ -1452,7 +1452,7 @@ def send_text(message):
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_inline(call):
-    print(call.data)
+
     #   buy_bot = Buy(message=call.message, call=call)
     if call.data.split("_")[0] == "region":
         work(call.message, call)
