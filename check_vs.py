@@ -233,6 +233,7 @@ def monitoring():
 #    tab.append(telebot.types.InlineKeyboardButton(text="мониторинг", callback_data="sub"))
 #    keyboard.row(null,null,null,null,null,null,null)
     tab = []
+    colum = [4,8,12,16,20,24,28,32,36,40,44,48,52,56,60]
     for kod, value in dat.items():
         ch1 = "🔵"
         ch2 = "🔵"
