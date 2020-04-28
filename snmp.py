@@ -1424,6 +1424,7 @@ def send_text(message):
             kod = message.text.split("_")[1]
             dat.pop(kod)
             lease.pop(kod)
+            stat.pop(kod)
 
         elif message.text == "Проверить ад":
             users[str(message.chat.id)]["kod"] = "null"
