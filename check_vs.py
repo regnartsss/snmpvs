@@ -120,7 +120,6 @@ def snmp(kod):
         oid(kod)
 
     d = {}
-    print("Филиал %s" % kod)
     for i, v in stat[kod]["oid"].items():
         errorIndication, errorStatus, errorIndex, varBinds = next(
             getCmd(SnmpEngine(),
