@@ -366,10 +366,10 @@ class Snmp():
                 if line.split() != []:
                     #                    print(line.split())
                     try:
-                        if line.split()[0] == 'GigabitEthernet0/0/0':
+                        if line.split()[0] == 'Tunnel0':
                             dat[self.kod]["ISP1"] = line.split()[1]
 
-                        elif line.split()[0] == 'GigabitEthernet0/0/1':
+                        elif line.split()[0] == 'Tunnel1':
                             dat[self.kod]["ISP2"] = line.split()[1]
 
                         elif line.split()[0] == 'Loopback0':
@@ -406,9 +406,9 @@ class Snmp():
                             else:
                                 dat[self.kod]["Vlan500"] = line.split()[1]
 
-                        elif line.split()[0] == 'Dialer100':
-                            #if dat[self.kod]["ISP2"] == "unassigned":
-                                dat[self.kod]["ISP2"] = line.split()[1]
+                        # elif line.split()[0] == 'Dialer100':
+                        #     #if dat[self.kod]["ISP2"] == "unassigned":
+                        #         dat[self.kod]["ISP2"] = line.split()[1]
 
                     except Exception as n:
                         print(n)
