@@ -1386,6 +1386,7 @@ def start_message(message):
 
 @bot.message_handler(content_types=['text'])
 def send_text(message):
+    print(message)
     try:
         if users[str(message.chat.id)]["new_filial"] == 1 or users[str(message.chat.id)]["new_filial"] == 2 or \
                 users[str(message.chat.id)]["new_filial"] == 3:
@@ -1474,6 +1475,9 @@ def callback_inline(call):
         bot.send_message(call.message.chat.id, text=text)
     elif call.data.split("_")[0] == "subscribe" or call.data.split("_")[0] == "subscribefilial":
         subscribe(call.message, call)
+    elif call.data.split("_")[0] == "sub":
+        kod = call.data.split("_")[1]
+        bot.answer_callback_query(callback_query_id=call.id, text=dat[kod]["name"])
 
 
 bot.infinity_polling(True)

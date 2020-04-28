@@ -229,8 +229,9 @@ def monitoring():
     keyboard = telebot.types.InlineKeyboardMarkup()
     i = 1
     tab = []
-    tab.append(telebot.types.InlineKeyboardButton(text="мониторинг", callback_data="sub"))
-    keyboard.row(*tab)
+    null = telebot.types.InlineKeyboardButton(text="   ", callback_data="sub")
+#    tab.append(telebot.types.InlineKeyboardButton(text="мониторинг", callback_data="sub"))
+#    keyboard.row(null,null,null,null,null,null,null)
     tab = []
     for kod, value in dat.items():
         ch1 = "🔵"
@@ -243,13 +244,15 @@ def monitoring():
             ch2 = "🔵"
         elif stat[str(kod)]["status_t2"] == 0:
             ch2 = "🔴"
-        tab.append(telebot.types.InlineKeyboardButton(text="%s\n\n%s%s " % (kod, ch1, ch2),callback_data="sub"))
+        tab.append(telebot.types.InlineKeyboardButton(text="%s %s%s " % (kod, ch1, ch2),callback_data="sub_%s"%kod))
         if i == 4 or i == 8 or i == 12 or i == 16 or i == 20 or i == 24 or i == 28 or i == 32:
             keyboard.row(*tab)
             tab = []
         i += 1
     keyboard.row(*tab)
-    bot.edit_message_text(chat_id="@sdwan_monitoring", message_id=20, text="<--------Мониторин-------->г\n Время проверки %s" % data_monitor(), reply_markup=keyboard)
-
+    bot.edit_message_text(chat_id="@sdwan_monitoring", message_id=21, text="<---------------->\n Время проверки %s" % data_monitor(), reply_markup=keyboard)
+    # bot.edit_message_text(chat_id="-462518174", message_id=567 ,text="<---------------->\n Время проверки %s" % data_monitor(), reply_markup=keyboard)
+    # bot.send_message(chat_id="765333440", text="<---------------->\n Время проверки %s" % data_monitor(),
+    #                  reply_markup=keyboard)
 
 
