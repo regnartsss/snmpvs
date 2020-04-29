@@ -159,11 +159,13 @@ def check():
         for kod, v in dat.items():
             snmp(kod)
             try:
+
                 #"No SNMP response received before timeout"
                 Intunnel1 = int(stat[kod]["1"]["ifInOctets_isp1_tunnel"]) - int(stat[kod]["0"]["ifInOctets_isp1_tunnel"])
                 Intunnel2 = int(stat[kod]["1"]["ifInOctets_isp2_tunnel"]) - int(stat[kod]["0"]["ifInOctets_isp2_tunnel"])
                 Outtunnel1 = int(stat[kod]["1"]["ifOutOctets_isp1_tunnel"]) - int(stat[kod]["0"]["ifOutOctets_isp1_tunnel"])
                 Outtunnel2 = int(stat[kod]["1"]["ifOutOctets_isp2_tunnel"]) - int(stat[kod]["0"]["ifOutOctets_isp2_tunnel"])
+
                 t = "%s\n%s\n" % (dat[kod]["name"], dat[kod]["sysName"])
                 text = "Филиал %s\n" % kod
                 try:
@@ -172,7 +174,7 @@ def check():
                 except:
                     stat[kod]["status_t1"] = 3
                     stat[kod]["status_t2"] = 3
-                if Intunnel1 > 0 and Outtunnel1 > 0:
+                if Intunnel1 > 0 or Outtunnel1 > 0:
                      status = 1
 
                      if stat[kod]["status_t1"] ==  status:
@@ -180,7 +182,7 @@ def check():
                      else:
                          text +="🔵 Основной провайдер работает\n"
                          stat[kod]["status_t1"] = 1
-                if Intunnel2 > 0 and Outtunnel2 > 0:
+                if Intunnel2 > 0 or Outtunnel2 > 0:
                     status = 1
                     if stat[kod]["status_t2"] == status:
                        pass
