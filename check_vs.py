@@ -257,7 +257,7 @@ def monitoring():
             # print("филиал %s" % kod)
             # print("%s %s "% (ch1, ch2))
             tab.append(telebot.types.InlineKeyboardButton(text="%s %s%s " % (kod, ch1, ch2),callback_data="sub_%s"%kod))
-            if i == 4 or i == 8 or i == 12 or i == 16 or i == 20 or i == 24 or i == 28 or i == 32:
+            if i in colum:
                 keyboard.row(*tab)
                 tab = []
             i += 1
