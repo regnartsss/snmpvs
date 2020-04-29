@@ -37,12 +37,15 @@ def open_user():
     with open(PATH + 'lease.json', 'rb') as f:
         lease = json.load(f)
     with open(PATH + 'subscrib.json', 'rb') as f:
-            subscrib = json.load(f)
+        subscrib = json.load(f)
+
 
 def open_stat():
     global stat
     with open(PATH + 'stat.json', 'rb') as f:
-         stat = json.load(f)
+        stat = json.load(f)
+
+
 def save_d():
     global dat, users, stat, lease, subscrib
     with open(PATH + 'dat.json', 'w', encoding="utf-16") as f:
@@ -62,10 +65,9 @@ def save_d():
     with open(PATH + 'lease.json', 'rb') as f:
         lease = json.load(f)
     with open(PATH + 'subscrib.json', 'w', encoding="utf-16") as f:
-            json.dump(subscrib, f)
+        json.dump(subscrib, f)
     with open(PATH + 'subscrib.json', 'rb') as f:
-            subscrib = json.load(f)
-
+        subscrib = json.load(f)
 
 
 open_user()
@@ -114,23 +116,17 @@ class Snmp():
         print("Получаем все айпи на интерфейса")
         self.ssh_ip_int()
         print("Получаем шлюз провайдера")
+        self.ssh_sh_int()
+        print("Получаем description провайдера")
         self.ssh_gateway()
         print("hostname cisco registrator")
         self.snmp_ipNetToMediaNEtAddress()
-        #        self.snmp_ifEntry()
-        #        print(dat)
-        #        self.snmp_ipAddrEntry()
-        #         if dat[self.kod]["Vlan100"] != "null":
-        #             self.snmp_ipNetToMediaNEtAddress(dat[self.kod]["Vlan100"])
-        #         if dat[self.kod]["Vlan500"] != "null":
-        #             self.snmp_ipNetToMediaNEtAddress(dat[self.kod]["Vlan500"])
-        #         if dat[self.kod]["Vlan400"] != "null":
-        #             self.snmp_ipNetToMediaNEtAddress(dat[self.kod]["Vlan400"], 1)
-
-
         save_d()
 
-    # bot.send_message(message.chat.id, "Филиал добавлен")
+        try:
+            bot.send_message(chat_id=765333440, text="Филиал добавлен %s " % self.kod)
+        except:
+            pass
 
     def snmp_ifEntry(self):
 
@@ -238,7 +234,7 @@ class Snmp():
             else:
 
                 for varBind in varBinds:
-#                    print(' = '.join([x.prettyPrint() for x in varBind]))
+                    #                    print(' = '.join([x.prettyPrint() for x in varBind]))
                     ip = ' = '.join([x.prettyPrint() for x in varBind]).split("= ")[1]
                     #                    print(ip.split(".")[3])
                     if ip == "No more variables left in this MIB View":
@@ -413,6 +409,97 @@ class Snmp():
                     except Exception as n:
                         print(n)
                         pass
+
+    def ssh_sh_int(self):
+        command = "sh int GigabitEthernet0/0/0 "
+        user = 'operator'
+        secret = '71LtkJnrYjn'
+        kod = "537"
+        port = 22
+        #
+        client = paramiko.SSHClient()
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        client.connect(hostname=self.loopback, username=user, password=secret, port=port)
+        stdin, stdout, stderr = client.exec_command(command)
+        f = stdout.read()
+        client.close()
+        #        print("test_3")
+        open(PATH + 'n.txt', 'wb').write(f)
+        time.sleep(1)
+        print("test_3")
+        with open(PATH + 'n.txt') as f:
+            lines = f.readlines()
+            for line in lines:
+                if line.split() != []:
+                    if line.split()[0] == "Description:":
+                        print(line.split()[1])
+                        dat[self.kod]["ISP1_NAME"] = line.split()[1]
+
+        command = "sh int GigabitEthernet0/0/1 "
+        client = paramiko.SSHClient()
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        client.connect(hostname=self.loopback, username=user, password=secret, port=port)
+        stdin, stdout, stderr = client.exec_command(command)
+        f = stdout.read()
+        client.close()
+        #        print("test_3")
+        open(PATH + 'n.txt', 'wb').write(f)
+        time.sleep(1)
+        print("test_3")
+        with open(PATH + 'n.txt') as f:
+            lines = f.readlines()
+            for line in lines:
+                if line.split() != []:
+                    if line.split()[0] == "Description:":
+                        print(line.split()[1])
+                        dat[self.kod]["ISP2_NAME"] = line.split()[1]
+
+
+def ssh_sh_int():
+    for k, v in dat.items():
+        command = "sh int GigabitEthernet0/0/0 "
+        user = 'operator'
+        secret = '71LtkJnrYjn'
+        kod = "537"
+        port = 22
+        #
+        client = paramiko.SSHClient()
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        client.connect(hostname=dat[k]["loopback"], username=user, password=secret, port=port)
+        stdin, stdout, stderr = client.exec_command(command)
+        f = stdout.read()
+        client.close()
+        #        print("test_3")
+        open(PATH + 'n.txt', 'wb').write(f)
+        time.sleep(1)
+        print("test_3")
+        with open(PATH + 'n.txt') as f:
+            lines = f.readlines()
+            for line in lines:
+                if line.split() != []:
+                    if line.split()[0] == "Description:":
+                        print(line.split()[1])
+                        dat[k]["ISP1_NAME"] = line.split()[1]
+
+        command = "sh int GigabitEthernet0/0/1 "
+        client = paramiko.SSHClient()
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        client.connect(hostname=dat[k]["loopback"], username=user, password=secret, port=port)
+        stdin, stdout, stderr = client.exec_command(command)
+        f = stdout.read()
+        client.close()
+        #        print("test_3")
+        open(PATH + 'n.txt', 'wb').write(f)
+        time.sleep(1)
+        print("test_3")
+        with open(PATH + 'n.txt') as f:
+            lines = f.readlines()
+            for line in lines:
+                if line.split() != []:
+                    if line.split()[0] == "Description:":
+                        print(line.split()[1])
+                        dat[k]["ISP2_NAME"] = line.split()[1]
+    save_d()
 
 
 #                print(line.split())
@@ -637,7 +724,7 @@ def new_user(message):
                                   "firstname": firstname,
                                   "lastname": lastname,
                                   "ssh": 0,
-                                  "subscribe":[]}
+                                  "subscribe": []}
 
         bot.send_message(message.chat.id, "Пользователь зарегистрирован", reply_markup=keyboard.main_menu_user())
     save_d()
@@ -779,12 +866,13 @@ def info_market(call):
         users[str(call.message.chat.id)]["kod"] = kod
         keyboard = telebot.types.InlineKeyboardMarkup()
         keyboard.row(telebot.types.InlineKeyboardButton(text="Lease", callback_data="lease_%s" % kod))
-#        keyboard.row(telebot.types.InlineKeyboardButton(text="Traffic", callback_data="traffic_%s" % kod))
+        #        keyboard.row(telebot.types.InlineKeyboardButton(text="Traffic", callback_data="traffic_%s" % kod))
         keyboard.row(telebot.types.InlineKeyboardButton(text="ssh", callback_data="ssh_%s" % kod))
         keyboard.row(telebot.types.InlineKeyboardButton(text="Назад", callback_data="region_%s" % dat[kod]["region"]))
 
         try:
-            bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=info_filial(kod),
+            bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                  text=info_filial(kod),
                                   reply_markup=keyboard)
         except:
             pass
@@ -793,17 +881,17 @@ def info_market(call):
         text = "Выберите подсеть. Запрос может занять несколько секунд"
         try:
             if call.data.split("_")[2] == "LAN":
-#                text = ssh_lease(kod, "Vlan100")
+                #                text = ssh_lease(kod, "Vlan100")
                 text = thread_ssh_lease(kod, "Vlan100")
 
             elif call.data.split("_")[2] == "CAM":
-#                text = ssh_lease(kod, "Vlan400")
+                #                text = ssh_lease(kod, "Vlan400")
                 text = thread_ssh_lease(kod, "Vlan400")
             elif call.data.split("_")[2] == "SC":
-#                text = ssh_lease(kod, "Vlan500")
+                #                text = ssh_lease(kod, "Vlan500")
                 text = thread_ssh_lease(kod, "Vlan500")
             elif call.data.split("_")[2] == "KIOSK":
-#                text = ssh_lease(kod, "Vlan200")
+                #                text = ssh_lease(kod, "Vlan200")
                 text = thread_ssh_lease(kod, "Vlan200")
         except:
             pass
@@ -814,7 +902,7 @@ def info_market(call):
         SC = telebot.types.InlineKeyboardButton(text="SC", callback_data="lease_%s_SC" % kod)
         KIOSK = telebot.types.InlineKeyboardButton(text="Kiosk", callback_data="lease_%s_KIOSK" % kod)
         keyboard.row(LAN, CAM, SC, KIOSK)
-#        keyboard.row(telebot.types.InlineKeyboardButton(text="Traffic", callback_data="traffic_%s" % kod))
+        #        keyboard.row(telebot.types.InlineKeyboardButton(text="Traffic", callback_data="traffic_%s" % kod))
         keyboard.row(telebot.types.InlineKeyboardButton(text="ssh", callback_data="ssh_%s" % kod))
         keyboard.row(telebot.types.InlineKeyboardButton(text="Назад", callback_data="region_%s" % dat[kod]["region"]))
         try:
@@ -822,7 +910,8 @@ def info_market(call):
                                   reply_markup=keyboard)
         except:
             try:
-                bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text="Нет лизов",
+                bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                      text="Нет лизов",
                                       reply_markup=keyboard)
             except:
                 bot.send_message(call.message.chat.id, text="Нет лизов")
@@ -834,7 +923,7 @@ def info_market(call):
 
 def info_filial(kod, st="all"):
     text = "%s\nКод филиала %s\nРегион %s\nhostname %s\nloopback %s\n" \
-           "IP_LAN: %s\nIP_Kiosk: %s\nIP_CAM: %s\nIP_SC: %s\nISP1: %s\ngateway_isp1: %s\nISP2: %s\ngateway_isp2: %s\n" % \
+           "IP_LAN: %s\nIP_Kiosk: %s\nIP_CAM: %s\nIP_SC: %s\nISP1_NAME: %s\nISP1: %s\ngateway_isp1: %s\nISP2_NAME: %s\nISP2: %s\ngateway_isp2: %s\n" % \
            (dat[kod]["name"],
             dat[kod]["kod"],
             data.region[int(dat[kod]["region"])],
@@ -844,8 +933,10 @@ def info_filial(kod, st="all"):
             dat[kod]["Vlan200"],
             dat[kod]["Vlan400"],
             dat[kod]["Vlan500"],
+            dat[kod]["ISP1_NAME"],
             dat[kod]["ISP1"],
             dat[kod]["gateway_isp1"],
+            dat[kod]["ISP2_NAME"],
             dat[kod]["ISP2"],
             dat[kod]["gateway_isp2"])
     print("error_m_2")
@@ -889,7 +980,7 @@ def work(message, call=""):
     elif call.data.split("_")[0] == "region":
         for key, value in dat.items():
             if value["region"] == int(call.data.split("_")[1]):
-                keyboard.row(telebot.types.InlineKeyboardButton(text="%s %s" %(key, dat[key]["name"]),
+                keyboard.row(telebot.types.InlineKeyboardButton(text="%s %s" % (key, dat[key]["name"]),
                                                                 callback_data="market_%s" % dat[key]["kod"]))
         keyboard.row(telebot.types.InlineKeyboardButton(text="Назад", callback_data="back_back"))
         try:
@@ -1046,7 +1137,7 @@ def ssh(message, call=""):
     t = stdout.read()
     #    print(stderr.read())
     #    print(stdin.read())
-#    print(t)
+    #    print(t)
     #    data = stdout.read() + stderr.read()
     #    print(data)
     bot.send_message(message.chat.id, t)
@@ -1116,7 +1207,6 @@ def leas_print(t):
     return "%s /%s %s\n" % (ip, mac, data)
 
 
-
 def snmp_cisco_mac(message):
     print(message.text)
     mac = message.text.split("/")[1]
@@ -1161,11 +1251,10 @@ def snmp_cisco_mac(message):
             bot.send_message(chat_id=message.chat.id, text="Установлена cisco 3550. Проверить порт не возможно")
 
 
-
 def thread_snmp_cisco_mac(message):
     print("thread_ssh_lease_start")
 
-    t = threading.Thread(target=snmp_cisco_mac, args=(message, ))
+    t = threading.Thread(target=snmp_cisco_mac, args=(message,))
     t.start()
     t.join()
 
@@ -1210,6 +1299,7 @@ def thread_search_kod(message):
     th.start()
     th.join()
 
+
 def search_name(message):
     print("sea_1")
     if message.text == "Нет" or message.text == "нет":
@@ -1224,39 +1314,38 @@ def search_name(message):
         print("sea_err")
         text = ""
         for kod, value in russian_kod.full_filial.items():
-#            print(value["name"].find(message.text))
+            #            print(value["name"].find(message.text))
             if len(message.text) < 5:
                 bot.send_message(message.chat.id, "Мало символов для поиска")
             elif value["name"].lower().find(message.text.lower()) >= 0:
                 print(value["name"])
-                text += "%s %s\n" %(kod, value["name"])
+                text += "%s %s\n" % (kod, value["name"])
 
+        #            if value["name"].find(message.text):
 
-#            if value["name"].find(message.text):
-
-#            if kod == message.text:
-#                print("поиск завершен")
-#                 for k, v in dat.items():
-#                     print("kod %s" % k)
-#                     print(message.text)
-#                     if k == message.text:
-#                         print("rrrr")
-#                         text = info_filial(kod)
-#                         break
-#                     else:
-#                         text = "Филиал %s\n Город %s\n Регион %s" % \
-#                                (russian_kod.full_filial[kod]["name"],
-#                                 russian_kod.full_filial[kod]["city"],
-#                                 russian_kod.full_filial[kod]["region"])
-#
+        #            if kod == message.text:
+        #                print("поиск завершен")
+        #                 for k, v in dat.items():
+        #                     print("kod %s" % k)
+        #                     print(message.text)
+        #                     if k == message.text:
+        #                         print("rrrr")
+        #                         text = info_filial(kod)
+        #                         break
+        #                     else:
+        #                         text = "Филиал %s\n Город %s\n Регион %s" % \
+        #                                (russian_kod.full_filial[kod]["name"],
+        #                                 russian_kod.full_filial[kod]["city"],
+        #                                 russian_kod.full_filial[kod]["region"])
+        #
         bot.send_message(message.chat.id, text)
         users[str(message.chat.id)]["search_name"] = 0
 
 
-def subscribe(message, call = ""):
+def subscribe(message, call=""):
     keyboard = telebot.types.InlineKeyboardMarkup()
     print("subscribe_start")
-    if  message.text == "Подписаться на уведомления":
+    if message.text == "Подписаться на уведомления":
         for k, v in data.region.items():
             keyboard.row(telebot.types.InlineKeyboardButton(text="%s" % v, callback_data="subscribe_%s" % k))
         try:
@@ -1267,7 +1356,8 @@ def subscribe(message, call = ""):
         for k, v in data.region.items():
             keyboard.row(telebot.types.InlineKeyboardButton(text="%s" % v, callback_data="subscribe_%s" % k))
         try:
-            bot.edit_message_text(chat_id=message.chat.id, message_id=message.message_id, text="Выберите регион:", reply_markup=keyboard)
+            bot.edit_message_text(chat_id=message.chat.id, message_id=message.message_id, text="Выберите регион:",
+                                  reply_markup=keyboard)
         except:
             pass
     elif call.data.split("_")[0] == "subscribe":
@@ -1313,11 +1403,13 @@ def key(message, region):
             try:
                 if subscrib[kod].count(message.chat.id) == 1:
                     status = "✅"
-                    keyboard.row(telebot.types.InlineKeyboardButton(text="%s%s %s %s" % (ch1, ch2, status, dat[kod]["name"]),
-                                                                    callback_data="subscribefilial_%s_%s" % (kod, region)))
+                    keyboard.row(
+                        telebot.types.InlineKeyboardButton(text="%s%s %s %s" % (ch1, ch2, status, dat[kod]["name"]),
+                                                           callback_data="subscribefilial_%s_%s" % (kod, region)))
                 else:
                     keyboard.row(telebot.types.InlineKeyboardButton(text="%s%s %s" % (ch1, ch2, dat[kod]["name"]),
-                                                                    callback_data="subscribefilial_%s_%s" % (kod, region)))
+                                                                    callback_data="subscribefilial_%s_%s" % (
+                                                                    kod, region)))
             except:
                 keyboard.row(telebot.types.InlineKeyboardButton(text="%s" % dat[kod]["name"],
                                                                 callback_data="subscribefilial_%s_%s" % (kod, region)))
@@ -1331,8 +1423,10 @@ def key(message, region):
     except Exception as n:
         print(n)
 
+
 def thread_check():
     threading.Thread(target=check).start()
+
 
 def ldap_move(message):
     # AD_SEARCH_TREE = 'OU=02. Восточная Сибирь,OU=1. Розничная Сеть (ДНС),OU=DNS Users,DC=partner,DC=ru'
@@ -1372,8 +1466,10 @@ def ldap_move(message):
 
     bot.send_message(message.chat.id, t)
 
+
 def thread_ldap_move(message):
-        threading.Thread(target=ldap_move, args=(message,)).start()
+    threading.Thread(target=ldap_move, args=(message,)).start()
+
 
 thread_check()
 
@@ -1386,7 +1482,6 @@ def start_message(message):
 
 @bot.message_handler(content_types=['text'])
 def send_text(message):
-
     try:
         if users[str(message.chat.id)]["new_filial"] == 1 or users[str(message.chat.id)]["new_filial"] == 2 or \
                 users[str(message.chat.id)]["new_filial"] == 3:
@@ -1421,14 +1516,18 @@ def send_text(message):
             update_registrator()
             bot.send_message(chat_id=message.chat.id, text="Завершено")
         elif message.text.split("_")[0] == "Удалить":
-            kod = message.text.split("_")[1]
+            kod = str(message.text.split("_")[1])
+            print(kod)
             dat.pop(kod)
             lease.pop(kod)
             stat.pop(kod)
-
+            save_d()
+            bot.send_message(chat_id=message.chat.id, text="Удалено")
         elif message.text == "Проверить ад":
             users[str(message.chat.id)]["kod"] = "null"
             thread_ldap_move(message)
+        elif message.text == "Провайдеры":
+            ssh_sh_int()
         elif message.text == "Найти по коду":
             users[str(message.chat.id)]["kod"] = "null"
             search_kod(message)
@@ -1441,8 +1540,9 @@ def send_text(message):
         elif users[str(message.chat.id)]["kod"] != "null":
             print("Ищем мак")
             thread_snmp_cisco_mac(message)
-            users[str(message.chat.id)]["kod"]="null"
-        else: print("Не известная команда")
+            users[str(message.chat.id)]["kod"] = "null"
+        else:
+            print("Не известная команда")
     except:
         users[str(message.chat.id)]["search_kod"] = 0
         users[str(message.chat.id)]["search_name"] = 0
@@ -1450,10 +1550,8 @@ def send_text(message):
         users[str(message.chat.id)]["ssh"] = 0
 
 
-
 @bot.callback_query_handler(func=lambda call: True)
 def callback_inline(call):
-
     #   buy_bot = Buy(message=call.message, call=call)
     if call.data.split("_")[0] == "region":
         work(call.message, call)
