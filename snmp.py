@@ -1576,7 +1576,10 @@ def callback_inline(call):
         subscribe(call.message, call)
     elif call.data.split("_")[0] == "sub":
         kod = call.data.split("_")[1]
-        bot.answer_callback_query(callback_query_id=call.id, text=dat[kod]["name"])
+        try:
+            bot.answer_callback_query(callback_query_id=call.id, text=dat[kod]["name"])
+        except:
+            pass
 
 
 bot.infinity_polling(True)
