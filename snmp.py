@@ -1476,7 +1476,7 @@ thread_check()
 def traceroute(message):
     kk = ["1", "2", "3", "4", "5"]
     for kod, value in dat.items():
-        text = kod
+        text = "%s \n" % kod
         command = "traceroute vrf 100 8.8.8.8"
         user = 'operator'
         secret = '71LtkJnrYjn'
