@@ -1499,7 +1499,7 @@ def traceroute(message):
                         text += "%s %s\n" % (line.split()[0], line.split()[1])
         print(text)
         bot.send_message(chat_id=message.chat.id, text=text)
-traceroute()
+
 
 
 @bot.message_handler(commands=['start'])
