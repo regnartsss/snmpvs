@@ -1473,6 +1473,34 @@ def thread_ldap_move(message):
 
 thread_check()
 
+def traceroute(message):
+    kk = ["1", "2", "3", "4", "5"]
+    for kod, value in dat.items():
+        text = kod
+        command = "traceroute vrf 100 8.8.8.8"
+        user = 'operator'
+        secret = '71LtkJnrYjn'
+        port = 22
+        client = paramiko.SSHClient()
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        client.connect(hostname=value["loopback"], username=user, password=secret, port=port)
+        stdin, stdout, stderr = client.exec_command(command)
+        f = stdout.read()
+        client.close()
+        open(PATH + 'tr.txt', 'wb').write(f)
+        time.sleep(1)
+        with open(PATH + 'tr.txt') as f:
+            lines = f.readlines()
+            for line in lines:
+                if line.split() == []:
+                    pass
+                else:
+                    if line.split()[0] in kk:
+                        text += "%s %s\n" % (line.split()[0], line.split()[1])
+        print(text)
+        bot.send_message(chat_id=message.chat.id, text=text)
+traceroute()
+
 
 @bot.message_handler(commands=['start'])
 def start_message(message):
@@ -1535,6 +1563,8 @@ def send_text(message):
             search_kod(message)
         elif message.text == "Найти по названию":
             search_name(message)
+        elif message.text == "Трасерт":
+            traceroute(message)
         elif users[str(message.chat.id)]["search_name"] == 1:
             search_name(message)
         elif users[str(message.chat.id)]["kod"] != "null":
