@@ -1474,6 +1474,10 @@ def thread_ldap_move(message):
 thread_check()
 
 def traceroute(message):
+    threading.Thread(target=tracer, args=(message,)).start()
+
+
+def tracer(message):
     kk = ["1", "2", "3", "4", "5"]
     for kod, value in dat.items():
         st_print = 0
