@@ -1481,7 +1481,7 @@ def tracer(message):
     kk = ["1", "2", "3", "4", "5"]
     for kod, value in dat.items():
         st_print = 0
-        all_text = "Код: %s\nLoopback: %s\n" % (kod, value["loopback"])
+        all_text = "Код: %s\nФилиал: %s\nLoopback: %s\n" % (kod, value["name"], value["loopback"])
         text = "Код: %s\nLoopback: %s\n" % (kod, value["loopback"])
         command = "traceroute vrf 100 ya.ru"
         user = 'operator'
