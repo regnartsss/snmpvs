@@ -1476,8 +1476,10 @@ thread_check()
 def traceroute(message):
     kk = ["1", "2", "3", "4", "5"]
     for kod, value in dat.items():
-        text = "%s %s\n" % (kod, value["loopback"])
-        command = "traceroute vrf 100 8.8.8.8"
+        st_print = 0
+        all_text = "Код: %s\nLoopback: %s\n" % (kod, value["loopback"])
+        text = "Код: %s\nLoopback: %s\n" % (kod, value["loopback"])
+        command = "traceroute vrf 100 ya.ru"
         user = 'operator'
         secret = '71LtkJnrYjn'
         port = 22
@@ -1492,13 +1494,20 @@ def traceroute(message):
         with open(PATH + 'tr.txt') as f:
             lines = f.readlines()
             for line in lines:
+                all_text += line
                 if line.split() == []:
                     pass
                 else:
                     if line.split()[0] in kk:
-                        text += "%s %s\n" % (line.split()[0], line.split()[1])
+                        # text += "%s %s\n" % (line.split()[0], line.split()[1])
+                        if line.split()[0] == "2" and line.split()[1].split(".")[2] != "33":
+                                st_print = 1
+        if st_print == 1:
+            print(text)
+            bot.send_message(chat_id=message.chat.id, text=all_text)
         print(text)
-        bot.send_message(chat_id=message.chat.id, text=text)
+
+#        bot.send_message(chat_id=message.chat.id, text=text)
 
 
 
