@@ -236,6 +236,7 @@ def monitoring():
         #    tab.append(telebot.types.InlineKeyboardButton(text="мониторинг", callback_data="sub"))
         #    keyboard.row(null,null,null,null,null,null,null)
         tab = []
+        text = ""
         colum = [4,8,12,16,20,24,28,32,36,40,44,48,52,56,60]
         colum_old = [3,6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,51]
         for kod, value in dat.items():
@@ -257,13 +258,14 @@ def monitoring():
             #
             # print("филиал %s" % kod)
             # print("%s %s "% (ch1, ch2))
+            text += "%s%s %s %s\n" % (ch1, ch2, kod, dat[str(kod)]["name"])
             tab.append(telebot.types.InlineKeyboardButton(text="%s %s%s " % (kod, ch1, ch2),callback_data="sub_%s"%kod))
             if i in colum_old:
                 keyboard.row(*tab)
                 tab = []
             i += 1
         keyboard.row(*tab)
-#        bot.send_message(chat_id="@sdwan_monitoring",text="<---------------->\n Время проверки %s" % data_monitor(), reply_markup=keyboard)
+        bot.send_message(chat_id=765333440, text=text)
         bot.edit_message_text(chat_id="@sdwan_monitoring", message_id=21, text="<---------------->\n Время проверки %s" % data_monitor(), reply_markup=keyboard)
     except:
         pass
