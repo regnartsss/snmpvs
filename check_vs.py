@@ -265,7 +265,7 @@ def monitoring():
                 tab = []
             i += 1
         keyboard.row(*tab)
-        bot.send_message(chat_id=765333440, text=text)
+#        bot.send_message(chat_id=765333440, text=text)
         bot.edit_message_text(chat_id="@sdwan_monitoring", message_id=21, text="<---------------->\n Время проверки %s" % data_monitor(), reply_markup=keyboard)
     except:
         pass
