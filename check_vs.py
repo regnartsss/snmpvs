@@ -237,6 +237,7 @@ def monitoring():
         #    keyboard.row(null,null,null,null,null,null,null)
         tab = []
         colum = [4,8,12,16,20,24,28,32,36,40,44,48,52,56,60]
+        colum_old = [3,6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,51]
         for kod, value in dat.items():
             ch1 = "🔵"
             ch2 = "🔵"
@@ -257,7 +258,7 @@ def monitoring():
             # print("филиал %s" % kod)
             # print("%s %s "% (ch1, ch2))
             tab.append(telebot.types.InlineKeyboardButton(text="%s %s%s " % (kod, ch1, ch2),callback_data="sub_%s"%kod))
-            if i in colum:
+            if i in colum_old:
                 keyboard.row(*tab)
                 tab = []
             i += 1
