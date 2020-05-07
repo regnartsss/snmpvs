@@ -455,53 +455,6 @@ class Snmp():
                         dat[self.kod]["ISP2_NAME"] = line.split()[1]
 
 
-def ssh_sh_int():
-    for k, v in dat.items():
-        command = "sh int GigabitEthernet0/0/0 "
-        user = 'operator'
-        secret = '71LtkJnrYjn'
-        kod = "537"
-        port = 22
-        #
-        client = paramiko.SSHClient()
-        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        client.connect(hostname=dat[k]["loopback"], username=user, password=secret, port=port)
-        stdin, stdout, stderr = client.exec_command(command)
-        f = stdout.read()
-        client.close()
-        #        print("test_3")
-        open(PATH + 'n.txt', 'wb').write(f)
-        time.sleep(1)
-        print("test_3")
-        with open(PATH + 'n.txt') as f:
-            lines = f.readlines()
-            for line in lines:
-                if line.split() != []:
-                    if line.split()[0] == "Description:":
-                        print(line.split()[1])
-                        dat[k]["ISP1_NAME"] = line.split()[1]
-
-        command = "sh int GigabitEthernet0/0/1 "
-        client = paramiko.SSHClient()
-        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        client.connect(hostname=dat[k]["loopback"], username=user, password=secret, port=port)
-        stdin, stdout, stderr = client.exec_command(command)
-        f = stdout.read()
-        client.close()
-        #        print("test_3")
-        open(PATH + 'n.txt', 'wb').write(f)
-        time.sleep(1)
-        print("test_3")
-        with open(PATH + 'n.txt') as f:
-            lines = f.readlines()
-            for line in lines:
-                if line.split() != []:
-                    if line.split()[0] == "Description:":
-                        print(line.split()[1])
-                        dat[k]["ISP2_NAME"] = line.split()[1]
-    save_d()
-
-
 #                print(line.split())
 # ssh_ip_int()
 
@@ -868,6 +821,7 @@ def info_market(call):
         keyboard.row(telebot.types.InlineKeyboardButton(text="Lease", callback_data="lease_%s" % kod))
         #        keyboard.row(telebot.types.InlineKeyboardButton(text="Traffic", callback_data="traffic_%s" % kod))
         keyboard.row(telebot.types.InlineKeyboardButton(text="ssh", callback_data="ssh_%s" % kod))
+        keyboard.row(telebot.types.InlineKeyboardButton(text="show ip interface brief", callback_data="sship_%s" % kod))
         keyboard.row(telebot.types.InlineKeyboardButton(text="Назад", callback_data="region_%s" % dat[kod]["region"]))
 
         try:
@@ -1167,6 +1121,59 @@ def ssh_lease(kod, lea):
     open(PATH + 't.txt', 'wb').write(t)
     print("ssh_lease_end")
 
+
+def ssh_ip_int_br(call):
+    kod = call.data.split("_")[1]
+    command = "show ip interface brief"
+    user = 'operator'
+    secret = '71LtkJnrYjn'
+    port = 22
+    client = paramiko.SSHClient()
+    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    client.connect(hostname=dat[kod]["loopback"], username=user, password=secret, port=port)
+    stdin, stdout, stderr = client.exec_command(command)
+    f = stdout.read()
+    client.close()
+    #        print("test_3")
+    open(PATH + 'leas.txt', 'wb').write(f)
+    time.sleep(1)
+    print("test_3")
+    with open(PATH + 'leas.txt') as f:
+        lines = f.readlines()
+        text = ""
+        for line in lines:
+            if line.split() != []:
+
+                column = line.split()[0]
+                if column == "Interface":
+                    text += line
+                elif column == "GigabitEthernet0/0/0":
+                    text += line
+                elif column == "GigabitEthernet0/0/1":
+                    text += line
+                elif column == "GigabitEthernet0/1/0":
+                    text += line
+                elif column == "Loopback0":
+                    text += line
+                elif column == "Tunnel0":
+                    text += line
+                elif column == "Tunnel1":
+                    text += line
+                elif column == "Vlan100":
+                    text += line
+                elif column == "Vlan200":
+                    text += line
+                elif column == "Vlan300":
+                    text += line
+                elif column == "Vlan400":
+                    text += line
+                elif column == "Vlan500":
+                    text += line
+                elif column == "Dialer100":
+                    text += line
+                elif column == "Dialer110":
+                    text += line
+        bot.send_message(call.message.chat.id, text)
 
 def thread_ssh_lease(kod, lea):
     print("thread_ssh_lease_start")
@@ -1567,8 +1574,8 @@ def send_text(message):
         elif message.text == "Проверить ад":
             users[str(message.chat.id)]["kod"] = "null"
             thread_ldap_move(message)
-        elif message.text == "Провайдеры":
-            ssh_sh_int()
+        # elif message.text == "Провайдеры":
+        #     ssh_sh_int()
         elif message.text == "Найти по коду":
             users[str(message.chat.id)]["kod"] = "null"
             search_kod(message)
@@ -1615,6 +1622,8 @@ def callback_inline(call):
                "sh ip int br - 'Посмотреть айпи на интерфейсе'\n" \
                "sh ip route - 'Посмотреть роуты'"
         bot.send_message(call.message.chat.id, text=text)
+    elif call.data.split("_")[0] == "sship":
+        ssh_ip_int_br(call)
     elif call.data.split("_")[0] == "subscribe" or call.data.split("_")[0] == "subscribefilial":
         subscribe(call.message, call)
     elif call.data.split("_")[0] == "sub":
