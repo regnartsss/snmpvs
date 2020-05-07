@@ -822,6 +822,7 @@ def info_market(call):
         #        keyboard.row(telebot.types.InlineKeyboardButton(text="Traffic", callback_data="traffic_%s" % kod))
         keyboard.row(telebot.types.InlineKeyboardButton(text="ssh", callback_data="ssh_%s" % kod))
         keyboard.row(telebot.types.InlineKeyboardButton(text="show ip interface brief", callback_data="sship_%s" % kod))
+        keyboard.row(telebot.types.InlineKeyboardButton(text="traceroute vrf 100 ya.ru", callback_data="traceroute_%s" % kod))
         keyboard.row(telebot.types.InlineKeyboardButton(text="Назад", callback_data="region_%s" % dat[kod]["region"]))
 
         try:
@@ -1174,6 +1175,32 @@ def ssh_ip_int_br(call):
                 elif column == "Dialer110":
                     text += line
         bot.send_message(call.message.chat.id, text)
+
+def ssh_traceroute_vrf(call):
+    kod = call.data.split("_")[1]
+    command = "traceroute vrf 100 ya.ru"
+    user = 'operator'
+    secret = '71LtkJnrYjn'
+    port = 22
+    client = paramiko.SSHClient()
+    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    client.connect(hostname=dat[kod]["loopback"], username=user, password=secret, port=port)
+    stdin, stdout, stderr = client.exec_command(command)
+    f = stdout.read()
+    client.close()
+    #        print("test_3")
+    open(PATH + 'leas.txt', 'wb').write(f)
+    time.sleep(1)
+    print("test_3")
+    with open(PATH + 'leas.txt') as f:
+        lines = f.readlines()
+        text = ""
+        for line in lines:
+            if line.split() != []:
+                text += line
+
+        bot.send_message(call.message.chat.id, text)
+
 
 def thread_ssh_lease(kod, lea):
     print("thread_ssh_lease_start")
@@ -1624,6 +1651,9 @@ def callback_inline(call):
         bot.send_message(call.message.chat.id, text=text)
     elif call.data.split("_")[0] == "sship":
         ssh_ip_int_br(call)
+    elif call.data.split("_")[0] == "traceroute":
+        bot.answer_callback_query(text="Ожидайте, запрос занимает некоторое время", callback_query_id=call.id, cache_time=100)
+        ssh_traceroute_vrf(call)
     elif call.data.split("_")[0] == "subscribe" or call.data.split("_")[0] == "subscribefilial":
         subscribe(call.message, call)
     elif call.data.split("_")[0] == "sub":
