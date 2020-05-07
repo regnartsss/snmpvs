@@ -1153,23 +1153,23 @@ def ssh_ip_int_br(call):
                 elif column == "GigabitEthernet0/0/1":
                     text += line
                 elif column == "GigabitEthernet0/1/0":
-                    text += line
-                elif column == "Loopback0":
-                    text += line
-                elif column == "Tunnel0":
-                    text += line
-                elif column == "Tunnel1":
-                    text += line
-                elif column == "Vlan100":
-                    text += line
-                elif column == "Vlan200":
-                    text += line
-                elif column == "Vlan300":
-                    text += line
-                elif column == "Vlan400":
-                    text += line
-                elif column == "Vlan500":
-                    text += line
+                #     text += line
+                # elif column == "Loopback0":
+                #     text += line
+                # elif column == "Tunnel0":
+                #     text += line
+                # elif column == "Tunnel1":
+                #     text += line
+                # elif column == "Vlan100":
+                #     text += line
+                # elif column == "Vlan200":
+                #     text += line
+                # elif column == "Vlan300":
+                #     text += line
+                # elif column == "Vlan400":
+                #     text += line
+                # elif column == "Vlan500":
+                #     text += line
                 elif column == "Dialer100":
                     text += line
                 elif column == "Dialer110":
