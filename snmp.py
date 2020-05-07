@@ -1513,6 +1513,7 @@ def traceroute(message):
 
 def tracer(message):
     kk = ["1", "2", "3", "4", "5"]
+    bot.send_message(chat_id=message.chat.id, text="Трассировка филиалов начата")
     for kod, value in dat.items():
         st_print = 0
         all_text = "Код: %s\nФилиал: %s\nLoopback: %s\n" % (kod, value["name"], value["loopback"])
@@ -1544,8 +1545,7 @@ def tracer(message):
             print(text)
             bot.send_message(chat_id=message.chat.id, text=all_text)
         print(text)
-
-#        bot.send_message(chat_id=message.chat.id, text=text)
+    bot.send_message(chat_id=message.chat.id, text="Трассировка филиалов заверешена")
 
 
 
