@@ -1514,15 +1514,15 @@ def traceroute(message):
 def tracer(message):
     kk = ["1", "2", "3", "4", "5"]
     bot.send_message(chat_id=message.chat.id, text="Трассировка филиалов начата")
-    try:
-        for kod, value in dat.items():
-            st_print = 0
-            all_text = "Код: %s\nФилиал: %s\nLoopback: %s\n" % (kod, value["name"], value["loopback"])
-            text = "Код: %s\nLoopback: %s\n" % (kod, value["loopback"])
-            command = "traceroute vrf 100 ya.ru"
-            user = 'operator'
-            secret = '71LtkJnrYjn'
-            port = 22
+    for kod, value in dat.items():
+        st_print = 0
+        all_text = "Код: %s\nФилиал: %s\nLoopback: %s\n" % (kod, value["name"], value["loopback"])
+        text = "Код: %s\nLoopback: %s\n" % (kod, value["loopback"])
+        command = "traceroute vrf 100 ya.ru"
+        user = 'operator'
+        secret = '71LtkJnrYjn'
+        port = 22
+        try:
             client = paramiko.SSHClient()
             client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
             client.connect(hostname=value["loopback"], username=user, password=secret, port=port)
@@ -1545,9 +1545,9 @@ def tracer(message):
             if st_print == 1:
                 print(text)
                 bot.send_message(chat_id=message.chat.id, text=all_text)
-            print(text)
-    except:
-        pass
+        except:
+            pass
+        print(text)
     bot.send_message(chat_id=message.chat.id, text="Трассировка филиалов заверешена")
 
 
