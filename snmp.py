@@ -1153,7 +1153,7 @@ def ssh_ip_int_br(call):
                 elif column == "GigabitEthernet0/0/1":
                     text += line
                 elif column == "GigabitEthernet0/1/0":
-                #     text += line
+                     text += line
                 # elif column == "Loopback0":
                 #     text += line
                 # elif column == "Tunnel0":
