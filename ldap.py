@@ -43,15 +43,15 @@ def AD():
         name = entry['attributes']['name']
         name_old = name.split("-")[0]
         name_old_3 = name[0:3]
-#        print(name_old_3)
+        # print(name_old_3)
         for i in dat:
             if name_old == i:
-                print("Найдет ПК %s" % name)
+                print("Найдет ПК %s\n" % name)
                 conn.modify_dn('CN=%s,CN=Computers,DC=partner,DC=ru'%name, 'CN=%s'%name,
                                new_superior='OU=newscript,OU=_Computers,OU=02. Восточная Сибирь,OU=1. Розничная Сеть (ДНС),OU=DNS Users,DC=partner,DC=ru')
         for x in range(len(data.pref)):
             if name_old_3 == data.pref[x]:
-                print("Найдет ПК %s" % name)
+                print("Найдет ПК %s\n" % name)
                 conn.modify_dn('CN=%s,CN=Computers,DC=partner,DC=ru'%name, 'CN=%s'%name,
                 new_superior = 'OU=newscript,OU=_Computers,OU=02. Восточная Сибирь,OU=1. Розничная Сеть (ДНС),OU=DNS Users,DC=partner,DC=ru')
 
