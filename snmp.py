@@ -1459,7 +1459,7 @@ def key(message, region):
 
 
 def thread_check():
-    tra_timer()
+    traceroute()
     threading.Thread(target=check).start()
 
 
@@ -1510,7 +1510,7 @@ def thread_ldap_move(message):
 
 def traceroute():
 
-    threading.Thread(target=tracer).start()
+    threading.Thread(target=tra_timer).start()
 
 
 def tra_timer():
