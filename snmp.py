@@ -1509,13 +1509,12 @@ def thread_ldap_move(message):
 
 
 def traceroute():
-
-    threading.Thread(target=tra_timer).start()
+     threading.Thread(target=tra_timer).start()
 
 
 def tra_timer():
     bot.send_message(chat_id=765333440, text="Трассировка филиалов начата")
-    schedule.every().hour.do(traceroute)
+    schedule.every().hour.do(tracer)
     while True:
         schedule.run_pending()
         time.sleep(1)
@@ -1623,8 +1622,8 @@ def send_text(message):
             search_kod(message)
         elif message.text == "Найти по названию":
             search_name(message)
-        # elif message.text == "Трасерт":
-        #     traceroute(message)
+        elif message.text == "Трасерт":
+            traceroute(message)
         elif users[str(message.chat.id)]["search_name"] == 1:
             search_name(message)
         elif users[str(message.chat.id)]["kod"] != "null":
