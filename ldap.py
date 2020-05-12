@@ -56,5 +56,5 @@ def AD():
                 new_superior = 'OU=newscript,OU=_Computers,OU=02. Восточная Сибирь,OU=1. Розничная Сеть (ДНС),OU=DNS Users,DC=partner,DC=ru')
 
 
-open_dat()
-AD()
+# open_dat()
+# AD()

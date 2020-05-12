@@ -1459,7 +1459,9 @@ def key(message, region):
 
 
 def thread_check():
+    tra_timer()
     threading.Thread(target=check).start()
+
 
 
 def ldap_move(message):
@@ -1505,15 +1507,22 @@ def thread_ldap_move(message):
     threading.Thread(target=ldap_move, args=(message,)).start()
 
 
-thread_check()
 
-def traceroute(message):
-    threading.Thread(target=tracer, args=(message,)).start()
+def traceroute():
+
+    threading.Thread(target=tracer).start()
 
 
-def tracer(message):
+def tra_timer():
+    bot.send_message(chat_id=765333440, text="Трассировка филиалов начата")
+    schedule.every().hour.do(traceroute)
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+
+def tracer():
     kk = ["1", "2", "3", "4", "5"]
-    bot.send_message(chat_id=message.chat.id, text="Трассировка филиалов начата")
+    # bot.send_message(chat_id=message.chat.id, text="Трассировка филиалов начата")
     for kod, value in dat.items():
         st_print = 0
         all_text = "Код: %s\nФилиал: %s\nLoopback: %s\n" % (kod, value["name"], value["loopback"])
@@ -1544,12 +1553,13 @@ def tracer(message):
                                     st_print = 1
             if st_print == 1:
                 print(text)
-                bot.send_message(chat_id=message.chat.id, text=all_text)
+                bot.send_message(chat_id=765333440, text=all_text)
         except:
             pass
         print(text)
-    bot.send_message(chat_id=message.chat.id, text="Трассировка филиалов заверешена")
+    # bot.send_message(chat_id=765333440, text="Трассировка филиалов заверешена")
 
+thread_check()
 
 
 @bot.message_handler(commands=['start'])
@@ -1613,8 +1623,8 @@ def send_text(message):
             search_kod(message)
         elif message.text == "Найти по названию":
             search_name(message)
-        elif message.text == "Трасерт":
-            traceroute(message)
+        # elif message.text == "Трасерт":
+        #     traceroute(message)
         elif users[str(message.chat.id)]["search_name"] == 1:
             search_name(message)
         elif users[str(message.chat.id)]["kod"] != "null":
