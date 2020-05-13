@@ -224,12 +224,12 @@ def check():
                 #     text += "🔴 🔴 не доступен"
                 # if stat[kod]["status_t1"] == 1 and stat[kod]["status_t2"] == 1:
                 #     text += "🔵 🔵 доступен"
-                # if text != "Филиал %s\n" % kod:
+                if text != "Филиал %s\n" % kod:
                 #      pass
                 # else:
                 #      for k in subscrib[kod]:
                 #
-                    # bot.send_message(chat_id=765333440, text="%s\n  %s" %(dat[kod]["name"], text))
+                     bot.send_message(chat_id=765333440, text="%s\n  %s" %(dat[kod]["name"], text))
 
             except Exception as n:
                 print(n)
