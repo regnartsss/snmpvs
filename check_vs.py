@@ -178,7 +178,7 @@ def check():
 
                     # 🔵 🔴 Норильск ТЦ Океан на Лауреатах gre_tele2_dv_rou2 туннель не работает
 
-
+                #Основной туннель работает
                 if Intunnel1 > 0 or Outtunnel1 > 0:
                      status = 1
 
@@ -190,6 +190,7 @@ def check():
                             text +="🔵 🔵 Филиал работает\n"
                          elif stat[kod]["status_t1"] == 1 and stat[kod]["status_t2"] == 0:
                             text +="🔵 🔴 Резервный провайдер не работает\n"
+                #Резервный туннель не работает
 
                 if Intunnel2 > 0 or Outtunnel2 > 0:
                     status = 1
@@ -209,6 +210,7 @@ def check():
                     else:
                         text += "🔴 🔴 Филиал не работает_2\n"
                         stat[kod]["status_t1"] = 0
+
                 if Intunnel2 == 0 and Outtunnel2 == 0:
                     status = 0
                     if stat[kod]["status_t2"] == status:
@@ -217,16 +219,17 @@ def check():
                         text += "🔴 🔴 Филиал не работает_2\n"
                         stat[kod]["status_t2"] = 0
 
+                # if
                 # if stat[kod]["status_t1"] == 0 and stat[kod]["status_t2"] == 0:
                 #     text += "🔴 🔴 не доступен"
                 # if stat[kod]["status_t1"] == 1 and stat[kod]["status_t2"] == 1:
                 #     text += "🔵 🔵 доступен"
-                if text != "Филиал %s\n" % kod:
+                # if text != "Филиал %s\n" % kod:
                 #      pass
                 # else:
                 #      for k in subscrib[kod]:
                 #
-                    bot.send_message(chat_id=765333440, text="%s\n  %s" %(dat[kod]["name"], text))
+                    # bot.send_message(chat_id=765333440, text="%s\n  %s" %(dat[kod]["name"], text))
 
             except Exception as n:
                 print(n)
