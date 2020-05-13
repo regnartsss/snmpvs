@@ -157,7 +157,9 @@ def check():
         open_all()
 #        time.sleep(30)
         for kod, v in dat.items():
+            print(kod)
             snmp(kod)
+            time.sleep(15)
             try:
 
                 #"No SNMP response received before timeout"
@@ -165,6 +167,27 @@ def check():
                 Intunnel2 = int(stat[kod]["1"]["ifInOctets_isp2_tunnel"]) - int(stat[kod]["0"]["ifInOctets_isp2_tunnel"])
                 Outtunnel1 = int(stat[kod]["1"]["ifOutOctets_isp1_tunnel"]) - int(stat[kod]["0"]["ifOutOctets_isp1_tunnel"])
                 Outtunnel2 = int(stat[kod]["1"]["ifOutOctets_isp2_tunnel"]) - int(stat[kod]["0"]["ifOutOctets_isp2_tunnel"])
+                print(Intunnel1)
+                print(Outtunnel1)
+                print(Intunnel2)
+                print(Outtunnel2)
+
+                if Intunnel1 > 0 or Outtunnel1 >0:
+                    status1 = 1
+                elif  Intunnel1 == 0 or Outtunnel1 ==0:
+                    status1 = 0
+                else:
+                    print("Ошибка 1")
+
+                if Intunnel2 > 0 or Outtunnel2 >0:
+                    status2 = 1
+                elif Intunnel2 == 0 or Outtunnel2 ==0:
+                    status2 = 0
+                else:
+                    print("Ошибка 2")
+                print("%s" % status1)
+                print("%s" % status2)
+
 
                 t = "%s\n%s\n" % (dat[kod]["name"], dat[kod]["sysName"])
                 text = "Филиал %s\n" % kod
@@ -175,68 +198,67 @@ def check():
                     stat[kod]["status_t1"] = 3
                     stat[kod]["status_t2"] = 3
 
-
-                    # 🔵 🔴 Норильск ТЦ Океан на Лауреатах gre_tele2_dv_rou2 туннель не работает
-
-                #Основной туннель работает
-                if Intunnel1 > 0 or Outtunnel1 > 0:
-                     status = 1
-
-                     if stat[kod]["status_t1"] == status:
-                         pass
-                     else:
-                         stat[kod]["status_t1"] = 1
-                         if stat[kod]["status_t1"] == 1 and stat[kod]["status_t2"] == 1:
-                            text +="🔵 🔵 Филиал работает\n"
-                         elif stat[kod]["status_t1"] == 1 and stat[kod]["status_t2"] == 0:
-                            text +="🔵 🔴 Резервный провайдер не работает\n"
-                #Резервный туннель не работает
-
-                if Intunnel2 > 0 or Outtunnel2 > 0:
-                    status = 1
-                    if stat[kod]["status_t2"] == status:
-                       pass
+                if status1 == 0 and status2 == 0:
+                    if stat[kod]["status_t1"] == status1 and stat[kod]["status_t2"] == status2:
+                        continue
                     else:
-                        stat[kod]["status_t2"] = 1
-                        if stat[kod]["status_t1"] == 1 and stat[kod]["status_t2"] == 1:
-                           text += "🔵 🔵 Филиал работает\n"
-                        elif stat[kod]["status_t1"] == 0 and stat[kod]["status_t2"] == 1:
-                            text += "🔴 🔵 Основной провайдер не работает\n"
-
-                if Intunnel1 == 0 and Outtunnel1 == 0:
-                    status = 0
-                    if stat[kod]["status_t1"] == status:
-                        pass
-                    else:
-                        text += "🔴 🔴 Филиал не работает_2\n"
+                        text += "🔴 🔴 Филиал не доступен"
+                        print("Филиал не доступен")
                         stat[kod]["status_t1"] = 0
-
-                if Intunnel2 == 0 and Outtunnel2 == 0:
-                    status = 0
-                    if stat[kod]["status_t2"] == status:
-                        pass
-                    else:
-                        text += "🔴 🔴 Филиал не работает_2\n"
                         stat[kod]["status_t2"] = 0
+                        send_mess(kod, text)
+                elif status1 == 1 and status2 == 0:
+                    if stat[kod]["status_t1"] == status1 and stat[kod]["status_t2"] == status2:
+                        continue
+                    else:
+                        text += "🔵 🔴 Резервный провайдер не работает\n"
+                        text += dat[kod]["ISP2_NAME"]
+                        print("Резервный не работает")
+                        stat[kod]["status_t1"] = 1
+                        stat[kod]["status_t2"] = 0
+                        send_mess(kod, text)
 
-                # if
-                # if stat[kod]["status_t1"] == 0 and stat[kod]["status_t2"] == 0:
-                #     text += "🔴 🔴 не доступен"
-                # if stat[kod]["status_t1"] == 1 and stat[kod]["status_t2"] == 1:
-                #     text += "🔵 🔵 доступен"
-                if text != "Филиал %s\n" % kod:
-                #      pass
-                # else:
-                #      for k in subscrib[kod]:
-                #
-                     bot.send_message(chat_id=765333440, text="%s\n  %s" %(dat[kod]["name"], text))
+
+                elif status1 == 0 and status2 == 1:
+                    if stat[kod]["status_t1"] == status1 and stat[kod]["status_t2"] == status2:
+                        continue
+                    else:
+                        text += "🔴 🔵 Основной провайдер не работает\n"
+                        text += dat[kod]["ISP1_NAME"]
+                        print("Основной не работает")
+                        stat[kod]["status_t1"] = 0
+                        stat[kod]["status_t2"] = 1
+                        send_mess(kod, text)
+
+
+                elif status1 == 1 and status2 == 1:
+                    if stat[kod]["status_t1"] == status1 and stat[kod]["status_t2"] == status2:
+                        continue
+                    else:
+                        text += "🔵 🔵 Филиал работает"
+                        print("Филиал работает")
+                        stat[kod]["status_t1"] = 1
+                        stat[kod]["status_t2"] = 1
+                        send_mess(kod, text)
+                else:
+                    pprint("тест")
+
+                # if text != "Филиал %s\n" % kod:
+                #     #      pass
+                #     # else:
+                #     #      for k in subscrib[kod]:
+                #     #
+                #     bot.send_message(chat_id=765333440, text="%s\n  %s" % (dat[kod]["name"], text))
 
             except Exception as n:
                 print(n)
-                print("Ошибка филиала %s"%kod)
+                print("Ошибка филиала %s" % kod)
                 pass
         save_stat()
         monitoring()
+def send_mess(kod, text):
+    for k in subscrib[kod]:
+        bot.send_message(chat_id=k, text="%s\n  %s" % (dat[kod]["name"], text))
 
 def data_monitor():
     return datetime.today().strftime("%H:%M:%S %d/%m/%Y")
