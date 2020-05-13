@@ -174,34 +174,47 @@ def check():
                 except:
                     stat[kod]["status_t1"] = 3
                     stat[kod]["status_t2"] = 3
+
+
+                    # 🔵 🔴 Норильск ТЦ Океан на Лауреатах gre_tele2_dv_rou2 туннель не работает
+
+
                 if Intunnel1 > 0 or Outtunnel1 > 0:
                      status = 1
 
-                     if stat[kod]["status_t1"] ==  status:
+                     if stat[kod]["status_t1"] == status:
                          pass
                      else:
-                         text +="🔵 Основной провайдер работает\n"
                          stat[kod]["status_t1"] = 1
+                         if stat[kod]["status_t1"] == 1 and stat[kod]["status_t2"] == 1:
+                            text +="🔵 🔵 Филиал работает\n"
+                         elif stat[kod]["status_t1"] == 1 and stat[kod]["status_t2"] == 0:
+                            text +="🔵 🔴 Резервный провайдер не работает\n"
+
                 if Intunnel2 > 0 or Outtunnel2 > 0:
                     status = 1
                     if stat[kod]["status_t2"] == status:
                        pass
                     else:
-                       text += "🔵 Резервный провайдер работает\n"
-                       stat[kod]["status_t2"] = 1
+                        stat[kod]["status_t2"] = 1
+                        if stat[kod]["status_t1"] == 1 and stat[kod]["status_t2"] == 1:
+                           text += "🔵 🔵 Филиал работает\n"
+                        elif stat[kod]["status_t1"] == 0 and stat[kod]["status_t2"] == 1:
+                            text += "🔴 🔵 Основной провайдер не работает\n"
+
                 if Intunnel1 == 0 and Outtunnel1 == 0:
                     status = 0
                     if stat[kod]["status_t1"] == status:
                         pass
                     else:
-                        text += "🔴 🔵 Основной провайдер не работает\n"
+                        text += "🔴 🔴 Филиал не работает_2\n"
                         stat[kod]["status_t1"] = 0
                 if Intunnel2 == 0 and Outtunnel2 == 0:
                     status = 0
                     if stat[kod]["status_t2"] == status:
                         pass
                     else:
-                        text += "🔵 🔴 Резервный провайдер не работает\n"
+                        text += "🔴 🔴 Филиал не работает_2\n"
                         stat[kod]["status_t2"] = 0
 
                 # if stat[kod]["status_t1"] == 0 and stat[kod]["status_t2"] == 0:
@@ -213,7 +226,7 @@ def check():
                 # else:
                 #      for k in subscrib[kod]:
                 #
-                #          bot.send_message(chat_id=k, text="%s\n  %s" %(dat[kod]["name"], text))
+                bot.send_message(chat_id=765333440, text="%s\n  %s" %(dat[kod]["name"], text))
 
             except Exception as n:
                 print(n)
