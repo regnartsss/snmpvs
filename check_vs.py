@@ -159,7 +159,7 @@ def check():
         for kod, v in dat.items():
             print(kod)
             snmp(kod)
-            time.sleep(15)
+
             try:
 
                 #"No SNMP response received before timeout"
@@ -167,10 +167,10 @@ def check():
                 Intunnel2 = int(stat[kod]["1"]["ifInOctets_isp2_tunnel"]) - int(stat[kod]["0"]["ifInOctets_isp2_tunnel"])
                 Outtunnel1 = int(stat[kod]["1"]["ifOutOctets_isp1_tunnel"]) - int(stat[kod]["0"]["ifOutOctets_isp1_tunnel"])
                 Outtunnel2 = int(stat[kod]["1"]["ifOutOctets_isp2_tunnel"]) - int(stat[kod]["0"]["ifOutOctets_isp2_tunnel"])
-                print(Intunnel1)
-                print(Outtunnel1)
-                print(Intunnel2)
-                print(Outtunnel2)
+                # print(Intunnel1)
+                # print(Outtunnel1)
+                # print(Intunnel2)
+                # print(Outtunnel2)
 
                 if Intunnel1 > 0 or Outtunnel1 >0:
                     status1 = 1
@@ -185,8 +185,8 @@ def check():
                     status2 = 0
                 else:
                     print("Ошибка 2")
-                print("%s" % status1)
-                print("%s" % status2)
+                # print("%s" % status1)
+                # print("%s" % status2)
 
 
                 t = "%s\n%s\n" % (dat[kod]["name"], dat[kod]["sysName"])
