@@ -157,7 +157,9 @@ def check():
         open_all()
 #        time.sleep(30)
         for kod, v in dat.items():
-            print(kod)
+            print(dat[kod]["name"])
+            print(stat[kod]["1"]["ifInOctets_isp2_tunnel"])
+            print(stat[kod]["1"]["ifOutOctets_isp2_tunnel"])
             snmp(kod)
 
             try:
@@ -167,6 +169,7 @@ def check():
                 Intunnel2 = int(stat[kod]["1"]["ifInOctets_isp2_tunnel"]) - int(stat[kod]["0"]["ifInOctets_isp2_tunnel"])
                 Outtunnel1 = int(stat[kod]["1"]["ifOutOctets_isp1_tunnel"]) - int(stat[kod]["0"]["ifOutOctets_isp1_tunnel"])
                 Outtunnel2 = int(stat[kod]["1"]["ifOutOctets_isp2_tunnel"]) - int(stat[kod]["0"]["ifOutOctets_isp2_tunnel"])
+
                 # print(Intunnel1)
                 # print(Outtunnel1)
                 # print(Intunnel2)
