@@ -157,9 +157,10 @@ def check():
         open_all()
 #        time.sleep(30)
         for kod, v in dat.items():
-            print(dat[kod]["name"])
-            print(stat[kod]["1"]["ifInOctets_isp2_tunnel"])
-            print(stat[kod]["1"]["ifOutOctets_isp2_tunnel"])
+            if kod == "2752":
+                print(dat[kod]["name"])
+                print(stat[kod]["1"]["ifInOctets_isp2_tunnel"])
+                print(stat[kod]["1"]["ifOutOctets_isp2_tunnel"])
             snmp(kod)
 
             try:
