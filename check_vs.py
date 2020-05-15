@@ -204,7 +204,6 @@ def check():
                     else:
                         text += "🔴 🔴 Филиал не доступен \nLoopback: %s\nISP_1: %s\nISP_2: %s" % \
                                 (dat[kod]["loopback"], dat[kod]["ISP1"], dat[kod]["ISP2"])
-
                         print("Филиал не доступен")
                         stat[kod]["status_t1"] = 0
                         stat[kod]["status_t2"] = 0
@@ -226,7 +225,6 @@ def check():
                         continue
                     else:
                         text += "🔴 🔵 Основной провайдер не работает\n%s\nISP_2: %s"%(dat[kod]["ISP1_NAME"],dat[kod]["ISP1"])
-                        text += dat[kod]["ISP1_NAME"]
                         print("Основной не работает")
                         stat[kod]["status_t1"] = 0
                         stat[kod]["status_t2"] = 1
