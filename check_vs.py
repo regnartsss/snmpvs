@@ -157,10 +157,6 @@ def check():
         open_all()
 #        time.sleep(30)
         for kod, v in dat.items():
-            if kod == "2752":
-                print(dat[kod]["name"])
-                print(stat[kod]["1"]["ifInOctets_isp2_tunnel"])
-                print(stat[kod]["1"]["ifOutOctets_isp2_tunnel"])
             snmp(kod)
 
             try:
@@ -206,7 +202,9 @@ def check():
                     if stat[kod]["status_t1"] == status1 and stat[kod]["status_t2"] == status2:
                         continue
                     else:
-                        text += "🔴 🔴 Филиал не доступен"
+                        text += "🔴 🔴 Филиал не доступен \nLoopback: %s\nISP_1: %s\nISP_2: %s" % \
+                                (dat[kod]["loopback"], dat[kod]["ISP1"], dat[kod]["ISP2"])
+
                         print("Филиал не доступен")
                         stat[kod]["status_t1"] = 0
                         stat[kod]["status_t2"] = 0
@@ -215,8 +213,8 @@ def check():
                     if stat[kod]["status_t1"] == status1 and stat[kod]["status_t2"] == status2:
                         continue
                     else:
-                        text += "🔵 🔴 Резервный провайдер не работает\n"
-                        text += dat[kod]["ISP2_NAME"]
+                        text += "🔵 🔴 Резервный провайдер не работает\n%s\nISP_2: %s"%(dat[kod]["ISP2_NAME"],dat[kod]["ISP2"])
+
                         print("Резервный не работает")
                         stat[kod]["status_t1"] = 1
                         stat[kod]["status_t2"] = 0
@@ -227,7 +225,7 @@ def check():
                     if stat[kod]["status_t1"] == status1 and stat[kod]["status_t2"] == status2:
                         continue
                     else:
-                        text += "🔴 🔵 Основной провайдер не работает\n"
+                        text += "🔴 🔵 Основной провайдер не работает\n%s\nISP_2: %s"%(dat[kod]["ISP1_NAME"],dat[kod]["ISP1"])
                         text += dat[kod]["ISP1_NAME"]
                         print("Основной не работает")
                         stat[kod]["status_t1"] = 0
