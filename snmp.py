@@ -823,7 +823,7 @@ def info_market(call):
 
 def info_filial(kod, st="all"):
     text = "%s\nКод филиала %s\nРегион %s\nhostname %s\nloopback %s\n" \
-           "IP_LAN: %s\nIP_Kiosk: %s\nIP_CAM: %s\nIP_SC: %s\nISP1_NAME: %s\nISP1: %s\ngateway_isp1: %s\nISP2_NAME: %s\nISP2: %s\ngateway_isp2: %s\nserila: %s\n" % \
+           "IP_LAN: %s\nIP_Kiosk: %s\nIP_CAM: %s\nIP_SC: %s\nISP1_NAME: %s\nISP1: %s\ngateway_isp1: %s\nISP2_NAME: %s\nISP2: %s\ngateway_isp2: %s\nserial: %s\n" % \
            (dat[kod]["name"],
             dat[kod]["kod"],
             data.region[int(dat[kod]["region"])],
