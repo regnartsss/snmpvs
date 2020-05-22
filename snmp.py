@@ -1516,7 +1516,7 @@ def search_serial_all():
 
     save_d()
 
-# thread_check()
+thread_check()
 
 
 @bot.message_handler(commands=['start'])
