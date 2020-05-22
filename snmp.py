@@ -14,6 +14,7 @@ import paramiko
 import time
 import russian_kod
 import threading
+import sshlist
 from check_vs import check
 from ldap3 import Server, Connection, SUBTREE, ALL_ATTRIBUTES
 
@@ -121,6 +122,7 @@ class Snmp():
         self.ssh_gateway()
         print("hostname cisco registrator")
         self.snmp_ipNetToMediaNEtAddress()
+        dat[self.kod]["serial"] = sshlist.ssh_serial(self.loopback)
         save_d()
 
         try:
@@ -453,63 +455,6 @@ class Snmp():
                     if line.split()[0] == "Description:":
                         print(line.split()[1])
                         dat[self.kod]["ISP2_NAME"] = line.split()[1]
-
-
-#                print(line.split())
-# ssh_ip_int()
-
-
-#
-# def ssh_gateway():
-#     print("test")
-#     loopback = "10.96.25.1"
-#     command = "show ip route"
-#     user = 'operator'
-#     secret = '71LtkJnrYjn'
-#     port = 22
-#     #
-#     client = paramiko.SSHClient()
-#     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-#     client.connect(hostname=loopback, username=user, password=secret, port=port)
-#     stdin, stdout, stderr = client.exec_command(command)
-#     # #    print(stderr.read())
-#     #
-#     print("test_2")
-#     f = stdout.read()
-#     client.close()
-#     print("test_3")
-#     open(PATH + 'g.txt', 'wb').write(f)
-#     time.sleep(5)
-#     isp_1, isp_2 = "0.0.0.0", "0.0.0.0"
-#     with open(PATH + 'g.txt') as f:
-#         lines = f.readlines()
-#         for line in lines:
-#             if line.split() == []:
-#                 pass
-#             else:
-#                 print(line.split())
-#                 if line.split()[0] == 'S*':
-#                     isp_1 = line.split()[4]
-#                 elif line.split()[0] == '[1/0]':
-#                     isp_2 = line.split()[2]
-#
-#     print(isp_1)
-#     print(isp_2)
-# #                elif line.split()[3] == '[1/0]':
-# #                    print(line.split())
-#
-#             # if line.split() == []:
-#             #     pass
-#             # else:
-#             #     #                    print(line.split())
-#             #     if line.split()[0].split(".")[0] == "10":
-#             #         text += leas_print(line.split())
-#             #     #                        print(line.split())
-#             #     else:
-#             #         pass
-#             # pass
-#
-# #ssh_gateway()
 
 
 def GetTime(s):
@@ -1327,6 +1272,27 @@ def search_kod(message):
         bot.send_message(message.chat.id, text)
         users[str(message.chat.id)]["search_kod"] = 0
 
+def search_serial(message):
+
+    if message.text == "Нет" or message.text == "нет":
+        users[str(message.chat.id)]["search_serial"] = 0
+        bot.send_message(message.chat.id, "Отмена")
+    elif message.text == "Найти serial":
+        users[str(message.chat.id)]["search_serial"] = 1
+        #        bot.send_message(message.chat.id, "Ожидайте, идет опрос устройства")
+        bot.send_message(message.chat.id, "Введите серийный номер или наберите Нет для отмены")
+    elif users[str(message.chat.id)]["search_serial"] == 1:
+        print("sea_err")
+        for k, v in dat.items():
+            # print("kod %s" % k)
+            # print(message.text)
+            print(v["serial"])
+            if v["serial"] == message.text:
+
+                text = "Филиал %s\n" % \
+                       (v["name"])
+        bot.send_message(message.chat.id, text)
+        users[str(message.chat.id)]["search_serial"] = 0
 
 def thread_search_kod(message):
     th = threading.Thread(target=search_kod, args=(message,))
@@ -1354,24 +1320,6 @@ def search_name(message):
             elif value["name"].lower().find(message.text.lower()) >= 0:
                 print(value["name"])
                 text += "%s %s\n" % (kod, value["name"])
-
-        #            if value["name"].find(message.text):
-
-        #            if kod == message.text:
-        #                print("поиск завершен")
-        #                 for k, v in dat.items():
-        #                     print("kod %s" % k)
-        #                     print(message.text)
-        #                     if k == message.text:
-        #                         print("rrrr")
-        #                         text = info_filial(kod)
-        #                         break
-        #                     else:
-        #                         text = "Филиал %s\n Город %s\n Регион %s" % \
-        #                                (russian_kod.full_filial[kod]["name"],
-        #                                 russian_kod.full_filial[kod]["city"],
-        #                                 russian_kod.full_filial[kod]["region"])
-        #
         bot.send_message(message.chat.id, text)
         users[str(message.chat.id)]["search_name"] = 0
 
@@ -1558,7 +1506,17 @@ def tracer():
         print(text)
     # bot.send_message(chat_id=765333440, text="Трассировка филиалов заверешена")
 
-thread_check()
+def search_serial_all():
+    # print("start")
+    for key, value in dat.items():
+        # print(value["loopback"])
+        # sshlist.ssh_serial("10.255.64.2")
+        # print(sshlist.ssh_serial("10.255.64.2"))
+        dat[key]["serial"] = sshlist.ssh_serial(value["loopback"])
+
+    save_d()
+
+# thread_check()
 
 
 @bot.message_handler(commands=['start'])
@@ -1615,6 +1573,7 @@ def send_text(message):
             thread_ldap_move(message)
         # elif message.text == "Провайдеры":
         #     ssh_sh_int()
+
         elif message.text == "Найти по коду":
             users[str(message.chat.id)]["kod"] = "null"
             search_kod(message)
@@ -1622,8 +1581,14 @@ def send_text(message):
             search_kod(message)
         elif message.text == "Найти по названию":
             search_name(message)
-        elif message.text == "Трасерт":
-            traceroute(message)
+
+        elif message.text == "Серийник":
+            search_serial_all()
+
+        elif users[str(message.chat.id)]["search_serial"] == 1:
+            search_serial(message)
+        elif message.text == "Найти serial":
+            search_serial(message)
         elif users[str(message.chat.id)]["search_name"] == 1:
             search_name(message)
         elif users[str(message.chat.id)]["kod"] != "null":
@@ -1635,6 +1600,7 @@ def send_text(message):
     except:
         users[str(message.chat.id)]["search_kod"] = 0
         users[str(message.chat.id)]["search_name"] = 0
+        users[str(message.chat.id)]["search_serial"] = 0
         users[str(message.chat.id)]["kod"] = "null"
         users[str(message.chat.id)]["ssh"] = 0
 
@@ -1676,4 +1642,5 @@ def callback_inline(call):
             pass
 
 
-bot.infinity_polling(True)
+# bot.infinity_polling(True)
+bot.polling()
