@@ -823,7 +823,7 @@ def info_market(call):
 
 def info_filial(kod, st="all"):
     text = "%s\nКод филиала %s\nРегион %s\nhostname %s\nloopback %s\n" \
-           "IP_LAN: %s\nIP_Kiosk: %s\nIP_CAM: %s\nIP_SC: %s\nISP1_NAME: %s\nISP1: %s\ngateway_isp1: %s\nISP2_NAME: %s\nISP2: %s\ngateway_isp2: %s\n" % \
+           "IP_LAN: %s\nIP_Kiosk: %s\nIP_CAM: %s\nIP_SC: %s\nISP1_NAME: %s\nISP1: %s\ngateway_isp1: %s\nISP2_NAME: %s\nISP2: %s\ngateway_isp2: %s\nserila: %s" % \
            (dat[kod]["name"],
             dat[kod]["kod"],
             data.region[int(dat[kod]["region"])],
@@ -838,7 +838,8 @@ def info_filial(kod, st="all"):
             dat[kod]["gateway_isp1"],
             dat[kod]["ISP2_NAME"],
             dat[kod]["ISP2"],
-            dat[kod]["gateway_isp2"])
+            dat[kod]["gateway_isp2"],
+            dat[kod]["serial"])
     print("error_m_2")
     try:
         text += "Cisco:\n"
@@ -1273,7 +1274,6 @@ def search_kod(message):
         users[str(message.chat.id)]["search_kod"] = 0
 
 def search_serial(message):
-
     if message.text == "Нет" or message.text == "нет":
         users[str(message.chat.id)]["search_serial"] = 0
         bot.send_message(message.chat.id, "Отмена")
