@@ -1407,7 +1407,7 @@ def key(message, region):
 
 
 def thread_check():
-    traceroute()
+    # traceroute()
     threading.Thread(target=check).start()
 
 

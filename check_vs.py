@@ -212,7 +212,7 @@ def check():
                     if stat[kod]["status_t1"] == status1 and stat[kod]["status_t2"] == status2:
                         continue
                     else:
-                        text += "🔵 🔴 Резервный провайдер не работает\n%s\nISP_1: %s"%(dat[kod]["ISP2_NAME"],dat[kod]["ISP2"])
+                        text += "🔵 🔴 Резервный провайдер не работает\n%s\nISP_2: %s"%(dat[kod]["ISP2_NAME"],dat[kod]["ISP2"])
 
                         print("Резервный не работает")
                         stat[kod]["status_t1"] = 1
@@ -224,7 +224,7 @@ def check():
                     if stat[kod]["status_t1"] == status1 and stat[kod]["status_t2"] == status2:
                         continue
                     else:
-                        text += "🔴 🔵 Основной провайдер не работает\n%s\nISP_2: %s"%(dat[kod]["ISP1_NAME"],dat[kod]["ISP1"])
+                        text += "🔴 🔵 Основной провайдер не работает\n%s\nISP_1: %s"%(dat[kod]["ISP1_NAME"],dat[kod]["ISP1"])
                         print("Основной не работает")
                         stat[kod]["status_t1"] = 0
                         stat[kod]["status_t2"] = 1
