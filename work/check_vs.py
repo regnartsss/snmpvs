@@ -37,7 +37,7 @@ async def thread_check():
     # await start_snmp()
 async def start_snmp():
     print("stop")
-    await bot.send_message(chat_id=765333440, text="dddddd")
+    # await bot.send_message(chat_id=765333440, text="dddddd")
     i = 0
     while i < 2:
         rows = await sql.sql_select("SELECT loopback, kod FROM filial")
@@ -50,7 +50,7 @@ async def start_snmp():
 async def oid(loopback, kod):
     oid = "1.3.6.1.2.1.31.1.1.1.1"
     i = 0
-    print(loopback)
+    # print(loopback)
     In_isp1, Out_isp1, In_isp2, Out_isp2 = "0", "0", "0", "0"
     await sql.sql_insert(f"INSERT INTO status (loopback, kod) VALUES ('{loopback}', {kod})")
     while i < 35:

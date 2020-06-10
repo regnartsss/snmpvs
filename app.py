@@ -1,6 +1,5 @@
 from aiogram import executor
 from loader import dp, bot
-from loader_telebot import bot_two
 from work.check_vs import thread_check
 from asgiref.sync import sync_to_async
 import asyncio
