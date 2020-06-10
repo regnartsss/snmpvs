@@ -123,6 +123,7 @@ async def snmp(loopback):
             d.append(r[1])
             d.append(r[2])
             d.append(r[3])
+            break
 
         #            for k in subscrib[kod]:
         #                bot.send_message(chat_id=k, text="%s\n  %s" % (dat[kod]["name"], text))
