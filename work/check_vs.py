@@ -137,6 +137,7 @@ async def snmp(loopback):
 
     await sql.sql_insert(request)
     await check(loopback)
+    await monitoring()
 
 
 async def check(loopback):
@@ -262,7 +263,7 @@ def data_monitor():
     return datetime.today().strftime("%H:%M:%S %d/%m/%Y")
 
 
-def monitoring():
+async def monitoring():
     keyboard = InlineKeyboardMarkup()
     i = 1
     # tab = []
@@ -273,7 +274,7 @@ def monitoring():
     text = ""
     colum = [4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60]
     colum_old = [3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 48, 51]
-    rows = sql.sql_select_no_await(f"SELECT kod, status_1, status_2, ISP1, ISP2 FROM filial")
+    rows = await sql.sql_select(f"SELECT kod, status_1, status_2, ISP1, ISP2 FROM filial")
     for row in rows:
         ch1 = "🔵"
         ch2 = "🔵"
@@ -295,5 +296,5 @@ def monitoring():
             tab = []
         i += 1
     keyboard.row(*tab)
-    bot.edit_message_text(chat_id="@sdwan_monitoring", message_id=21,
+    await bot.edit_message_text(chat_id="@sdwan_monitoring", message_id=21,
                           text="<---------------->\n Время проверки %s" % data_monitor(), reply_markup=keyboard)
