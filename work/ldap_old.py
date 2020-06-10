@@ -2,11 +2,10 @@ from ldap3 import Server, Connection, SUBTREE, ALL_ATTRIBUTES
 # server = ldap3.Server('ldap://{}'.format(ip), get_info=ALL)
 # conn = ldap.open("partner.ru")
 # conn.simple_bind_s("podkopaev.k@partner.ru", "z15X3vdy")
-import dns.resolver
-import socket
 import json
 import os
-import data
+from data import data
+
 
 def find_location():
     return os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__))).replace('\\', '/') + '/'

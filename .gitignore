@@ -2,6 +2,6 @@ $ cat .gitignore
 __pycache__/
 venv/
 .idea/
-config.py
+data/config.py
 *.txt
 *.json

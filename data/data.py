@@ -1,3 +1,6 @@
+admin_id = [765333440]
+
+
 mib_all = {"ifInOctets_isp1": "1.3.6.1.2.1.2.2.1.10.1",
            "ifOutOctets_isp1": ".1.3.6.1.2.1.2.2.1.16.1",
            "ifOperStatus_isp1": "1.3.6.1.2.1.2.2.1.8.1",
