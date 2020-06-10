@@ -278,7 +278,7 @@ async def monitoring():
     text = ""
     colum = [4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60]
     colum_old = [3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 48, 51]
-    rows = await sql.sql_select(f"SELECT kod, status_1, status_2, ISP1, ISP2 FROM filial")
+    rows = await sql.sql_select(f"SELECT kod, status_1, status_2, ISP1, ISP2 FROM status")
     for row in rows:
         ch1 = "🔵"
         ch2 = "🔵"
