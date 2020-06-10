@@ -118,10 +118,12 @@ async def snmp(loopback):
             print(errorIndication)
             # "No SNMP response received before timeout"
             print("тут ошибка")
-            await sql.sql_select(
-                f"UPDATE status SET In1_two = In1_one, Out1_two = Out1_one, In2_two = In2_one, Out2_two = Out2_one "
-                f"WHERE loopback = '{loopback}'")
-            continue
+            r = await sql.sql_selectone(f"SELECT In1_one, Out1_one,In2_one, Out2_one WHERE loopback = '{loopback}'")
+            d.append(r[0])
+            d.append(r[1])
+            d.append(r[2])
+            d.append(r[3])
+
         #            for k in subscrib[kod]:
         #                bot.send_message(chat_id=k, text="%s\n  %s" % (dat[kod]["name"], text))
         elif errorStatus:
@@ -132,6 +134,7 @@ async def snmp(loopback):
                 #                print(' = '.join([x.prettyPrint() for x in varBind]))
                 m = (' = '.join([x.prettyPrint() for x in varBind]).split("= ")[1])
                 d.append(m)
+                # print(d)
     request = f"UPDATE status SET In1_one = In1_two, Out1_one = Out1_two, In2_one = In2_two, Out2_one = Out2_two, " \
               f"In1_two = {d[0]}, Out1_two = {d[1]},In2_two = {d[2]}, Out2_two = {d[3]} WHERE loopback = '{loopback}'"
 
