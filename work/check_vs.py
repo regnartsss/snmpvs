@@ -118,7 +118,7 @@ async def snmp(loopback):
             print(errorIndication)
             # "No SNMP response received before timeout"
             print("тут ошибка")
-            r = await sql.sql_selectone(f"SELECT In1_one, Out1_one,In2_one, Out2_one WHERE loopback = '{loopback}'")
+            r = await sql.sql_selectone(f"SELECT In1_one, Out1_one,In2_one, Out2_one FROM status WHERE loopback = '{loopback}'")
             d.append(r[0])
             d.append(r[1])
             d.append(r[2])
