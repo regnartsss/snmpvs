@@ -46,7 +46,7 @@ async def start_snmp():
                 await oid(row[0], row[1])
             else:
                 await snmp(row[0])
-
+        await monitoring()
 async def oid(loopback, kod):
     oid = "1.3.6.1.2.1.31.1.1.1.1"
     i = 0
@@ -121,7 +121,7 @@ async def snmp(loopback):
             await sql.sql_select(
                 f"UPDATE status SET In1_two = In1_one, Out1_two = Out1_one, In2_two = In2_one, Out2_two = Out2_one "
                 f"WHERE loopback = '{loopback}'")
-            break
+            continue
         #            for k in subscrib[kod]:
         #                bot.send_message(chat_id=k, text="%s\n  %s" % (dat[kod]["name"], text))
         elif errorStatus:
@@ -137,7 +137,7 @@ async def snmp(loopback):
 
     await sql.sql_insert(request)
     await check(loopback)
-    await monitoring()
+
 
 
 async def check(loopback):
