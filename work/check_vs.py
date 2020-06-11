@@ -46,7 +46,7 @@ async def start_snmp():
                 await oid(row[0], row[1])
             else:
                 await snmp(row[0])
-        # await monitoring()
+        await monitoring()
 async def oid(loopback, kod):
     oid = "1.3.6.1.2.1.31.1.1.1.1"
     i = 0
