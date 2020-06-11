@@ -310,3 +310,13 @@ async def monitoring():
     keyboard.row(*tab)
     await bot.edit_message_text(chat_id="@sdwan_monitoring", message_id=21,
                           text="<---------------->\n Время проверки %s" % data_monitor(), reply_markup=keyboard)
+
+
+async def call_name(call):
+    kod = call.data.split("_")[1]
+    name = (await sql.sql_selectone(f"SELECT name FROM filial WHERE kod = {kod}"))[0]
+    try:
+        bot.answer_callback_query(callback_query_id=call.id, text=name)
+    except Exception as n:
+        print(n)
+        pass

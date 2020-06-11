@@ -1,4 +1,4 @@
-from loader import dp
+from loader import dp, bot
 from aiogram import types
 # from Map import goto
 # from Build import build
@@ -15,6 +15,7 @@ from aiogram import types
 from work.Keyboard_menu import work
 from work.sub import worksub
 from work.Add_filial import filial_check
+from work.check_vs import call_name
 
 @dp.callback_query_handler(lambda callback_query: True)
 async def handler(call: types.CallbackQuery):
@@ -38,8 +39,9 @@ async def handler(call: types.CallbackQuery):
         await call.message.edit_text("Выберите регион", reply_markup=await worksub(message=call.message, call=call))
 
     elif call.data.split("_")[0] == "check":
-
         await call.message.answer(await filial_check(call))
+    elif call.data.split("_")[0] == "sub":
+        await call_name(call)
 
     # if (await sql.sql_selectone("select start_bot from data"))[0] == 1:
     #     print("Бот остановлен")
