@@ -14,7 +14,7 @@ from aiogram import types
 # async def handler(call: types.CallbackQuery):
 from work.Keyboard_menu import work
 from work.sub import worksub
-
+from work.Add_filial import filial_check
 
 @dp.callback_query_handler(lambda callback_query: True)
 async def handler(call: types.CallbackQuery):
@@ -27,7 +27,6 @@ async def handler(call: types.CallbackQuery):
     elif call.data.split("_")[0] == "menu":
         await call.message.edit_text("Выберите регион", reply_markup=await work(message=call.message, call=call))
 
-
     elif call.data.split("_")[0] == "regionsub":
         await worksub(message=call.message, call=call)
         # await call.message.edit_text("Выберите филиал", reply_markup=await worksub(message=call.message, call=call))
@@ -35,11 +34,12 @@ async def handler(call: types.CallbackQuery):
     elif call.data.split("_")[0] == "filialsub":
         await worksub(message=call.message, call=call)
 
-
     elif call.data.split("_")[0] == "menusub":
         await call.message.edit_text("Выберите регион", reply_markup=await worksub(message=call.message, call=call))
 
+    elif call.data.split("_")[0] == "check":
 
+        await call.message.answer(await filial_check(call))
 
     # if (await sql.sql_selectone("select start_bot from data"))[0] == 1:
     #     print("Бот остановлен")

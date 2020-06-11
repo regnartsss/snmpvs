@@ -17,6 +17,9 @@ async def work(message, call=""):
         return keyboard
     elif call.data.split("_")[0] == "filial":
         text = await info_filial(call.data.split("_")[1])
+
+        keyboard.row(
+            InlineKeyboardButton(text="Обновить информацию", callback_data=f"check_{call.data.split('_')[1]}"))
         keyboard.row(
             InlineKeyboardButton(text="Назад", callback_data=f"region_{call.data.split('_')[2]}"))
         return text, keyboard

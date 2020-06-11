@@ -545,6 +545,25 @@ class Add_snmp():
 
 
 
+async def filial_check(call):
+    data ={}
+    kod = call.data.split("_")[1]
+    request = f"SELECT loopback, name, region FROM filial WHERE kod = {kod}"
+    # print(request)
+    row = await sql.sql_selectone(request)
+    data['loopback'] = row[0]
+    data['name'] = row[1]
+    data['region'] = (await sql.sql_selectone(f"SELECT name FROM region WHERE id = {row[2]}"))[0]
+    await sql.sql_insert(f'DELETE FROM cisco WHERE kod = {kod}')
+    await sql.sql_insert(f'DELETE FROM registrator WHERE kod = {kod}')
+    await sql.sql_insert(f'DELETE FROM status WHERE kod = {kod}')
+    await sql.sql_insert(f'DELETE FROM filial WHERE kod = {kod}')
+    await call.message.answer(f"Идет обновление филиала\n"
+                         f"Loopback: {data['loopback']}\n"
+                         f"Филиал: {data['name']}\n"
+                         f"Регион: {data['region']}")
+    status = await Add_snmp(message=call.message, data=data).snmp_sysName()
+    return status
 
 
 

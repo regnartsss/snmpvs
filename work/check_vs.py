@@ -46,7 +46,7 @@ async def start_snmp():
                 await oid(row[0], row[1])
             else:
                 await snmp(row[0])
-        await monitoring()
+        # await monitoring()
 async def oid(loopback, kod):
     oid = "1.3.6.1.2.1.31.1.1.1.1"
     i = 0
@@ -146,13 +146,19 @@ async def snmp(loopback):
 
 async def check(loopback):
     await asyncio.sleep(1)
-    st = await sql.sql_selectone(
-        f"SELECT In1_two, In2_two, Out1_two, Out2_two, In1_one,  In2_one, Out1_one, Out2_one "
-        f"FROM status WHERE loopback = '{loopback}'")
+    print(loopback)
+    request = f"""SELECT In1_two, In2_two, Out1_two, Out2_two, In1_one,  In2_one, Out1_one, Out2_one
+                FROM status WHERE loopback = '{loopback}'"""
+    print(loopback)
+    st = await sql.sql_selectone(request)
     Intunnel1 = st[0] - st[4]
     Intunnel2 = st[1] - st[5]
     Outtunnel1 = st[2] - st[6]
     Outtunnel2 = st[3] - st[7]
+    print(Intunnel1)
+    print(Outtunnel1)
+    print(Intunnel2)
+    print(Outtunnel2)
     status1, status2 = 3, 3
     if Intunnel1 > 0 or Outtunnel1 > 0:
         # sql.sql_insert_no_await(f"UPDATE status SET status1 = 1 WHERE loopback = '{loopback}'")
@@ -279,7 +285,7 @@ async def monitoring():
     colum = [4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60]
     colum_old = [3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 48, 51]
     request = f"SELECT filial.kod, status_1, status_2, ISP1, ISP2 FROM status INNER JOIN filial ON status.kod = filial.kod"
-    print(request)
+    # print(request)
     rows = await sql.sql_select(request)
     for row in rows:
         ch1 = "🔵"
