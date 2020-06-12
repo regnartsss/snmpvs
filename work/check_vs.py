@@ -9,17 +9,17 @@ import asyncio
 import time
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-mib = {  # "ifInOctets_isp1": "1.3.6.1.2.1.31.1.1.1.6.1",
-    #   "ifOutOctets_isp1": "1.3.6.1.2.1.31.1.1.1.10.1",
-    #   "ifInOctets_isp2": "1.3.6.1.2.1.31.1.1.1.6.2",
-    #   "ifOutOctets_isp2": "1.3.6.1.2.1.31.1.1.1.10.2",
-
-    "ifInOctets_isp1_tunnel": "1.3.6.1.2.1.31.1.1.1.6.%s",
-    "ifOutOctets_isp1_tunnel": "1.3.6.1.2.1.31.1.1.1.10.%s",
-    "ifInOctets_isp2_tunnel": "1.3.6.1.2.1.31.1.1.1.6",
-    "ifOutOctets_isp2_tunnel": "1.3.6.1.2.1.31.1.1.1.10"
-}
-import threading
+# mib = {  # "ifInOctets_isp1": "1.3.6.1.2.1.31.1.1.1.6.1",
+#     #   "ifOutOctets_isp1": "1.3.6.1.2.1.31.1.1.1.10.1",
+#     #   "ifInOctets_isp2": "1.3.6.1.2.1.31.1.1.1.6.2",
+#     #   "ifOutOctets_isp2": "1.3.6.1.2.1.31.1.1.1.10.2",
+#
+#     "ifInOctets_isp1_tunnel": "1.3.6.1.2.1.31.1.1.1.6.%s",
+#     "ifOutOctets_isp1_tunnel": "1.3.6.1.2.1.31.1.1.1.10.%s",
+#     "ifInOctets_isp2_tunnel": "1.3.6.1.2.1.31.1.1.1.6",
+#     "ifOutOctets_isp2_tunnel": "1.3.6.1.2.1.31.1.1.1.10"
+# }
+# import threading
 
 
 
@@ -58,9 +58,7 @@ async def oid(loopback, kod):
         i += 1
         errorIndication, errorStatus, errorIndex, varBinds = next(
             getCmd(SnmpEngine(),
-                   UsmUserData(userName='dvsnmp', authKey='55GjnJwtPfk',
-
-                               authProtocol=usmHMACSHAAuthProtocol
+                   UsmUserData(userName='dvsnmp', authKey='55GjnJwtPfk',                         authProtocol=usmHMACSHAAuthProtocol
                                ),
                    UdpTransportTarget((str(loopback), 161)),
                    ContextData(),
@@ -118,7 +116,7 @@ async def snmp(loopback):
             print(errorIndication)
             # "No SNMP response received before timeout"
             print("тут ошибка")
-            r = await sql.sql_selectone(f"SELECT In1_one, Out1_one,In2_one, Out2_one FROM status WHERE loopback = '{loopback}'")
+            r = await sql.sql_selectone(f"SELECT In1_two, Out1_two,In2_two, Out2=two FROM status WHERE loopback = '{loopback}'")
             d.append(r[0])
             d.append(r[1])
             d.append(r[2])
