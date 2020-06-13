@@ -1,6 +1,6 @@
 from aiogram import executor
 from loader import dp, bot
-from work.check_vs import thread_check
+from work.check_vs import start_snmp
 from asgiref.sync import sync_to_async
 import asyncio
 import handlers
@@ -31,7 +31,7 @@ def startbot():
 
 
 loop = asyncio.get_event_loop()
-asyncio.ensure_future(thread_check())
+asyncio.ensure_future(start_snmp())
 asyncio.ensure_future(startbot())
 loop.run_forever()
 

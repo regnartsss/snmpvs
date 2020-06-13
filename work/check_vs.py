@@ -40,7 +40,7 @@ async def ssh_tunnel(loopback):
         client.close()
         #        print("test_3")
         open('tunnel.txt', 'wb').write(f)
-        time.sleep(1)
+        await asyncio.sleep(1)
         print(f"ssh_tunnel_{loopback}")
         with open('tunnel.txt') as f:
             lines = f.readlines()
@@ -268,4 +268,3 @@ async def call_name(call):
     except Exception as n:
         print(n)
 
-asyncio.run(start_snmp())
