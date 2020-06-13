@@ -144,19 +144,19 @@ async def snmp(loopback):
 
 async def check(loopback):
     await asyncio.sleep(1)
-    print(loopback)
+    # print(loopback)
     request = f"""SELECT In1_two, In2_two, Out1_two, Out2_two, In1_one,  In2_one, Out1_one, Out2_one
                 FROM status WHERE loopback = '{loopback}'"""
-    print(loopback)
+    # print(loopback)
     st = await sql.sql_selectone(request)
     Intunnel1 = st[0] - st[4]
     Intunnel2 = st[1] - st[5]
     Outtunnel1 = st[2] - st[6]
     Outtunnel2 = st[3] - st[7]
-    print(Intunnel1)
-    print(Outtunnel1)
-    print(Intunnel2)
-    print(Outtunnel2)
+    # print(Intunnel1)
+    # print(Outtunnel1)
+    # print(Intunnel2)
+    # print(Outtunnel2)
     status1, status2 = 3, 3
     if Intunnel1 > 0 or Outtunnel1 > 0:
         # sql.sql_insert_no_await(f"UPDATE status SET status1 = 1 WHERE loopback = '{loopback}'")
@@ -281,8 +281,8 @@ async def monitoring():
     tab = []
     text = ""
     colum = [4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60]
-    colum_old = [3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 48, 51]
-    request = f"SELECT filial.kod, status_1, status_2, ISP1, ISP2 FROM status INNER JOIN filial ON status.kod = filial.kod"
+    # colum_old = [3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 48, 51]
+    request = f"SELECT filial.kod, status_1, status_2, ISP1, ISP2 FROM status INNER JOIN filial ON status.kod = filial.kod ORDER BY flilial.kod"
     # print(request)
     rows = await sql.sql_select(request)
     for row in rows:
@@ -300,8 +300,8 @@ async def monitoring():
             ch1 = "⚪"
         if row[4] == "unassigned":
             ch2 = "⚪"
-        tab.append(InlineKeyboardButton(text=f"{row[0]} {ch1}{ch2}", callback_data=f"sub_{row[0]}"))
-        if i in colum_old:
+        tab.append(InlineKeyboardButton(text=f"{ch1}{ch2}{row[0]} ", callback_data=f"sub_{row[0]}"))
+        if i in colum:
             keyboard.row(*tab)
             tab = []
         i += 1
