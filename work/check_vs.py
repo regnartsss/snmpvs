@@ -7,34 +7,10 @@ from work import sql
 from loader import bot
 import asyncio
 import time
+import paramiko
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+import asyncio
 
-# mib = {  # "ifInOctets_isp1": "1.3.6.1.2.1.31.1.1.1.6.1",
-#     #   "ifOutOctets_isp1": "1.3.6.1.2.1.31.1.1.1.10.1",
-#     #   "ifInOctets_isp2": "1.3.6.1.2.1.31.1.1.1.6.2",
-#     #   "ifOutOctets_isp2": "1.3.6.1.2.1.31.1.1.1.10.2",
-#
-#     "ifInOctets_isp1_tunnel": "1.3.6.1.2.1.31.1.1.1.6.%s",
-#     "ifOutOctets_isp1_tunnel": "1.3.6.1.2.1.31.1.1.1.10.%s",
-#     "ifInOctets_isp2_tunnel": "1.3.6.1.2.1.31.1.1.1.6",
-#     "ifOutOctets_isp2_tunnel": "1.3.6.1.2.1.31.1.1.1.10"
-# }
-# import threading
-
-
-
-async def thread_check():
-    print("start")
-    await start_snmp()
-    # asyncio.run(start_snmp())
-    # asyncio.ensure_future(start_snmp())
-    # loop = asyncio.get_running_loop()
-    # # with concurrent.futures.ThreadPoolExecutor() as pool:
-    # #     await loop.run_in_executor(pool, start_snmp)
-    # #     # print('custom thread pool', result)
-    # # loop.run_in_executor(start_snmp)
-    # loop.run_in_executor(None, start_snmp())
-    # await start_snmp()
 async def start_snmp():
     print("stop")
     # await bot.send_message(chat_id=765333440, text="dddddd")
@@ -43,104 +19,71 @@ async def start_snmp():
         rows = await sql.sql_select("SELECT loopback, kod FROM filial")
         for row in rows:
             if (await sql.sql_selectone(f"SELECT count(loopback) FROM status WHERE loopback = '{row[0]}'"))[0] == 0:
-                await oid(row[0], row[1])
+                await sql.sql_insert(f"INSERT INTO status (loopback, kod) VALUES ('{row[0]}', {row[1]})")
             else:
-                await snmp(row[0])
+                await ssh_tunnel(row[0])
         await monitoring()
-async def oid(loopback, kod):
-    oid = "1.3.6.1.2.1.31.1.1.1.1"
-    i = 0
-    # print(loopback)
-    In_isp1, Out_isp1, In_isp2, Out_isp2 = "0", "0", "0", "0"
-    await sql.sql_insert(f"INSERT INTO status (loopback, kod) VALUES ('{loopback}', {kod})")
-    while i < 35:
-        await asyncio.sleep(1)
-        i += 1
-        errorIndication, errorStatus, errorIndex, varBinds = next(
-            getCmd(SnmpEngine(),
-                   UsmUserData(userName='dvsnmp', authKey='55GjnJwtPfk',                         authProtocol=usmHMACSHAAuthProtocol
-                               ),
-                   UdpTransportTarget((str(loopback), 161)),
-                   ContextData(),
-                   ObjectType(ObjectIdentity("%s.%s" % (oid, i)))
-                   ))
 
-        if errorIndication:
-            print(errorIndication)
-        elif errorStatus:
-            print('%s at %s' % (errorStatus.prettyPrint(),
-                                errorIndex and varBinds[int(errorIndex) - 1][0] or '?'))
-        else:
-            for varBind in varBinds:
+async def ssh_tunnel(loopback):
+        command = "show int"
+        user = 'operator'
+        secret = '71LtkJnrYjn'
+        port = 22
+        d = []
+        i_1, i_2 = 0, 0
+        st_1, st_2 = 1, 1
+        client = paramiko.SSHClient()
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        client.connect(hostname=loopback, username=user, password=secret, port=port)
+        stdin, stdout, stderr = client.exec_command(command)
+        f = stdout.read()
+        client.close()
+        #        print("test_3")
+        open('tunnel.txt', 'wb').write(f)
+        time.sleep(1)
+        print(f"ssh_tunnel_{loopback}")
+        with open('tunnel.txt') as f:
+            lines = f.readlines()
+            for line in lines:
+                if line.split() != []:
+                    # print(line.split())
+                    if line.split()[0] == "Tunnel0":
+                        # print("Туннель")
+                        st_1 = 0
+                    elif line.split()[0] == "Tunnel1":
+                        # print("Туннель2")
+                        st_2 = 0
+                    elif i_1 == 29:
+                        st_1 = 1
+                    elif st_1 == 0:
+                        if i_1 == 23:
+                            d.append(line.split()[3])
+                            # print(line.split())
+                        elif i_1 == 27:
+                            d.append(line.split()[3])
+                            # print(line.split())
+                            # i_1 = 0
+                            st_1 = 1
+                        i_1 += 1
+                    elif i_2 == 29:
+                         st_2 = 1
+                    elif st_2 == 0:
+                        # print(line.split())
+                        if i_2 == 23:
+                            d.append(line.split()[3])
+                             # print(line.split())
+                        elif i_2 == 27:
+                            d.append(line.split()[3])
+                             # print(line.split())
+                    #         i_2 = 0
+                            st_2 = 1
+                        i_2 += 1
 
-                oi = (' = '.join([x.prettyPrint() for x in varBind]).split("= ")[1])
-                #                print(oi)
-                if oi == "Tu0":
-                    numoid = (' = '.join([x.prettyPrint() for x in varBind]).split("= ")[0].split(".")[6])
-                    print(numoid)
-                    In_isp1 = "1.3.6.1.2.1.31.1.1.1.6.%s" % numoid
-                    Out_isp1 = "1.3.6.1.2.1.31.1.1.1.10.%s" % numoid
-                    # stat[kod]["oid"]["ifInOctets_isp1_tunnel"] = "1.3.6.1.2.1.31.1.1.1.6.%s" % numoid
-                    # stat[kod]["oid"]["ifOutOctets_isp1_tunnel"] = "1.3.6.1.2.1.31.1.1.1.10.%s" % numoid
-                elif oi == "Tu1":
-                    numoid = (' = '.join([x.prettyPrint() for x in varBind]).split("= ")[0].split(".")[6])
-                    print(numoid)
-                    In_isp2 = "1.3.6.1.2.1.31.1.1.1.6.%s" % numoid
-                    Out_isp2 = "1.3.6.1.2.1.31.1.1.1.10.%s" % numoid
-                    # stat[kod]["oid"]["ifInOctets_isp2_tunnel"] = "1.3.6.1.2.1.31.1.1.1.6.%s" % numoid
-                    # stat[kod]["oid"]["ifOutOctets_isp2_tunnel"] = "1.3.6.1.2.1.31.1.1.1.10.%s" % numoid
-                else:
-                    pass
+        request = f"UPDATE status SET In1_one = In1_two, Out1_one = Out1_two, In2_one = In2_two, Out2_one = Out2_two, " \
+                              f"In1_two = {d[0]}, Out1_two = {d[1]},In2_two = {d[2]}, Out2_two = {d[3]} WHERE loopback = '{loopback}'"
+        await sql.sql_insert(request)
 
-        await sql.sql_insert(
-            f"UPDATE status SET In_isp1 = '{In_isp1}',Out_isp1 = '{Out_isp1}', In_isp2 = '{In_isp2}', Out_isp2 ='{Out_isp2}' WHERE loopback = '{loopback}'")
-
-
-async def snmp(loopback):
-    # print(loopback)
-    await asyncio.sleep(1)
-    oid_all = sql.sql_selectone_no_await(
-        f"SELECT In_isp1, Out_isp1, In_isp2, Out_isp2 FROM status WHERE loopback = '{loopback}'")
-    d = []
-    for oid in oid_all:
-        await asyncio.sleep(1)
-        errorIndication, errorStatus, errorIndex, varBinds = next(
-            getCmd(SnmpEngine(),
-                   UsmUserData(userName='dvsnmp', authKey='55GjnJwtPfk', authProtocol=usmHMACSHAAuthProtocol),
-                   UdpTransportTarget((str(loopback), 161)),
-                   ContextData(),
-                   ObjectType(ObjectIdentity(oid)))
-        )
-
-        if errorIndication:
-            print(errorIndication)
-            # "No SNMP response received before timeout"
-            print("тут ошибка")
-            r = await sql.sql_selectone(f"SELECT In1_two, Out1_two,In2_two, Out2_two FROM status WHERE loopback = '{loopback}'")
-            d.append(r[0])
-            d.append(r[1])
-            d.append(r[2])
-            d.append(r[3])
-            break
-
-        #            for k in subscrib[kod]:
-        #                bot.send_message(chat_id=k, text="%s\n  %s" % (dat[kod]["name"], text))
-        elif errorStatus:
-            print('%s at %s' % (errorStatus.prettyPrint(),
-                                errorIndex and varBinds[int(errorIndex) - 1][0] or '?'))
-        else:
-            for varBind in varBinds:
-                #                print(' = '.join([x.prettyPrint() for x in varBind]))
-                m = (' = '.join([x.prettyPrint() for x in varBind]).split("= ")[1])
-                d.append(m)
-                # print(d)
-    request = f"UPDATE status SET In1_one = In1_two, Out1_one = Out1_two, In2_one = In2_two, Out2_one = Out2_two, " \
-              f"In1_two = {d[0]}, Out1_two = {d[1]},In2_two = {d[2]}, Out2_two = {d[3]} WHERE loopback = '{loopback}'"
-
-    await sql.sql_insert(request)
-    await check(loopback)
-
-
+                    #     return line.split()[3]
 
 async def check(loopback):
     await asyncio.sleep(1)
@@ -203,6 +146,7 @@ async def check(loopback):
             # stat[kod]["status_t1"] = 0
             # stat[kod]["status_t2"] = 0
             await sql.sql_insert(f"UPDATE status SET status_1 = 0, status_2 = 0 WHERE loopback = '{loopback}'")
+            print(text)
             await send_mess(kod, text)
     elif status1 == 1 and status2 == 0:
         if status_t1 == status1 and status_t2 == status2:
@@ -218,6 +162,8 @@ async def check(loopback):
             # stat[kod]["status_t1"] = 1
             # stat[kod]["status_t2"] = 0
             await sql.sql_insert(f"UPDATE status SET status_1 = 1, status_2 = 0 WHERE loopback = '{loopback}'")
+            print(text)
+
             await send_mess(kod, text)
 
     elif status1 == 0 and status2 == 1:
@@ -234,6 +180,8 @@ async def check(loopback):
             # stat[kod]["status_t1"] = 0
             # stat[kod]["status_t2"] = 1
             await sql.sql_insert(f"UPDATE status SET status_1 = 0, status_2 = 1 WHERE loopback = '{loopback}'")
+            print(text)
+
 
             await send_mess(kod, text)
 
@@ -250,6 +198,8 @@ async def check(loopback):
             # stat[kod]["status_t1"] = 1
             # stat[kod]["status_t2"] = 1
             await sql.sql_insert(f"UPDATE status SET status_1 = 1, status_2 = 1 WHERE loopback = '{loopback}'")
+            print(text)
+
 
             await send_mess(kod, text)
     else:
@@ -317,3 +267,5 @@ async def call_name(call):
         await bot.answer_callback_query(callback_query_id=call.id, text=f"{name}")
     except Exception as n:
         print(n)
+
+asyncio.run(start_snmp())
