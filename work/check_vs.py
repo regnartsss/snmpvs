@@ -232,7 +232,7 @@ async def monitoring():
     text = ""
     colum = [4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60]
     # colum_old = [3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 48, 51]
-    request = f"SELECT filial.kod, status_1, status_2, ISP1, ISP2 FROM status INNER JOIN filial ON status.kod = filial.kod ORDER BY flilial.kod"
+    request = f"SELECT filial.kod, status_1, status_2, ISP1, ISP2 FROM status INNER JOIN filial ON status.kod = filial.kod ORDER BY status.kod"
     # print(request)
     rows = await sql.sql_select(request)
     for row in rows:
