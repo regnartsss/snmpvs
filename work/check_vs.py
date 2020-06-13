@@ -313,8 +313,7 @@ async def monitoring():
 async def call_name(call):
     kod = call.data.split("_")[1]
     name = (await sql.sql_selectone(f"SELECT name FROM filial WHERE kod = {kod}"))[0]
-    print(name)
     try:
-        bot.answer_callback_query(callback_query_id=call.id, text=f"{name}")
+        await bot.answer_callback_query(callback_query_id=call.id, text=f"{name}")
     except Exception as n:
         print(n)
