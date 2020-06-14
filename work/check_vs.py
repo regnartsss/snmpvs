@@ -24,7 +24,7 @@ async def start_snmp():
 
 async def oid(loopback, kod):
     await asyncio.sleep(1)
-    oid = "1.3.6.1.2.1.31.1.1.1.1"
+    mib = "1.3.6.1.2.1.31.1.1.1.1"
     i = 0
     In_isp1, Out_isp1, In_isp2, Out_isp2 = "0", "0", "0", "0"
     await sql.sql_insert(f"INSERT INTO status (loopback, kod) VALUES ('{loopback}', {kod})")
@@ -36,7 +36,7 @@ async def oid(loopback, kod):
                    UsmUserData(userName='dvsnmp', authKey='55GjnJwtPfk', authProtocol=usmHMACSHAAuthProtocol),
                    UdpTransportTarget((str(loopback), 161)),
                    ContextData(),
-                   ObjectType(ObjectIdentity(f"{oid}.{i}"))
+                   ObjectType(ObjectIdentity(f"{mib}.{i}"))
                    ))
 
         if errorIndication:
@@ -68,17 +68,17 @@ async def snmp(loopback):
     print(loopback)
     # oid_all = await sql.sql_selectone(f"SELECT In_isp1, Out_isp1, In_isp2, Out_isp2 FROM status "
     #                                   f"WHERE loopback = '{loopback}'")
-    oid_all = await sql.sql_selectone(f"SELECT In_isp1, In_isp2 FROM status "
+    mib_all = await sql.sql_selectone(f"SELECT In_isp1, In_isp2 FROM status "
                                       f"WHERE loopback = '{loopback}'")
     d = []
-    for oid in oid_all:
+    for mib in mib_all:
         await asyncio.sleep(1)
         errorIndication, errorStatus, errorIndex, varBinds = next(
             getCmd(SnmpEngine(),
                    UsmUserData(userName='dvsnmp', authKey='55GjnJwtPfk', authProtocol=usmHMACSHAAuthProtocol),
                    UdpTransportTarget((str(loopback), 161)),
                    ContextData(),
-                   ObjectType(ObjectIdentity(oid)))
+                   ObjectType(ObjectIdentity(mib)))
         )
 
         if errorIndication:
