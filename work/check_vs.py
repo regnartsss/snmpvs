@@ -19,7 +19,7 @@ async def start_snmp():
             else:
                 await asyncio.sleep(1)
                 await snmp(row[0])
-        # await monitoring()
+        await monitoring()
 
 
 async def oid(loopback, kod):
