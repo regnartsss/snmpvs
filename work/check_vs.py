@@ -231,7 +231,6 @@ async def monitoring():
 
 
 async def call_name(call):
-    await asyncio.sleep(1)
     kod = call.data.split("_")[1]
     name = (await sql.sql_selectone(f"SELECT name FROM filial WHERE kod = {kod}"))[0]
     try:
