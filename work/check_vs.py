@@ -13,16 +13,17 @@ async def start_snmp():
     while i < 2:
         rows = await sql.sql_select("SELECT loopback, kod FROM filial ORDER BY loopback")
         for row in rows:
-
+            await asyncio.sleep(1)
             if (await sql.sql_selectone(f"SELECT count(loopback) FROM status WHERE loopback = '{row[0]}'"))[0] == 0:
                 await oid(row[0], row[1])
             else:
-                await asyncio.sleep(1)
+
                 await snmp(row[0])
         await monitoring()
 
 
 async def oid(loopback, kod):
+    await asyncio.sleep(1)
     oid = "1.3.6.1.2.1.31.1.1.1.1"
     i = 0
     In_isp1, Out_isp1, In_isp2, Out_isp2 = "0", "0", "0", "0"
@@ -105,6 +106,7 @@ async def snmp(loopback):
 
 
 async def check(loopback):
+    await asyncio.sleep(1)
     request = f"""SELECT In1_two, In2_two, Out1_two, Out2_two, In1_one,  In2_one, Out1_one, Out2_one
                 FROM status WHERE loopback = '{loopback}'"""
     st = await sql.sql_selectone(request)
@@ -173,6 +175,7 @@ async def check(loopback):
 
 
 async def request_name(loopback):
+    await asyncio.sleep(1)
     return await sql.sql_selectone(
         f"SELECT name, kod, loopback, ISP1, ISP2, isp1_name, isp2_name FROM filial WHERE loopback = '{loopback}'")
 
@@ -181,6 +184,7 @@ async def send_mess(kod, text):
     try:
         rows = await sql.sql_selectone(f"SELECT user_id FROM sub WHERE kod = {kod}")
         for row in rows:
+            await asyncio.sleep(1)
             await bot.send_message(chat_id=row, text=text)
     except TypeError:
         print("Ошибка отправки")
@@ -227,6 +231,7 @@ async def monitoring():
 
 
 async def call_name(call):
+    await asyncio.sleep(1)
     kod = call.data.split("_")[1]
     name = (await sql.sql_selectone(f"SELECT name FROM filial WHERE kod = {kod}"))[0]
     try:
