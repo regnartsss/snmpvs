@@ -53,9 +53,16 @@ class Add_snmp():
             try:
                 self.kod = sysName.split("= ")[1].split("-")[2]
                 try:
+                    self.kod = self.kod.split(".")[0]
+                except Exception as n:
+                    print(f"Удаление старого филиала {self.kod}")
+
+
+                try:
                     request = f"DELETE FROM filial WHERE kod = {self.kod}"
                     await sql.sql_insert(request)
                 except Exception as n:
+                    print(self.kod)
                     await bot.send_message(chat_id=765333440, text=f"Удаление старого филиала {self.kod} - {n}")
             except IndexError:
                 return "Ошибка в loopback или адрес не доступен"
