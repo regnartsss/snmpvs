@@ -66,7 +66,7 @@ async def start_check_registrator():
             cam = s[1].split()[2]
             cam_down = s[1].split()[0]
             select = await sql.sql_insert(f"SELECT disk, cam_down FROM registrator WHERE ip = '{row[0]}'")
-            disk_old, cam_down_old = tuple(select)
+            disk_old, cam_down_old = select
             if disk_old == disk:
                 pass
             else:

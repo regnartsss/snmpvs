@@ -28,7 +28,7 @@ def startbot():
 
 loop = asyncio.get_event_loop()
 asyncio.ensure_future(start_snmp())
-asyncio.ensure_future(start_check_registrator())
+# asyncio.ensure_future(start_check_registrator())
 asyncio.ensure_future(startbot())
 loop.run_forever()
 
