@@ -60,8 +60,8 @@ async def start_check_registrator():
         for row in rows:
             s = await snmpregist(row[0])
             # print(s)
-            cam = s[1].split()[0]
-            cam_down = s[1].split()[2]
+            cam = s[1].split()[2]
+            cam_down = s[1].split()[0]
             await sql.sql_insert(f"Update registrator SET disk = '{s[0]}', cam = '{cam}', cam_down ='{cam_down}' WHERE ip = '{row[0]}'")
         # try:
         #     (ip, name, registr, stregistr) = tuple(row)
