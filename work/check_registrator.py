@@ -53,8 +53,8 @@ async def snmpregist(ip):
 
 
 async def start_check_registrator():
-    while 2<3:
-        await asyncio.sleep(1)
+    while 2 < 3:
+        await asyncio.sleep(60)
         rows = await sql.sql_select("SELECT ip FROM registrator")
         # print(rows)
         for row in rows:
