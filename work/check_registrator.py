@@ -65,7 +65,7 @@ async def start_check_registrator():
             disk = s[0]
             cam = s[1].split()[2]
             cam_down = s[1].split()[0]
-            select = await sql.sql_insert(f"SELECT disk, cam_down WHERE ip = '{row[0]}'")
+            select = await sql.sql_insert(f"SELECT disk, cam_down FROM registrator WHERE ip = '{row[0]}'")
             await sql.sql_insert(f"Update registrator SET disk = '{s[0]}', cam = '{cam}', cam_down ='{cam_down}' WHERE ip = '{row[0]}'")
             disk_old, cam_down_old = tuple(row)
             if disk_old == disk:
