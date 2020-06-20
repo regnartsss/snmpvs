@@ -57,7 +57,6 @@ class Add_snmp():
                 except Exception as n:
                     print(f"Удаление старого филиала {self.kod}")
 
-
                 try:
                     request = f"DELETE FROM filial WHERE kod = {self.kod}"
                     await sql.sql_insert(request)
