@@ -13,12 +13,8 @@ import time
 
 #
 async def on_startup(dp):
-    # print("tt")
-    # await thread_check()
-    # loop = asyncio.get_event_loop()
-    # # asyncio.ensure_future(start())
-    # loop.run_until_complete(thread_check())
-    # loop.run_forever()
+    import middlewares
+    middlewares.setup(dp)
     await bot.send_message(765333440, "Бот запущен")
 #     loop = asyncio.get_event_loop()
 #     asyncio.ensure_future(start())

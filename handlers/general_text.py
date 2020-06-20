@@ -11,6 +11,7 @@ from work.Keyboard_menu import work
 from work.sub import worksub
 from work.search import SearchFilial, search_name, search_kod, search_serial, search_kod_win, search_name_win, \
     search_serial_win
+from middlewares.middleware_and_antiflood import rate_limit
 
 
 @dp.message_handler(state=SearchFilial.Filial)
@@ -120,7 +121,7 @@ async def process_name(message: types.Message, state: FSMContext):
 
 
 @dp.message_handler(content_types=types.ContentTypes.ANY)
-# @rate_limit(0.5)
+@rate_limit(0.5)
 async def all_other_messages(message: types.Message, state: FSMContext):
     print(message.from_user.id)
     if message.chat.id in admin_id:
