@@ -70,8 +70,7 @@ async def process_name(message: types.Message, state: FSMContext):
         await message.answer("Отмена", reply_markup=main_menu())
         await state.finish()
     else:
-        request = f"SELECT count(kod) FROM filial WHERE loopback = '{message.text}'"
-        print(await sql.sql_selectone(request))
+        request = f"SELECT count(kod) FROM filial WHERE loopback = '{message.text}' and sdwan = 1"
         if (await sql.sql_selectone(request))[0] == 1:
             await message.answer("Филиал уже добавлен", reply_markup=main_menu())
             await state.finish()

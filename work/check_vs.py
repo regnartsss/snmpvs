@@ -5,11 +5,13 @@ from work import sql
 from loader import bot
 import asyncio
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from concurrent.futures import ThreadPoolExecutor
 
 
 async def start_snmp():
     print("start")
     i = 0
+    loop = asyncio.get_running_loop()
     while i < 2:
         rows = await sql.sql_select("SELECT loopback, kod FROM filial ORDER BY loopback")
         for row in rows:
@@ -17,9 +19,10 @@ async def start_snmp():
             if (await sql.sql_selectone(f"SELECT count(loopback) FROM status WHERE loopback = '{row[0]}'"))[0] == 0:
                 await oid(row[0], row[1])
             else:
-
                 await snmp(row[0])
-        await monitoring()
+                # executor = ThreadPoolExecutor()
+                # await loop.run_in_executor(executor, snmp_no_async, row[0])
+        # await monitoring()
 
 
 async def oid(loopback, kod):
@@ -63,9 +66,12 @@ async def oid(loopback, kod):
             f"UPDATE status SET In_isp1 = '{In_isp1}',Out_isp1 = '{Out_isp1}', "
             f"In_isp2 = '{In_isp2}', Out_isp2 ='{Out_isp2}' WHERE loopback = '{loopback}'")
 
+# def snmp_no_async(loopback):
+#     print("test")
+#     asyncio.run(snmp(loopback))
 
 async def snmp(loopback):
-    print(loopback)
+    print("snmp")
     # oid_all = await sql.sql_selectone(f"SELECT In_isp1, Out_isp1, In_isp2, Out_isp2 FROM status "
     #                                   f"WHERE loopback = '{loopback}'")
     mib_all = await sql.sql_selectone(f"SELECT In_isp1, In_isp2 FROM status "

@@ -4,7 +4,7 @@ from work import sql
 import paramiko
 import os
 import time
-
+from loader import bot
 def find_location():
     return os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__))).replace('\\', '/') + '/'
 
@@ -52,6 +52,11 @@ class Add_snmp():
                 sysName = ' = '.join([x.prettyPrint() for x in varBind])
             try:
                 self.kod = sysName.split("= ")[1].split("-")[2]
+                try:
+                    request = f"DELETE FROM filial WHERE kod = {self.kod}"
+                    await sql.sql_insert(request)
+                except Exception as n:
+                    await bot.send_message(chat_id=765333440, text=f"Удаление старого филиала {self.kod} - {n}")
             except IndexError:
                 return "Ошибка в loopback или адрес не доступен"
             try:
@@ -71,7 +76,7 @@ class Add_snmp():
             serial = await self.ssh_serial()
             request = f"UPDATE filial  SET ISP1 = '{ip['ISP1']}', ISP2 = '{ip['ISP2']}', vlan100 = '{ip['Vlan100']}', " \
                       f"vlan200 = '{ip['Vlan200']}', vlan300 = '{ip['Vlan300']}', vlan400 = '{ip['Vlan400']}', " \
-                      f"vlan500 = '{ip['Vlan500']}', gateway_isp1 = '{ip['gateway_isp1']}', gateway_isp2 = '{ip['gateway_isp2']}', serial = '{serial}' WHERE kod = {self.kod}"
+                      f"vlan500 = '{ip['Vlan500']}', gateway_isp1 = '{ip['gateway_isp1']}', gateway_isp2 = '{ip['gateway_isp2']}', serial = '{serial}', sdwan = 1 WHERE kod = {self.kod}"
             await sql.sql_insert(request)
             for k,v in ip['registrator'].items():
                 request = f"INSERT INTO registrator (kod, ip, hostname) VALUES ({self.kod}, '{k}','{v}')"

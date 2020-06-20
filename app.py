@@ -1,6 +1,7 @@
 from aiogram import executor
 from loader import dp, bot
 from work.check_vs import start_snmp
+from work.check_registrator import start_check_registrator
 from asgiref.sync import sync_to_async
 import asyncio
 import handlers
@@ -29,9 +30,9 @@ def startbot():
         executor.start_polling(dp, skip_updates=True, on_startup=on_startup)
 
 
-
 loop = asyncio.get_event_loop()
 asyncio.ensure_future(start_snmp())
+asyncio.ensure_future(start_check_registrator())
 asyncio.ensure_future(startbot())
 loop.run_forever()
 

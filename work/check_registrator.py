@@ -1,69 +1,68 @@
 from work import sql
 from pysnmp.hlapi import *
+import asyncio
 import time
-trassir = {
-    u'\U0001F4BB' + ' Сервер': '1.3.6.1.4.1.3333.1.7',
-    u'\U0001F4BD' + ' Диски': '1.3.6.1.4.1.3333.1.3',
-    u'\U0001F4C3' + ' Глубина архива дней': '1.3.6.1.4.1.3333.1.2',
-    u'\U0001F3A5' + ' Камеры': '1.3.6.1.4.1.3333.1.5',
-    u'\U0000231B' + ' Время работы сервера ': '1.3.6.1.4.1.3333.1.11',
-    'Не работает камера:': '1.3.6.1.4.1.3333.1.8',
-    'ip address ': '1.3.6.1.4.1.3333.1.9',
-    'Прошивка ': '1.3.6.1.4.1.3333.1.10'
+# trassir = {
+#     u'\U0001F4BB' + ' Сервер': '1.3.6.1.4.1.3333.1.7',
+#     u'\U0001F4BD' + ' Диски': '1.3.6.1.4.1.3333.1.3',
+#     u'\U0001F4C3' + ' Глубина архива дней': '1.3.6.1.4.1.3333.1.2',
+#     u'\U0001F3A5' + ' Камеры': '1.3.6.1.4.1.3333.1.5',
+#     u'\U0000231B' + ' Время работы сервера ': '1.3.6.1.4.1.3333.1.11',
+#     'Не работает камера:': '1.3.6.1.4.1.3333.1.8',
+#     'ip address ': '1.3.6.1.4.1.3333.1.9',
+#     'Прошивка ': '1.3.6.1.4.1.3333.1.10'
+#
+# }
+# trassirusercam = {
+#     u'\U0001F4BB' + ' Сервер': '1.3.6.1.4.1.3333.1.7',
+#     u'\U0001F4BD' + ' Диски': '1.3.6.1.4.1.3333.1.3',
+#     u'\U0001F4C3' + ' Глубина архива дней': '1.3.6.1.4.1.3333.1.2',
+#     u'\U0001F3A5' + ' Камеры': '1.3.6.1.4.1.3333.1.5',
+#     u'\U0000231B' + ' Время работы сервера ': '1.3.6.1.4.1.3333.1.11',
+#     u'\U0001F50D' + ' Не работает камера:': '1.3.6.1.4.1.3333.1.8'
+# }
+# trassiruser = {
+#     u'\U0001F4BB' + ' Сервер': '1.3.6.1.4.1.3333.1.7',
+#     u'\U0001F4BD' + ' Диски': '1.3.6.1.4.1.3333.1.3',
+#     u'\U0001F4C3' + ' Глубина архива дней': '1.3.6.1.4.1.3333.1.2',
+#     u'\U0001F3A5' + ' Камеры': '1.3.6.1.4.1.3333.1.5',
+#     u'\U0000231B' + ' Время работы сервера ': '1.3.6.1.4.1.3333.1.11'
+# }
+trassirmonitoring = ['1.3.6.1.4.1.3333.1.3', '1.3.6.1.4.1.3333.1.5']
 
-}
-trassirusercam = {
-    u'\U0001F4BB' + ' Сервер': '1.3.6.1.4.1.3333.1.7',
-    u'\U0001F4BD' + ' Диски': '1.3.6.1.4.1.3333.1.3',
-    u'\U0001F4C3' + ' Глубина архива дней': '1.3.6.1.4.1.3333.1.2',
-    u'\U0001F3A5' + ' Камеры': '1.3.6.1.4.1.3333.1.5',
-    u'\U0000231B' + ' Время работы сервера ': '1.3.6.1.4.1.3333.1.11',
-    u'\U0001F50D' + ' Не работает камера:': '1.3.6.1.4.1.3333.1.8'
-}
-trassiruser = {
-    u'\U0001F4BB' + ' Сервер': '1.3.6.1.4.1.3333.1.7',
-    u'\U0001F4BD' + ' Диски': '1.3.6.1.4.1.3333.1.3',
-    u'\U0001F4C3' + ' Глубина архива дней': '1.3.6.1.4.1.3333.1.2',
-    u'\U0001F3A5' + ' Камеры': '1.3.6.1.4.1.3333.1.5',
-    u'\U0000231B' + ' Время работы сервера ': '1.3.6.1.4.1.3333.1.11'
 
-}
-def snmpregist(ip):
-            d = []
-            for r in trassir:
-                #        print(r)
-                errorIndication, errorStatus, errorIndex, varBinds = next(
-                    getCmd(SnmpEngine(), CommunityData('dssl'), UdpTransportTarget((ip, 161)),
-                           ContextData(), ObjectType(ObjectIdentity(trassir[r]))))
-                if errorIndication:
-                    #                print(errorIndication)
-                    st = "0"
-                    break
-                elif errorStatus:
-                    print('%s at %s' % (
-                    errorStatus.prettyPrint(), errorIndex and varBinds[int(errorIndex) - 1][0] or '?'))
-                    continue
-                else:
-                    for varBind in varBinds:
-                        status = (' ='.join([x.prettyPrint() for x in varBind])).split("=")[1]
-                        # print(status)
-                        d.append(status)
-            return d
-
-async def start_check_regisatrator():
-    # try:
-    rows = sql.sql_select_no_await("SELECT ip FROM registrator")
-    # except:
-    #     time.sleep(300)
-    #     start_check()
-    for row in rows:
-        # print(snmpregist(row[0]))
-        reg = snmpregist(row[0])
-        # print(reg)
-        if reg == []:
-            pass
+async def snmpregist(ip):
+            # print(ip)
+    d = []
+    for r in trassirmonitoring:
+        # print(r)
+        errorIndication, errorStatus, errorIndex, varBinds = next(
+            getCmd(SnmpEngine(), CommunityData('dssl'), UdpTransportTarget((ip, 161)),
+                   ContextData(), ObjectType(ObjectIdentity(r))))
+        if errorIndication:
+            break
+        elif errorStatus:
+            print('%s at %s' % (
+            errorStatus.prettyPrint(), errorIndex and varBinds[int(errorIndex) - 1][0] or '?'))
+            continue
         else:
-            sql.sql_insert_no_await(f"Update registrator SET disk = '{reg[1]}', arhive = '{reg[2]}', cam = '{reg[3]}', cam_down ='{reg[5]}', uptime = '{reg[4]}', firmware = '{reg[7]}' WHERE ip = '{row[0]}'")
+            for varBind in varBinds:
+                status = (' ='.join([x.prettyPrint() for x in varBind])).split("=")[1]
+                d.append(status)
+    return d
+
+
+async def start_check_registrator():
+    while 2<3:
+        await asyncio.sleep(1)
+        rows = await sql.sql_select("SELECT ip FROM registrator")
+        # print(rows)
+        for row in rows:
+            s = await snmpregist(row[0])
+            # print(s)
+            cam = s[1].split()[0]
+            cam_down = s[1].split()[2]
+            await sql.sql_insert(f"Update registrator SET disk = '{s[0]}', cam = '{cam}', cam_down ='{cam_down}' WHERE ip = '{row[0]}'")
         # try:
         #     (ip, name, registr, stregistr) = tuple(row)
         #     st, statusall = "", ""
@@ -172,5 +171,5 @@ async def start_check_regisatrator():
     # select_registr()
 
 
-# check()
+# start_check_registrator()
 
