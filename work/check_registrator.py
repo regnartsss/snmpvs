@@ -58,7 +58,9 @@ async def start_check_registrator():
         rows = await sql.sql_select("SELECT ip FROM registrator")
         # print(rows)
         for row in rows:
+            await asyncio.sleep(1)
             s = await snmpregist(row[0])
+            await asyncio.sleep(1)
             # print(s)
             cam = s[1].split()[2]
             cam_down = s[1].split()[0]
