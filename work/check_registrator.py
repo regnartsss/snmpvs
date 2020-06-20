@@ -62,11 +62,21 @@ async def start_check_registrator():
             s = await snmpregist(row[0])
             await asyncio.sleep(1)
             # print(s)
+            disk = s[0]
             cam = s[1].split()[2]
             cam_down = s[1].split()[0]
+            select = await sql.sql_insert(f"SELECT disk, cam_down WHERE ip = '{row[0]}'")
             await sql.sql_insert(f"Update registrator SET disk = '{s[0]}', cam = '{cam}', cam_down ='{cam_down}' WHERE ip = '{row[0]}'")
-        # try:
-        #     (ip, name, registr, stregistr) = tuple(row)
+            disk_old, cam_down_old = tuple(row)
+            if disk_old == disk:
+                pass
+            else:
+                print(f"Ошибка диска {row[0]}")
+            if cam_down == cam_down_old:
+                pass
+            else:
+                print(f"Ошибка камеры {row[0]}")
+
         #     st, statusall = "", ""
         #     s, r = 0, 0
         #     #        if len(registr.split(";")) > 1:

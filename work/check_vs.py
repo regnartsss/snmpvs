@@ -71,7 +71,7 @@ async def oid(loopback, kod):
 #     asyncio.run(snmp(loopback))
 
 async def snmp(loopback):
-    print("snmp")
+    # print("snmp")
     # oid_all = await sql.sql_selectone(f"SELECT In_isp1, Out_isp1, In_isp2, Out_isp2 FROM status "
     #                                   f"WHERE loopback = '{loopback}'")
     mib_all = await sql.sql_selectone(f"SELECT In_isp1, In_isp2 FROM status "
