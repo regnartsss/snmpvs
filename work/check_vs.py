@@ -22,7 +22,7 @@ async def start_snmp():
                 await snmp(row[0])
                 # executor = ThreadPoolExecutor()
                 # await loop.run_in_executor(executor, snmp_no_async, row[0])
-        # await monitoring()
+        await monitoring()
 
 
 async def oid(loopback, kod):
