@@ -1,5 +1,6 @@
 from loader import dp, bot
 from aiogram import types
+from work.ssh import ssh_traceroute_vrf
 # from Map import goto
 # from Build import build
 # from Fight import fight, field_goto
@@ -42,6 +43,8 @@ async def handler(call: types.CallbackQuery):
         await call.message.answer(await filial_check(call))
     elif call.data.split("_")[0] == "sub":
         await call_name(call)
+    elif call.data.split("_")[0] == "ssh":
+        await ssh_traceroute_vrf(call)
 
     # if (await sql.sql_selectone("select start_bot from data"))[0] == 1:
     #     print("Бот остановлен")

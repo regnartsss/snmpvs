@@ -13,16 +13,23 @@ async def start_snmp():
     i = 0
     loop = asyncio.get_running_loop()
     while i < 2:
-        rows = await sql.sql_select("SELECT loopback, kod FROM filial ORDER BY loopback")
+        rows = await sql.sql_select("SELECT loopback, kod, sdwan FROM filial ORDER BY loopback")
         for row in rows:
+            # print(row)
             await asyncio.sleep(1)
-            if (await sql.sql_selectone(f"SELECT count(loopback) FROM status WHERE loopback = '{row[0]}'"))[0] == 0:
-                await oid(row[0], row[1])
+            if row[2] == 1:
+                if (await sql.sql_selectone(f"SELECT count(loopback) FROM status WHERE loopback = '{row[0]}'"))[0] == 0:
+                    await oid(row[0], row[1])
+                else:
+                    await snmp(row[0])
+                    # executor = ThreadPoolExecutor()
+                    # await loop.run_in_executor(executor, snmp_no_async, row[0])
+            elif row[2] == 0:
+                pass
+                # print("Микротик")
             else:
-                await snmp(row[0])
-                # executor = ThreadPoolExecutor()
-                # await loop.run_in_executor(executor, snmp_no_async, row[0])
-        await monitoring()
+                print("Ошибка")
+            # await monitoring()
 
 
 async def oid(loopback, kod):

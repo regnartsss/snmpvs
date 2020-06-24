@@ -2,7 +2,7 @@ from aiogram import executor
 from loader import dp, bot
 from work.check_vs import start_snmp
 from work.check_registrator import start_check_registrator
-from asgiref.sync import sync_to_async
+# from asgiref.sync import sync_to_async
 import asyncio
 import handlers
 import concurrent.futures

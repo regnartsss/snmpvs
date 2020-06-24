@@ -24,6 +24,13 @@ gateway_isp2: {row[15]}
 serial: {row[16]}
 """
         return text
+
+# def stat(kod)
+
+
+
+
+
         # print(text)
         # text += "Cisco:\n"
         # for k_l, v_l in lease[kod]["cisco"].items():
