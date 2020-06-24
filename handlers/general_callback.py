@@ -1,7 +1,9 @@
 from loader import dp, bot
 from aiogram import types
 from work.Keyboard_menu import ssh
-from work.ssh import ssh_t
+from work.Ssh import ssh_t
+import asyncio
+
 # from Map import goto
 # from Build import build
 # from Fight import fight, field_goto
@@ -45,6 +47,9 @@ async def handler(call: types.CallbackQuery):
     elif call.data.split("_")[0] == "sub":
         await call_name(call)
     elif call.data.split("_")[1] == "trac":
+        # asyncio.ensure_future(ssh_t("10.96.25.1"))
+        await bot.answer_callback_query(text="Ожидайте, запрос занимает некоторое время", callback_query_id=call.id,
+                                  cache_time=100)
         await ssh_t(call)
     elif call.data.split("_")[0] == "ssh":
         data = await ssh(call=call)

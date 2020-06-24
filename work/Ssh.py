@@ -12,7 +12,6 @@ PATH = find_location()
 
 
 async def ssh_traceroute_vrf(call):
-    print("fffff")
     loopback = await kod_loopback(call)
     command = "traceroute vrf 100 10.10.33.5"
     user = 'operator'
@@ -22,19 +21,16 @@ loopback: {loopback}"""
     async with asyncssh.connect(loopback, username=user, password=secret, known_hosts=None) as conn:
         result = await conn.run(command, check=True)
         f += result.stdout
-        print(f)
-
+        await call.message.answer(f)
 
 async def ssh_t(call):
-    print("ddddd")
-    print(call.data)
-    try:
-        asyncio.get_event_loop().run_until_complete(ssh_traceroute_vrf(call))
-    except (OSError, asyncssh.Error) as exc:
-        # await call.message.answer('SSH connection failed: ' + str(exc))
-        sys.exit('SSH connection failed: ' + str(exc))
-    # await call.message.answer(f)
 
+
+    try:
+        await ssh_traceroute_vrf(call)
+    except (OSError, asyncssh.Error) as exc:
+        await call.message.answer('SSH connection failed: ' + str(exc))
+        sys.exit('SSH connection failed: ' + str(exc))
 
 
 async def kod_loopback(call):
