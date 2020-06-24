@@ -12,25 +12,38 @@ PATH = find_location()
 
 
 async def ssh_traceroute_vrf(call):
+    print("fffff")
     loopback = await kod_loopback(call)
     command = "traceroute vrf 100 10.10.33.5"
     user = 'operator'
     secret = '71LtkJnrYjn'
-
     f = f"""traceroute vrf 100 10.10.33.5
 loopback: {loopback}"""
     async with asyncssh.connect(loopback, username=user, password=secret, known_hosts=None) as conn:
         result = await conn.run(command, check=True)
         f += result.stdout
-        await call.message.answer(f)
+        print(f)
 
 
-async def ssh(call):
+async def ssh_t(call):
+    print("ddddd")
+    print(call.data)
     try:
         asyncio.get_event_loop().run_until_complete(ssh_traceroute_vrf(call))
     except (OSError, asyncssh.Error) as exc:
-        await call.message.answer('SSH connection failed: ' + str(exc))
+        # await call.message.answer('SSH connection failed: ' + str(exc))
         sys.exit('SSH connection failed: ' + str(exc))
+    # await call.message.answer(f)
+
+
+
+async def kod_loopback(call):
+    kod = call.data.split("_")[2]
+    print(kod)
+    loopback = await sql_selectone(f"SELECT loopback FROM filial Where kod = {kod}")
+    return loopback[0]
+
+
 
 
     # client = paramiko.SSHClient()
@@ -49,9 +62,3 @@ async def ssh(call):
     #         if line.split() != []:
     #             text += line
     # await call.message.answer(text)
-
-
-async def kod_loopback(call):
-    kod = call.data.split("_")[1]
-    loopback = await sql_selectone(f"SELECT loopback FROM filial Where kod = {kod}")
-    return loopback[0]
