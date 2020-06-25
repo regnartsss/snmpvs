@@ -4,44 +4,101 @@ from datetime import datetime
 from work import sql
 from loader import bot
 import asyncio
+import aiosnmp
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from concurrent.futures import ThreadPoolExecutor
 
 
 async def start_snmp():
     print("start")
+    await asyncio.sleep(10)
     i = 0
-    loop = asyncio.get_running_loop()
     while i < 2:
-        rows = await sql.sql_select("SELECT loopback, kod, sdwan FROM filial ORDER BY loopback")
+        rows = await sql.sql_select("SELECT loopback, kod, sdwan FROM filial")
         for row in rows:
-            # print(row)
             await asyncio.sleep(1)
             if row[2] == 1:
                 if (await sql.sql_selectone(f"SELECT count(loopback) FROM status WHERE loopback = '{row[0]}'"))[0] == 0:
                     await oid(row[0], row[1])
                 else:
                     await snmp(row[0])
-                    # executor = ThreadPoolExecutor()
-                    # await loop.run_in_executor(executor, snmp_no_async, row[0])
             elif row[2] == 0:
-                pass
-                # print("Микротик")
+                print(await sql.sql_selectone(f"SELECT count(loopback) FROM status WHERE loopback = '{row[0]}'"))
+                if (await sql.sql_selectone(f"SELECT count(loopback) FROM status WHERE loopback = '{row[0]}'"))[0] == 0:
+                    await oid_mikrotik(row[0], row[1])
+                else:
+                    try:
+                        await check_snmp(row[0])
+                    except ValueError:
+                        pass
             else:
                 print("Ошибка")
             # await monitoring()
+
+
+async def oid_mikrotik(ip, kod):
+    i = 9
+    mib = '1.3.6.1.2.1.2.2.1.2.'
+    await sql.sql_insert(f"INSERT INTO status (loopback, kod) VALUES ('{ip}', {kod})")
+    while i < 30:
+        i += 1
+        with aiosnmp.Snmp(host=ip, port=161, community="public", timeout=5, retries=1, max_repetitions=2, ) as s:
+            try:
+                for res in await s.get(f"{mib}{i}"):
+                    name_rou = res.value.decode('UTF-8')
+            except Exception as n:
+                print(f"oid_mikrotik {n}")
+            try:
+                name = name_rou.find("gre")
+            except:
+                continue
+            if name == 0:
+                id = name_rou.split("_")[3]
+                if id == "rou1":
+                    await sql.sql_insert(f"UPDATE status SET In_isp1 = '{i}' WHERE loopback = '{ip}'")
+                    # sql_insert(INSERT INTO status (loopback, In_isp1, In_isp1, kod) VALUES ()
+                elif id == "rou2":
+                    await sql.sql_insert(f"UPDATE status SET In_isp2= '{i}' WHERE loopback = '{ip}'")
+
+
+async def check_snmp(ip):
+    status1, status2 = await snmp_mikrotik(ip)
+    if status1 == 1:
+        status1 = 1
+    elif status1 == 2:
+        status1 = 0
+    if status2 == 1:
+        status2 = 1
+    elif status2 == 2:
+        status2 = 0
+    await check_all(ip, status1, status2)
+
+
+async def snmp_mikrotik(ip):
+    mib = '1.3.6.1.2.1.2.2.1.8.'
+    mib_all = await sql.sql_selectone(f"SELECT In_isp1, In_isp2 FROM status "
+                                      f"WHERE loopback = '{ip}'")
+    status = []
+    for mib_old in mib_all:
+        with aiosnmp.Snmp(host=ip, port=161, community="public", timeout=5, retries=1, max_repetitions=2, ) as s:
+            try:
+                for res in await s.get(f"{mib}{mib_old}"):
+                    status.append(res.value)
+            except Exception as n:
+                print(n)
+                pass
+    return status
 
 
 async def oid(loopback, kod):
     await asyncio.sleep(1)
     mib = "1.3.6.1.2.1.31.1.1.1.1"
     i = 0
-    In_isp1, Out_isp1, In_isp2, Out_isp2 = "0", "0", "0", "0"
+    in_isp1, out_isp1, in_isp2, out_isp2 = "0", "0", "0", "0"
     await sql.sql_insert(f"INSERT INTO status (loopback, kod) VALUES ('{loopback}', {kod})")
     while i < 35:
         await asyncio.sleep(1)
         i += 1
-        errorIndication, errorStatus, errorIndex, varBinds = next(
+        error_indication, error_status, error_index, var_binds = next(
             getCmd(SnmpEngine(),
                    UsmUserData(userName='dvsnmp', authKey='55GjnJwtPfk', authProtocol=usmHMACSHAAuthProtocol),
                    UdpTransportTarget((str(loopback), 161)),
@@ -49,33 +106,30 @@ async def oid(loopback, kod):
                    ObjectType(ObjectIdentity(f"{mib}.{i}"))
                    ))
 
-        if errorIndication:
-            print(errorIndication)
-        elif errorStatus:
-            print('%s at %s' % (errorStatus.prettyPrint(),
-                                errorIndex and varBinds[int(errorIndex) - 1][0] or '?'))
+        if error_indication:
+            print(error_indication)
+        elif error_status:
+            print('%s at %s' % (error_status.prettyPrint(),
+                                error_index and var_binds[int(error_index) - 1][0] or '?'))
         else:
-            for varBind in varBinds:
+            for varBind in var_binds:
 
                 oi = (' = '.join([x.prettyPrint() for x in varBind]).split("= ")[1])
                 #                print(oi)
                 if oi == "Tu0":
-                    numoid = (' = '.join([x.prettyPrint() for x in varBind]).split("= ")[0].split(".")[6])
-                    In_isp1 = "1.3.6.1.2.1.31.1.1.1.6.%s" % numoid
-                    Out_isp1 = "1.3.6.1.2.1.31.1.1.1.10.%s" % numoid
+                    num_oid = (' = '.join([x.prettyPrint() for x in varBind]).split("= ")[0].split(".")[6])
+                    in_isp1 = "1.3.6.1.2.1.31.1.1.1.6.%s" % num_oid
+                    out_isp1 = "1.3.6.1.2.1.31.1.1.1.10.%s" % num_oid
                 elif oi == "Tu1":
-                    numoid = (' = '.join([x.prettyPrint() for x in varBind]).split("= ")[0].split(".")[6])
-                    In_isp2 = "1.3.6.1.2.1.31.1.1.1.6.%s" % numoid
-                    Out_isp2 = "1.3.6.1.2.1.31.1.1.1.10.%s" % numoid
+                    num_oid = (' = '.join([x.prettyPrint() for x in varBind]).split("= ")[0].split(".")[6])
+                    in_isp2 = "1.3.6.1.2.1.31.1.1.1.6.%s" % num_oid
+                    out_isp2 = "1.3.6.1.2.1.31.1.1.1.10.%s" % num_oid
                 else:
                     pass
         await sql.sql_insert(
-            f"UPDATE status SET In_isp1 = '{In_isp1}',Out_isp1 = '{Out_isp1}', "
-            f"In_isp2 = '{In_isp2}', Out_isp2 ='{Out_isp2}' WHERE loopback = '{loopback}'")
+            f"UPDATE status SET In_isp1 = '{in_isp1}',Out_isp1 = '{out_isp1}', "
+            f"In_isp2 = '{in_isp2}', Out_isp2 ='{out_isp2}' WHERE loopback = '{loopback}'")
 
-# def snmp_no_async(loopback):
-#     print("test")
-#     asyncio.run(snmp(loopback))
 
 async def snmp(loopback):
     # print("snmp")
@@ -86,7 +140,7 @@ async def snmp(loopback):
     d = []
     for mib in mib_all:
         await asyncio.sleep(1)
-        errorIndication, errorStatus, errorIndex, varBinds = next(
+        error_indication, error_status, error_index, var_binds = next(
             getCmd(SnmpEngine(),
                    UsmUserData(userName='dvsnmp', authKey='55GjnJwtPfk', authProtocol=usmHMACSHAAuthProtocol),
                    UdpTransportTarget((str(loopback), 161)),
@@ -94,19 +148,19 @@ async def snmp(loopback):
                    ObjectType(ObjectIdentity(mib)))
         )
 
-        if errorIndication:
-            print(errorIndication)
+        if error_indication:
+            print(error_indication)
             print("Loopback не доступен")
             r = await sql.sql_selectone(f"SELECT In1_two, In2_two FROM status WHERE loopback = '{loopback}'")
             d.append(r[0])
             d.append(r[1])
 
             break
-        elif errorStatus:
-            print('%s at %s' % (errorStatus.prettyPrint(),
-                                errorIndex and varBinds[int(errorIndex) - 1][0] or '?'))
+        elif error_status:
+            print('%s at %s' % (error_status.prettyPrint(),
+                                error_index and var_binds[int(error_index) - 1][0] or '?'))
         else:
-            for varBind in varBinds:
+            for varBind in var_binds:
                 #                print(' = '.join([x.prettyPrint() for x in varBind]))
                 m = (' = '.join([x.prettyPrint() for x in varBind]).split("= ")[1])
                 d.append(m)
@@ -115,31 +169,31 @@ async def snmp(loopback):
     request = f"UPDATE status SET In1_one = In1_two, In2_one = In2_two, In1_two = {d[0]}, In2_two = {d[1]} " \
               f"WHERE loopback = '{loopback}'"
     await sql.sql_insert(request)
-    await check(loopback)
+    await check_cisco(loopback)
 
 
-async def check(loopback):
+async def check_cisco(loopback):
     await asyncio.sleep(1)
     request = f"""SELECT In1_two, In2_two, Out1_two, Out2_two, In1_one,  In2_one, Out1_one, Out2_one
                 FROM status WHERE loopback = '{loopback}'"""
     st = await sql.sql_selectone(request)
-    In_tunnel_1 = st[0] - st[4]
-    In_tunnel_2 = st[1] - st[5]
-    Out_tunnel_1 = st[2] - st[6]
-    Out_tunnel_2 = st[3] - st[7]
-    # print(Intunnel1)
-    # print(Outtunnel1)
-    # print(Intunnel2)
-    # print(Outtunnel2)
+    in_tunnel_1 = st[0] - st[4]
+    in_tunnel_2 = st[1] - st[5]
+    out_tunnel_1 = st[2] - st[6]
+    out_tunnel_2 = st[3] - st[7]
     status1, status2 = 3, 3
-    if In_tunnel_1 > 0 or Out_tunnel_1 > 0:
+    if in_tunnel_1 > 0 or out_tunnel_1 > 0:
         status1 = 1
-    elif In_tunnel_1 == 0 or Out_tunnel_1 == 0:
+    elif in_tunnel_1 == 0 or out_tunnel_1 == 0:
         status1 = 0
-    if In_tunnel_2 > 0 or Out_tunnel_2 > 0:
+    if in_tunnel_2 > 0 or out_tunnel_2 > 0:
         status2 = 1
-    elif In_tunnel_2 == 0 or Out_tunnel_2 == 0:
+    elif in_tunnel_2 == 0 or out_tunnel_2 == 0:
         status2 = 0
+    await check_all(loopback, status1, status2)
+
+
+async def check_all(loopback, status1, status2):
     status_t1, status_t2, kod = await sql.sql_selectone(
         f"SELECT status_1, status_2, kod FROM status WHERE loopback = '{loopback}'")
 
@@ -170,7 +224,6 @@ async def check(loopback):
             data = await request_name(loopback)
             text = f"{data[0]}\nКод: {data[1]}\n🔴 🔵 Основной провайдер не работает\n\n" \
                    f"Loopback: {data[2]}\n{data[5]}\nISP_1: {data[3]}\n"
-            print("Основной не работает")
             await sql.sql_insert(f"UPDATE status SET status_1 = 0, status_2 = 1 WHERE loopback = '{loopback}'")
             await send_mess(kod, text)
 
@@ -178,7 +231,6 @@ async def check(loopback):
         if status_t1 == status1 and status_t2 == status2:
             pass
         else:
-            print("Филиал работает")
             data = await request_name(loopback)
             text = f"{data[0]}\nКод: {data[1]}\n🔵 🔵 Филиал работает"
             await sql.sql_insert(f"UPDATE status SET status_1 = 1, status_2 = 1 WHERE loopback = '{loopback}'")

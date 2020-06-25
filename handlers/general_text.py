@@ -71,6 +71,8 @@ async def process_name(message: types.Message, state: FSMContext):
         await message.answer("Отмена", reply_markup=main_menu())
         await state.finish()
     else:
+        # ip = message.text.split(".")[1:3]
+        # print(ip)
         request = f"SELECT count(kod) FROM filial WHERE loopback = '{message.text}' and sdwan = 1"
         if (await sql.sql_selectone(request))[0] == 1:
             await message.answer("Филиал уже добавлен", reply_markup=main_menu())
@@ -141,12 +143,13 @@ async def all_other_messages(message: types.Message, state: FSMContext):
             await sql.sql_insert(f'DELETE FROM cisco')
             await sql.sql_insert(f'DELETE FROM registrator')
             await sql.sql_insert(f'DELETE FROM status')
-            request = f"SELECT loopback, name, region FROM filial ORDER by name"
+            request = f"SELECT loopback, name, region, kod FROM filial ORDER by name"
             rows = await sql.sql_select(request)
             for row in rows:
                 data['loopback'] = row[0]
                 data['name'] = row[1]
                 data['region'] = (await sql.sql_selectone(f"SELECT name FROM region WHERE id = {row[2]}"))[0]
+                data['kod'] = row[3]
                 await message.answer(f"Идет добавление филиала\n"
                                      f"Loopback: {data['loopback']}\n"
                                      f"Филиал: {data['name']}\n"
@@ -162,7 +165,6 @@ async def all_other_messages(message: types.Message, state: FSMContext):
         elif message.text == "Поиск по коду":
             await search_kod(message)
         elif message.text == "Поиск по серийнику":
-
             await search_serial(message)
     else:
         if message.text == "Подписаться на уведомления":
