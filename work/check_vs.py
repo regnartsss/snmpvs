@@ -280,7 +280,7 @@ async def monitoring():
     i = 1
 
     tab = []
-    column = [4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 64, 68,72,76,80,84,88,92,96,100,104,108,112,116,120]
+    column = [4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 64, 68,72,76,80,84,88,92,96,100,104,108,112,116,120,124,128]
     # column_old = [3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 48, 51]
     request = f"SELECT filial.kod, status_1, status_2, ISP1, ISP2 FROM status " \
               f"INNER JOIN filial ON status.kod = filial.kod ORDER BY status.kod"
