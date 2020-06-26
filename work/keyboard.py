@@ -15,7 +15,7 @@ def main_menu():
     keyboard.row("Филиалы", "Разное")
     keyboard.row("Регистраторы")
     keyboard.row("Поиск")
-    keyboard.row("Подписаться на уведомления")
+    keyboard.row("Кнопки пользователя")
     return keyboard
 
 
@@ -50,5 +50,6 @@ def filial():
 
 def main_menu_user():
     keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
+    keyboard.row("Проверить регистратор")
     keyboard.row("Подписаться на уведомления")
     return keyboard

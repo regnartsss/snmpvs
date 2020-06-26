@@ -5,9 +5,9 @@ from aiogram.dispatcher import FSMContext
 from work import sql
 from work.keyboard import main_menu
 from work.Add_filial import NewFilial, Add_snmp
-from work.Statistics import info_filial
-from work.keyboard import keyboard_other, region, keyboard_back, keyboard_search
-from work.Keyboard_menu import work
+from work.Statistics import info_filial, check_registrator
+from work.keyboard import keyboard_other, region, keyboard_back, keyboard_search, main_menu_user
+from work.Keyboard_menu import work, key_registrator
 from work.sub import worksub
 from work.search import SearchFilial, search_name, search_kod, search_serial, search_kod_win, search_name_win, \
     search_serial_win
@@ -156,8 +156,6 @@ async def all_other_messages(message: types.Message, state: FSMContext):
                                      f"Регион: {data['region']}", reply_markup=main_menu())
                 status = await Add_snmp(message=message, data=data).snmp_sysName()
                 await message.answer(status)
-        elif message.text == "Подписаться на уведомления":
-            await message.answer("Выберите регион", reply_markup=await worksub(message, call=""))
         elif message.text == "Поиск":
             await message.answer("Поиск", reply_markup=keyboard_search())
         elif message.text == "Поиск по названию":
@@ -166,6 +164,17 @@ async def all_other_messages(message: types.Message, state: FSMContext):
             await search_kod(message)
         elif message.text == "Поиск по серийнику":
             await search_serial(message)
+        elif message.text == "Кнопки пользователя":
+            await message.answer("Для возврата к основному меню введите /start или нажмите сюда", reply_markup=main_menu_user())
+        elif message.text == "Регистраторы":
+            await message.answer("Регистраторы", reply_markup=await key_registrator(message))
+        elif message.text == "Подписаться на уведомления":
+            await message.answer("Выберите регион", reply_markup=await worksub(message, call=""))
+        elif message.text == "Проверить регистратор":
+            await message.answer(await check_registrator(message))
     else:
         if message.text == "Подписаться на уведомления":
             await message.answer("Выберите регион", reply_markup=await worksub(message, call=""))
+        elif message.text == "Проверить регистратор":
+            await message.answer(await check_registrator(message))
+

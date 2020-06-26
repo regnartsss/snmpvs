@@ -3,6 +3,7 @@ from pysnmp.hlapi import *
 import asyncio
 import aiosnmp
 from loader import bot
+from work.check_vs import send_mess
 import time
 trassir = [
            # '1.3.6.1.4.1.3333.1.1',  # db
@@ -69,7 +70,6 @@ async def start_check_registrator():
         for row in rows:
             data_r = await snmpregist(row[0])
             if data_r is False:
-                print("ti")
                 request = f"""SELECT filial.name, registrator.hostname, filial.kod, down FROM filial LEFT JOIN registrator 
                 ON filial.kod = registrator.kod WHERE registrator.ip = '{row[0]}'
                     """
@@ -130,20 +130,17 @@ async def info_filial(ip, data):
            '1.3.6.1.4.1.3333.1.5',  # cameras
            '1.3.6.1.4.1.3333.1.11',  # up_time
            ]
-        print("dddd")
         info = await info_snmp_registrator(ip, mib)
-        print(info)
         request = f"""SELECT filial.name, registrator.hostname FROM filial LEFT JOIN registrator ON filial.kod = registrator.kod 
                     WHERE registrator.ip = '{ip}'"""
-        print(request)
         row = await sql.sql_selectone(request)
         text = f"""
         {row[0]}
-        💻 Сервер {row[1]}
-        💽 Диски {info[1]}
-        📃 Глубина архива дней {info[0]}
-        🎥 Камеры {info[2]}
-        ⌛  Время работы сервера  {info[3]}\n """
+💻 Сервер {row[1]}
+💽 Диски {info[1]}
+📃 Глубина архива дней {info[0]}
+🎥 Камеры {info[2]}
+⌛  Время работы сервера  {info[3]}\n """
         return text
     elif data == 'cam_down':
         mib = [
@@ -159,12 +156,12 @@ async def info_filial(ip, data):
         row = await sql.sql_selectone(request)
         text = f"""
         {row[0]}
-        💻 Сервер {row[1]}
-        💽 Диски {info[1]}
-        📃 Глубина архива дней {info[0]}
-        🎥 Камеры {info[2]}
-        ⌛  Время работы сервера  {info[3]}\n
-        🔍 Не работает камера: {info[4]} 
+💻 Сервер {row[1]}
+💽 Диски {info[1]}
+📃 Глубина архива дней {info[0]}
+🎥 Камеры {info[2]}
+⌛  Время работы сервера  {info[3]}\n
+🔍 Не работает камера: {info[4]} 
         """
         return text
     elif data == 'up':
@@ -182,11 +179,9 @@ async def info_filial(ip, data):
             '1.3.6.1.4.1.3333.1.11',  # up_time
         ]
         info = await info_snmp_registrator(ip, mib)
-        print(info)
         request = f"""SELECT filial.name, registrator.hostname FROM filial LEFT JOIN registrator 
 ON filial.kod = registrator.kod WHERE registrator.ip = '{ip}'"""
         row = await sql.sql_selectone(request)
-        print(row)
         text = f"{row[0]}\n" \
                f"💻 Сервер {row[1]}\n" \
                f"💽 Диски {info[1]}\n" \
@@ -198,133 +193,10 @@ ON filial.kod = registrator.kod WHERE registrator.ip = '{ip}'"""
 
 async def info_registrator(ip):
     row = await info_snmp_registrator(ip, trassir)
-    print(row)
-    print(row[2])
     cam = row[2].split()[2]
     cam_down = row[2].split()[0]
     request = f"""UPDATE registrator 
 SET archive = '{row[0]}', disk = '{row[1]}', cam = '{cam}', 
 cam_down = '{cam_down}', script = '{row[3]}', firmware = '{row[4]}', uptime = '{row[5]}', down = 0 WHERE ip = '{ip}'"""
-    # print(request)
     await sql.sql_insert(request)
-    #     f"UPDATE disk = '{disk}', cam_down = '{cam_down}', cam = '{cam}' FROM registrator WHERE ip = '{row[0]}'")
-    #
-    #
-
-        #     st, statusall = "", ""
-        #     s, r = 0, 0
-        #     #        if len(registr.split(";")) > 1:
-        #     #            print("Больше двух")
-        #     #       print("registra " + registr)
-        #     #        print(len(registr.split(";")))
-        #     if stregistr == "1":
-        #         #            print(registr + " не проверяется")
-        #         continue
-        #     else:
-        #         while r < len(registr.split(";")):
-        #             st = snmpregist(registr.split(";")[r])[1]
-        #             statusall = statusall + st
-        #             r += 1
-        #
-        #         #        print(statusall)
-        #         if statusall == stregistr:
-        #             continue
-        #         else:
-        #             r = 0
-        #             stsend = ''
-        #             while r < len(statusall.split(";")) - 1:
-        #                 if stregistr == "":
-        #
-        #                     stsend = statusall
-        #
-        #                     # sendreg(statusall, name, reg=registr, st=1)
-        #                     break
-        #                 elif statusall.split(";")[r] == "0":
-        #                     if statusall.split(";")[r] == stregistr.split(";")[r]:
-        #                         stsend = stsend + statusall.split(";")[r] + ";"
-        #                         r += 1
-        #                         continue
-        #                     else:
-        #                         name_server = stregistr.split(";")[r].split(":")[4]
-        #                         stsend = stsend + statusall.split(";")[r]
-        #                         #                        print('Не доступен '+name_server)
-        #
-        #                         # sendreg(statusall.split(";")[r], name, reg=registr)
-        #                 elif stregistr.split(";")[r] == "0":
-        #                     stsend = stsend + statusall.split(";")[r]
-        #                     #                    print('Доступен')
-        #                     # sendreg(statusall.split(";")[r], name, text="Доступен", reg=registr, st=1)
-        #
-        #                 else:
-        #                     if statusall.split(";")[r] == stregistr.split(";")[r]:
-        #                         stsend = stsend + statusall.split(";")[r] + ";"
-        #                         r += 1
-        #                         continue
-        #                     else:
-        #                         stat = statusall.split(";")[r]
-        #                         stre = stregistr.split(";")[r]
-        #                         #                        print(stat+" = "+ stregistr)
-        #                         if stat.split(":")[2] != stre.split(":")[2]:
-        #                             if stat.split(":")[2] == "OK":
-        #                                 #                                print("нет ошибка диска")
-        #                                 stsend = stsend + statusall.split(";")[r]
-        #                                 #                                print(registr)
-        #                                 # sendreg(statusall.split(";")[r], name, text="Проблема с жестким диском решена",
-        #                                 #         reg=registr, st=1)
-        #                             else:
-        #                                 #                                print("Ошибка диска")
-        #                                 stsend = stsend + statusall.split(";")[r]
-        #                                 #                                print (stsend)
-        #                                 #                                print(registr)
-        #                                 # sendreg(statusall.split(";")[r], name, text="Проблема с жестким диском",
-        #                                 #         reg=registr, st=1)
-        #                         elif stat.split(":")[4] != stre.split(":")[4]:
-        #                             camdown = re.findall('\d+', stat.split(":")[4].split("/")[0])
-        #                             cam = re.findall('\d+', stat.split(":")[4].split("/")[1])
-        #                             #                            print (camdown)
-        #                             #                            print (cam)
-        #                             if camdown < cam:
-        #                                 #                                print("Ошибка камеры")
-        #                                 stsend = stsend + statusall.split(";")[r]
-        #                                 # sendreg(statusall.split(";")[r], name, text="Проблема с камерой", reg=registr,
-        #                                 #         st=2)
-        #                             elif camdown == cam:
-        #                                 #                                print("Камеры ОК")
-        #                                 stsend = stsend + statusall.split(";")[r]
-        #                                 # sendreg(statusall.split(";")[r], name, text="Камеры работают", reg=registr,
-        #                                 #         st=1)
-        #                         else:
-        #                             stsend = stsend + statusall.split(";")[r]
-        #
-        #                 stsend = stsend + ";"
-        #                 #                print("r1" + str(r))
-        #                 r += 1
-        #             #                print("r2" + str(r))
-        #             #
-        #             # sql_insert("UPDATE snmp SET stregistr = '" + stsend + "' WHERE registr = '" + registr + "'")
-        # except Exception as e:
-        #     print(e)
-            # if str(e) == "list index out of range":
-            #     bot.send_message(ADMIN, "Ошибка проверки регистратора, добавлен новый регистратор " + registr)
-            #     sql_insert("UPDATE snmp SET stregistr = '' WHERE registr = '" + str(registr) + "'")
-            # #         print("Ошибка проверки регистратора "+ str(e))
-            # else:
-            #     bot.send_message(ADMIN, "Ошибка проверки регистратора " + str(registr) + " " + str(e))
-            #     sql_insert("UPDATE snmp SET stregistr = '' WHERE registr = '" + str(registr) + "'")
-            #     continue
-    # sr += 1
-    # savestatus(sr, timesr, p=2)
-    # select_registr()
-
-
-async def send_mess(kod, text):
-    try:
-        rows = await sql.sql_selectone(f"SELECT user_id FROM sub WHERE kod = {kod}")
-        for row in rows:
-            await asyncio.sleep(1)
-            await bot.send_message(chat_id=row, text=text)
-    except TypeError:
-        print("Ошибка отправки")
-
-# start_check_registrator()
 

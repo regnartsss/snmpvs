@@ -1,6 +1,5 @@
 from pysnmp.hlapi import *
-from pprint import pprint
-from datetime import datetime
+from datetime import datetime, time
 from work import sql
 from loader import bot
 import asyncio
@@ -30,7 +29,7 @@ async def start_snmp():
                     #     pass
             else:
                 print("Ошибка")
-            await monitoring()
+            # await monitoring()
 
 
 async def oid_mikrotik(ip, kod):
@@ -83,12 +82,12 @@ async def snmp_mikrotik(ip):
     status = []
     for mib_old in mib_all:
         with aiosnmp.Snmp(host=ip, port=161, community="public", timeout=5, retries=2, ) as s:
-            try:
-                for res in await s.get(f"{mib}{mib_old}"):
-                    status.append(res.value)
-            except Exception as n:
-                print(n)
-                pass
+                try:
+                    for res in await s.get(f"{mib}{mib_old}"):
+                        status.append(res.value)
+                except aiosnmp.exceptions.SnmpTimeoutError:
+                    pass
+
     return status
 
 
@@ -240,7 +239,7 @@ async def check_all(loopback, status1, status2):
             await sql.sql_insert(f"UPDATE status SET status_1 = 1, status_2 = 1 WHERE loopback = '{loopback}'")
             await send_mess(kod, text)
     else:
-        pprint("тест")
+        print("тест")
 
 
 async def request_name(loopback):
@@ -254,9 +253,22 @@ async def send_mess(kod, text):
         rows = await sql.sql_selectone(f"SELECT user_id FROM sub WHERE kod = {kod}")
         for row in rows:
             await asyncio.sleep(1)
-            await bot.send_message(chat_id=row, text=text)
+            await bot.send_message(chat_id=row, text=text,disable_notification=await notif())
     except TypeError:
         print("Ошибка отправки")
+
+
+async def notif():
+    H, M, S = datetime.now().strftime("%H:%M:%S").split(":")[0:3]
+    time_min = time(20, 00)
+    time_max = time(8, 00)
+    time_old = time(int(H), int(M))
+    if time_min < time_old > time_max:
+         print("Без звука")
+         return True
+    else:
+         print("Со звуком")
+         return None
 
 
 def data_monitor():
@@ -268,7 +280,7 @@ async def monitoring():
     i = 1
 
     tab = []
-    column = [4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60]
+    column = [4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 64, 68,72,76,80,84,88,92,96,100,104,108,112,116,120]
     # column_old = [3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 48, 51]
     request = f"SELECT filial.kod, status_1, status_2, ISP1, ISP2 FROM status " \
               f"INNER JOIN filial ON status.kod = filial.kod ORDER BY status.kod"
@@ -305,4 +317,4 @@ async def call_name(call):
     try:
         await bot.answer_callback_query(callback_query_id=call.id, text=f"{name}")
     except Exception as n:
-        print(n)
+        print(f"cal{n}")

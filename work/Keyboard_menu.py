@@ -42,7 +42,12 @@ async def ssh(call):
     #             InlineKeyboardButton(text="Назад", callback_data=f"region_{call.data.split('_')[2]}"))
     return text, keyboard
 
-
+async def key_registrator(message):
+    keyboard = InlineKeyboardMarkup()
+    rows = await sql.sql_select("SELECT id, name FROM region")
+    for row in rows:
+        keyboard.row(InlineKeyboardButton(text=f"{row[1]}", callback_data=f"registrator_{row[0]}"))
+    return keyboard
 
 
 
