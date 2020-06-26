@@ -30,7 +30,7 @@ async def start_snmp():
                     #     pass
             else:
                 print("Ошибка")
-            # await monitoring()
+            await monitoring()
 
 
 async def oid_mikrotik(ip, kod):
