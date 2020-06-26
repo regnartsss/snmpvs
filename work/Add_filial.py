@@ -1,4 +1,5 @@
-from pysnmp.hlapi import getCmd, SnmpEngine,UsmUserData, usmHMACSHAAuthProtocol, UdpTransportTarget, ContextData, ObjectType, ObjectIdentity,CommunityData,bulkCmd
+from pysnmp.hlapi import getCmd, SnmpEngine, UsmUserData, usmHMACSHAAuthProtocol, UdpTransportTarget, ContextData, \
+    ObjectType, ObjectIdentity, CommunityData, bulkCmd
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from work import sql
 import paramiko
@@ -7,33 +8,25 @@ import time
 from loader import bot
 import asyncio
 import aiosnmp
+import aioping
+
 
 def find_location():
     return os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__))).replace('\\', '/') + '/'
 
 
 PATH = find_location()
+
+
 class NewFilial(StatesGroup):
-        loopback = State()
-        name = State()
-        region = State()
-
-
-    #
-    #     for key, value in dat.items():
-    #         try:
-    #             dat[key]["region"]
-    #         except KeyError:
-    #             print("error_2")
-    #             for k, v in data.region.items():
-    #
-    #                 if v == message.text:
-    #                     dat[key]["region"] = k
-    #                     bot.send_message(message.chat.id, info_filial(key), reply_markup=keyboard.main_menu()
+    loopback = State()
+    name = State()
+    region = State()
 
 
 class Add_snmp():
     def __init__(self, message, data):
+        print(data)
         self.loopback = data['loopback']
         self.name = data['name']
         self.region = data['region']
@@ -44,21 +37,35 @@ class Add_snmp():
 
     # Начальная информация о филиале
     async def snmp_sysName(self):
-        try:
             print(self.loopback)
-            request = f"SELECT sdwan FROM filial WHERE loopback = '{self.loopback}'"
-            sdwan = (await sql.sql_selectone(request))[0]
-        except Exception as n:
-            print(n)
-            sdwan = 1
-        print(f"sdwan{sdwan}")
-        if sdwan == 1:
-            await self.cisco()
-            return self.kod
-        else:
-            print("Проверка микротика")
-            await self.mikrotik()
-            return self.kod
+            old = self.loopback.split(".")[1:2]
+            if old[0] == '255':
+                print("cisco")
+                await self.cisco()
+                return self.kod
+            else:
+                print("mikorik")
+                await self.mikrotik()
+                return self.kod
+        #     request = f"SELECT sdwan FROM filial WHERE loopback = '{self.loopback}'"
+        #     print(request)
+        #     sdwan = (await sql.sql_selectone(request))[0]
+        #     print(sdwan)
+        # except TypeError:
+        #     request = f"INSERT INTO filial (kod, loopback, name, region) VALUES ({self.kod},'{self.loopback}','{self.name}',(SELECT id FROM region WHERE name = '{self.region}'))"
+        #     await sql.sql_insert(request)
+        #     return f"Проверьте поле sdwan {self.kod} {self.loopback}"
+        #     # await bot.send_message(chat_id=765333440, text=f"Проверьте поле sdwan {self.kod} {self.loopback}")
+        #     # return
+        # else:
+        #     print("всё ок")
+        #     if sdwan == 1:
+        #         print("Проверка cisco")
+
+        #     else:
+        #         print("Проверка микротика")
+        #         await self.mikrotik()
+        #         return self.kod
 
     async def cisco(self):
         print("Hostname")
@@ -82,6 +89,7 @@ class Add_snmp():
                 print(f"Удаление старого филиала {self.kod}")
             try:
                 request = f"DELETE FROM filial WHERE kod = {self.kod}"
+                print(request)
                 await sql.sql_insert(request)
             except Exception as n:
                 print(self.kod)
@@ -138,7 +146,6 @@ class Add_snmp():
             request = f"INSERT INTO cisco (kod, ip, hostname) VALUES ({self.kod}, '{k}','{v}')"
             await sql.sql_insert(request)
 
-
     async def mikrotik_hostname(self):
         mibname = '1.3.6.1.2.1.1.5.0'
         errorIndication, errorStatus, errorIndex, varBinds = next(
@@ -152,48 +159,26 @@ class Add_snmp():
             namerou = (' ='.join([x.prettyPrint() for x in varBind])).split("=")[1]
             return namerou
 
-
-
-                    # name = namerou.find("gre")
-                    # print(name)
-                    # if name == 0:
-                    #     id = namerou.split("_")[3]
-                    #     if id == "rou1":
-                    #         # print(new_ip + " qq " + new_name)
-                    #         sql.sql_insert(
-                    #             "INSERT INTO snmp (name, ip, namerou1, oidrou1) VALUES (""'" + new_name + "','" + new_ip + "','" + namerou + "','" + str(
-                    #                 i) + "')")
-                    #         bot.send_message(message.chat.id,
-                    #                          "Добавлен филиал " + new_name + ", ip " + new_ip + " туннель " + namerou + " ")
-                    #     else:
-                    #
-                    #         sql.sql_insert("UPDATE snmp SET oidrou2 = '" + str(
-                    #             i) + "', namerou2 = '" + namerou + "' WHERE ip = '" + new_ip + "'")
-                    #         bot.send_message(message.chat.id, "Туннель " + namerou + " ")
-                    #         sql.sql_insert("ALTER TABLE user ADD '" + str(new_ip) + "' TEXT ")
-                #
-                # i = i + 1
-
     async def mikrotik_cisco(self):
         data = {}
         data["cisco"] = {}
         data["registrator"] = {}
         ip = self.loopback
-        # print(ip)
-        # print(ip.split(".")[0:3])
-        ip = ip.split(".")[1:3]
-        i = 1
-        while i < 20:
-            ip_cisco = f"10.{ip[0]}.{ip[1]}.{i}"
-            await self.snmp_cisco_v2(ip_cisco, data)
-            # print(ip_cisco)
-            i+=1
-        i=0
-        while i < 20:
-            ip_registrator = f"19.{ip[0]}.{ip[1]}.{i}"
-            # print(ip_registrator)
-            await self.snmp_trassir(ip_registrator, data)
-            i += 1
+        with aiosnmp.Snmp(host=ip, port=161, community="public", timeout=10, retries=2, max_repetitions=2, ) as snmp:
+            try:
+                results = await snmp.bulk_walk(".1.3.6.1.2.1.4.22.1.3")
+                for res in results:
+                    ip_old = str(res.value)
+                    if 1 < int(ip_old.split(".")[3]) < 20:
+                        ip_n = ip.split(".")[1:3]
+                        ip_cisco = f"10.{ip_n[0]}.{ip_n[1]}.0"
+                        ip_reg = f"19.{ip_n[0]}.{ip_n[1]}.0"
+                        if ip_cisco.split(".")[0:3] == ip_old.split(".")[0:3]:
+                            await self.snmp_cisco_v2(ip_old, data)
+                        elif ip_reg.split(".")[0:3] == ip_old.split(".")[0:3]:
+                            await self.snmp_trassir(ip_old, data)
+            except:
+                pass
         return data
 
     async def mikrotik_gre(self):
@@ -201,25 +186,28 @@ class Add_snmp():
         oid = '1.3.6.1.2.1.2.2.1.2.'
         while i < 30:
             i += 1
-            with aiosnmp.Snmp(host=self.loopback, port=161, community="public", timeout=5, retries=1, max_repetitions=2, ) as snmp:
+            with aiosnmp.Snmp(host=self.loopback, port=161, community="public", timeout=5, retries=2,
+                              max_repetitions=1, ) as snmp:
                 try:
-                    for res in await snmp.get(f"{oid}{i}"):
-                        namerou = res.value.decode('UTF-8')
+                    try:
+                        for res in await snmp.get(f"{oid}{i}"):
+                            namerou = res.value.decode('UTF-8')
+                    except AttributeError:
+                        continue
                 except Exception as n:
-                    print(f"Ошибка AttributeError {n}")
-                    continue
+                    print("Устройство не доступно")
+                    break
                 name = namerou.find("gre")
                 # print(name)
                 if name == 0:
                     print(namerou)
                     id = namerou.split("_")[3]
                     if id == "rou1":
-                        await sql.sql_insert(f"UPDATE filial SET isp1_name = '{namerou}' WHERE loopback = '{self.loopback}'")
-                        # sql_insert(INSERT INTO status (loopback, In_isp1, In_isp1, kod) VALUES ()
-
+                        await sql.sql_insert(
+                            f"UPDATE filial SET isp1_name = '{namerou}' WHERE loopback = '{self.loopback}'")
                     elif id == "rou2":
-                        await sql.sql_insert(f"UPDATE filial SET isp2_name = '{namerou}' WHERE loopback = '{self.loopback}'")
-                    #     await sql.sql_insert(f"UPDATE status SET In_isp2= '{i}' WHERE loopback = '{ip}'")
+                        await sql.sql_insert(
+                            f"UPDATE filial SET isp2_name = '{namerou}' WHERE loopback = '{self.loopback}'")
                 else:
                     pass
 
@@ -279,7 +267,7 @@ class Add_snmp():
                     except Exception as n:
                         print(n)
 
-        data["cisco"]={}
+        data["cisco"] = {}
         data["registrator"] = {}
 
         for (errorIndication,
@@ -302,7 +290,6 @@ class Add_snmp():
                                     errorIndex and varBinds[int(errorIndex) - 1][0] or '?'))
                 break
             else:
-
                 for varBind in varBinds:
                     #                    print(' = '.join([x.prettyPrint() for x in varBind]))
                     ip = ' = '.join([x.prettyPrint() for x in varBind]).split("= ")[1]
@@ -314,15 +301,15 @@ class Add_snmp():
                             if 1 < int(ip.split(".")[3]) < 10:
                                 await asyncio.sleep(1)
                                 # print("cisco")
-                                await self.snmp_cisco_v2(ip,data)
+                                await self.snmp_cisco_v2(ip, data)
                         elif data["Vlan400"].split(".")[0:3] == ip.split(".")[0:3]:
                             if 1 < int(ip.split(".")[3]) < 15:
                                 await asyncio.sleep(1)
-                                await self.snmp_trassir(ip,data)
+                                await self.snmp_trassir(ip, data)
                         elif data["Vlan500"].split(".")[0:3] == ip.split(".")[0:3]:
                             if 1 < int(ip.split(".")[3]) < 15:
                                 await asyncio.sleep(1)
-                                await self.snmp_cisco_v2(ip,data)
+                                await self.snmp_cisco_v2(ip, data)
                     else:
                         pass
         command = "show ip route"
@@ -370,55 +357,25 @@ class Add_snmp():
         return data
 
     async def snmp_cisco_v2(self, ip, data):
-        with aiosnmp.Snmp(host=ip, port=161, community="read", timeout=5, retries=1, max_repetitions=2,) as snmp:
+        print(ip)
+        with aiosnmp.Snmp(host=ip, port=161, community="read", timeout=10, retries=2, max_repetitions=2, ) as snmp:
             try:
                 for res in await snmp.get(".1.3.6.1.4.1.9.2.1.3.0"):
                     data["cisco"][ip] = res.value.decode('UTF-8')
-            except Exception as n:
-                print(f"Ошибка {n}")
 
-        # errorIndication, errorStatus, errorIndex, varBinds = await next(
-        #     getCmd(SnmpEngine(),
-        #            CommunityData('read', mpModel=0),
-        #            UdpTransportTarget((ip, 161)),
-        #            ContextData(),
-        #            ObjectType(ObjectIdentity('SNMPv2-MIB', 'sysName', 0)))
-        # )
-        # if errorIndication:
-        #     print(errorIndication)
-        # elif errorStatus:
-        #     print('%s at %s' % (errorStatus.prettyPrint(),
-        #                         errorIndex and varBinds[int(errorIndex) - 1][0] or '?'))
-        # else:
-        #     for varBind in varBinds:
-        #         print(' = '.join([x.prettyPrint() for x in varBind]))
-        #         hostname_cisco = ' = '.join([x.prettyPrint() for x in varBind]).split("= ")[1]
+            except Exception as n:
+                print(f"Ошибка_cisco {n}")
 
 
     async def snmp_trassir(self, ip, data):
-        with aiosnmp.Snmp(host=ip, port=161, community="dssl", timeout=5, retries=1, max_repetitions=2,) as snmp:
+        print(ip)
+        with aiosnmp.Snmp(host=ip, port=161, community="dssl", timeout=10, retries=2, max_repetitions=2, ) as snmp:
             try:
                 for res in await snmp.get("1.3.6.1.4.1.3333.1.7"):
                     data["registrator"][ip] = res.value.decode('UTF-8')
-            except Exception as n:
-                print(f"Ошибка {n}")
 
-        # errorIndication, errorStatus, errorIndex, varBinds = next(
-        #     getCmd(SnmpEngine(),
-        #            CommunityData('dssl'),
-        #            UdpTransportTarget((ip, 161)),
-        #            ContextData(),
-        #            ObjectType(ObjectIdentity('1.3.6.1.4.1.3333.1.7')))
-        # )
-        # if errorIndication:
-        #     print(errorIndication)
-        # elif errorStatus:
-        #     print('%s at %s' % (errorStatus.prettyPrint(),
-        #                         errorIndex and varBinds[int(errorIndex) - 1][0] or '?'))
-        # else:
-        #     for varBind in varBinds:
-        #         #               print(' = '.join([x.prettyPrint() for x in varBind]))
-        #         hostname_trassir = ' = '.join([x.prettyPrint() for x in varBind]).split("= ")[1]
+            except Exception as n:
+                print(f"Ошибка_trassir {n}")
 
 
     async def ssh_sh_int(self):
@@ -481,218 +438,11 @@ class Add_snmp():
             for line in lines:
                 if line.split() != []:
                     if line.split()[0] == "Processor":
-
                         return line.split()[3]
-#
-#     async def snmp_ifEntry(self):
-#
-#         for (errorIndication,
-#              errorStatus,
-#              errorIndex,
-#              varBinds) in bulkCmd(SnmpEngine(),
-#                                   UsmUserData(userName='dvsnmp', authKey='55GjnJwtPfk',
-#                                               authProtocol=usmHMACSHAAuthProtocol
-#                                               ),
-#                                   UdpTransportTarget((self.loopback, 161)),
-#                                   ContextData(),
-#                                   1, 25,
-#                                   ObjectType(ObjectIdentity('1.3.6.1.2.1.2.2.1.2')),
-#                                   lexicographicMode=False):
-#             if errorIndication:
-#                 print(errorIndication)
-#                 break
-#             elif errorStatus:
-#                 print('%s at %s' % (errorStatus.prettyPrint(),
-#                                     errorIndex and varBinds[int(errorIndex) - 1][0] or '?'))
-#                 break
-#             else:
-#                 for varBind in varBinds:
-#                     print(' = '.join([x.prettyPrint() for x in varBind]))
-#                     vl = ' = '.join([x.prettyPrint() for x in varBind]).split("= ")[1]
-#                     index = ' = '.join([x.prettyPrint() for x in varBind]).split(" =")[0].split(".")[5]
-#                     if vl == "Vlan100":
-#                         data["vlan100"] = index
-#                     elif vl == "Vlan400":
-#                         data["vlan400"] = index
-#                     elif vl == "Vlan500":
-#                         data["vlan500"] = index
-#
-#     async def snmp_ipAddrEntry(self):
-#         data["ISP1"] = "0.0.0.0"
-#         data["ISP2"] = "0.0.0.0"
-#         for (errorIndication,
-#              errorStatus,
-#              errorIndex,
-#              varBinds) in bulkCmd(SnmpEngine(),
-#                                   UsmUserData(userName='dvsnmp', authKey='55GjnJwtPfk',
-#                                               authProtocol=usmHMACSHAAuthProtocol
-#                                               ),
-#                                   UdpTransportTarget((self.loopback, 161)),
-#                                   ContextData(),
-#                                   1, 25,
-#                                   ObjectType(ObjectIdentity('IP-MIB', 'ipAddrEntry', 2)),
-#                                   lexicographicMode=False):
-#             if errorIndication:
-#                 print(errorIndication)
-#                 break
-#             elif errorStatus:
-#                 print('%s at %s' % (errorStatus.prettyPrint(),
-#                                     errorIndex and varBinds[int(errorIndex) - 1][0] or '?'))
-#                 break
-#             else:
-#                 for varBind in varBinds:
-#                     print(' = '.join([x.prettyPrint() for x in varBind]))
-#                     s = ' = '.join([x.prettyPrint() for x in varBind])
-#                     print(s.split("= ")[1])
-#                     d = s.split(" =")[0].split(".")[1:5]
-#                     s = s.split("= ")[1]
-#                     d = "%s.%s.%s.%s" % (d[0], d[1], d[2], d[3])
-#
-#                     if s == "1":
-#                         data["ISP1"] = d
-#                     elif s == "2":
-#                         data["ISP2"] = d
-#                     elif s == data["vlan100"]:
-#                         if d.split(".")[0] == "169":
-#                             data["IP_100"] = "null"
-#                         else:
-#                             data["IP_100"] = d
-#                     elif s == data["vlan400"]:
-#                         data["IP_400"] = d
-#                     elif s == data["vlan500"]:
-#                         print(d.split(".")[0])
-#                         if d.split(".")[0] == "169":
-#                             data["IP_500"] = "null"
-#                         else:
-#                             data["IP_500"] = d
-#
 
-
-#     # "show ip route"
-
-#
-#
-
-#
-#
-# ad = Add_snmp()
-#
-
-# async def new(message):
-#     result = await snmp_sysName(message)
-#     if result is True:
-#         await NewFilial.next()
-#         await message.answer("Введите название филиала как в карточке 1С")
-#     # else:
-#     #     await message.answer("Ошибка при опросе устройства, повторите позднее")
-#     #     await NewFilial.
-#
-#
-# async def snmp_sysName(message):
-#         print("Hostname")
-#         # errorIndication, errorStatus, errorIndex, varBinds = next(getCmd(SnmpEngine(),
-#         #                                                                  UsmUserData(userName='dvsnmp',
-#         #                                                                              authKey='55GjnJwtPfk',
-#         #                                                                              authProtocol=usmHMACSHAAuthProtocol),
-#         #                                                                  UdpTransportTarget((self.loopback, 161)),
-#         #                                                                  ContextData(),
-#         #                                                                  ObjectType(
-#         #                                                                      ObjectIdentity("1.3.6.1.2.1.1.5.0"))))
-#         # for varBind in varBinds:
-#         #     sysName = ' = '.join([x.prettyPrint() for x in varBind])
-#         # self.kod = sysName.split("= ")[1].split("-")[2]
-#         # try:
-#         #     self.kod = self.kod.split(".")[0]
-#         # except Exception as n:
-#         #     print(n)
-#         #     pass
-#         # print("Создаем карточку")
-#         # print(self.kod)
-#
-#         # data = {}
-#         # leasea = {"cisco": {}, "registrator": {}}
-#         # try:
-#         #     data["sysName"] = sysName.split("= ")[1].split(".")[0]
-#         # except:
-#         #     data["sysName"] = sysName.split("= ")[1]
-#         # data["kod"] = self.kod
-#         # print("Получаем все айпи на интерфейса")
-#         # self.ssh_ip_int()
-#         # print("Получаем шлюз провайдера")
-#         # self.ssh_sh_int()
-#         # print("Получаем description провайдера")
-#         # self.ssh_gateway()
-#         # print("hostname cisco registrator")
-#         # self.snmp_ipNetToMediaNEtAddress()
-#         # data["serial"] = sshlist.ssh_serial(self.loopback)
-#         # save_d()
-#         return True
-#         # try:
-#         #     bot.send_message(chat_id=765333440, text="Филиал добавлен %s " % self.kod)
-#         # except:
-#         #     pass
-
-
-#
-# def new_name():
-#     await NewFilial.next()
-#
-#
-#
-#     if message.text == "111":
-#         users[str(message.chat.id)]["new_filial"] = 0
-#         bot.send_message(message.chat.id, "Отмена")
-#     elif message.text == "Добавить":
-#         users[str(message.chat.id)]["new_filial"] = 1
-#         #        bot.send_message(message.chat.id, "Ожидайте, идет опрос устройства")
-#         bot.send_message(message.chat.id, "Введите Loopback адрес или наберите 111 для отмены")
-#
-#     elif users[str(message.chat.id)]["new_filial"] == 1:
-#         #       try:
-#         print("Добавить")
-#         for kod, value in dat.items():
-#             if dat[kod]["loopback"] == message.text:
-#                 users[str(message.chat.id)]["new_filial"] = 0
-#                 bot.send_message(message.chat.id, "Филиал уже добавлен")
-#
-#         users[str(message.chat.id)]["new_filial"] = 2
-#         bot.send_message(message.chat.id, "Ожидайте, идет опрос устройства")
-#         Snmp(message=message).snmp_sysName()
-#         bot.send_message(message.chat.id, "Loopback: %s\nВведите название филиала как в карточке 1С" % message.text)
-
-    # except:
-    #     users[str(message.chat.id)]["new_filial"] = 2
-    #     #        dat[message.text {}}
-    #     bot.send_message(message.chat.id, "Ожидайте, идет опрос устройства")
-    #     Snmp(message=message).snmp_sysName()
-    # #     bot.send_message(message.chat.id, "Loopback: %s\nВведите название филиала как в карточке 1С" % message.text)
-    # elif users[str(message.chat.id)]["new_filial"] == 2:
-    #     users[str(message.chat.id)]["new_filial"] = 3
-    #     for k, v in dat.items():
-    #         try:
-    #             dat[k]["name"]
-    #
-    #         except:
-    #             print("error_1")
-    #             dat[k]["name"] = message.text
-    #             bot.send_message(message.chat.id, "Выберите регион", reply_markup=keyboard.region())
-    # elif users[str(message.chat.id)]["new_filial"] == 3:
-    #     users[str(message.chat.id)]["new_filial"] = 0
-    #
-    #     for key, value in dat.items():
-    #         try:
-    #             dat[key]["region"]
-    #         except KeyError:
-    #             print("error_2")
-    #             for k, v in data.region.items():
-    #
-    #                 if v == message.text:
-    #                     dat[key]["region"] = k
-    #                     bot.send_message(message.chat.id, info_filial(key), reply_markup=keyboard.main_menu())
-    #
 
 async def filial_check(call):
-    data ={}
+    data = {}
     kod = call.data.split("_")[1]
     request = f"SELECT loopback, name, region, kod FROM filial WHERE kod = {kod}"
     # print(request)
@@ -706,11 +456,10 @@ async def filial_check(call):
     await sql.sql_insert(f'DELETE FROM status WHERE kod = {kod}')
     await sql.sql_insert(f'DELETE FROM filial WHERE kod = {kod}')
     await call.message.answer(f"Идет обновление филиала\n"
-                         f"Loopback: {data['loopback']}\n"
-                         f"Филиал: {data['name']}\n"
-                         f"Регион: {data['region']}")
+                              f"Loopback: {data['loopback']}\n"
+                              f"Филиал: {data['name']}\n"
+                              f"Регион: {data['region']}")
     status = await Add_snmp(message=call.message, data=data).snmp_sysName()
+    # if status is None:
+    #     return "Ошибка"
     return status
-
-
-

@@ -46,8 +46,8 @@ async def snmpregist(ip):
                 for res in await snmp.get(r):
                     status = res.value.decode('UTF-8')
                     d.append(status)
-            except Exception as n:
-                print(f"Ошибка snmpregist  {n}")
+            except aiosnmp.exceptions.SnmpTimeoutError:
+                return False
     return d
 
 
@@ -56,65 +56,70 @@ async def info_snmp_registrator(ip, mib_all):
         for r in mib_all:
             with aiosnmp.Snmp(host=ip, port=161, community="dssl", timeout=10, retries=3,
                               max_repetitions=5, ) as snmp:
-                try:
-                    for res in await snmp.get(r):
-                        status = res.value.decode('UTF-8')
-                        d.append(status)
-                except Exception as n:
-                    print(f"Ошибка snmpregist  {n}")
+                        for res in await snmp.get(r):
+                            status = res.value.decode('UTF-8')
+                            d.append(status)
         return d
 
 
 async def start_check_registrator():
-    while 2 < 3:
+    while 0 < 1:
         await asyncio.sleep(5)
         rows = await sql.sql_select("SELECT ip FROM registrator")
-        # print(rows)
         for row in rows:
-
-                s = await snmpregist(row[0])
-                # print(s)
-                disk = s[0]
-                # cam = s[1].split()[2]
-                cam_down = s[1].split()[0]
-                select = await sql.sql_selectone(f"SELECT disk, cam_down, kod, cam FROM registrator WHERE ip = '{row[0]}'")
-                try:
-                    disk_old, cam_down_old, kod, cam = select
-                    # print(disk_old)
-                    if disk_old == None:
-                        # print("ffff")
-                        await info_registrator(row[0])
-                        continue
-                    elif disk_old == disk:
-                        pass
-                    else:
-                        print(f"Ошибка диска {row[0]}")
-                        await sql.sql_insert(
-                            f"Update registrator SET disk = '{s[0]}' WHERE ip = '{row[0]}'")
-                    if cam_down == cam_down_old:
-                        pass
-                    else:
-                        if cam_down == cam:
-                            print(f"Камера работает {row[0]}")
-                            text = await info_filial(row[0], 'cam_up')
-                            text += "Камеры работают"
-                            await send_mess(kod, text)
-
-                        else:
-                            print(f"Камера не работает {row[0]}")
-                            text = await info_filial(row[0], 'cam_down')
-                            text += "Камеры работают"
-                            await send_mess(kod, text)
-
-                        await sql.sql_insert(f"Update registrator SET cam_down ='{cam_down}' WHERE ip = '{row[0]}'")
-                except:
-                    r = (await sql.sql_selectone(f"""
-                    SELECT filial.name, registrator.hostname, filial.kod FROM filial LEFT JOIN registrator ON filial.kod = registrator.kod 
-                    WHERE registrator.ip = '{row[0]}'
-                    """))
+            data_r = await snmpregist(row[0])
+            if data_r is False:
+                print("ti")
+                request = f"""SELECT filial.name, registrator.hostname, filial.kod, down FROM filial LEFT JOIN registrator 
+                ON filial.kod = registrator.kod WHERE registrator.ip = '{row[0]}'
+                    """
+                r = await sql.sql_selectone(request)
+                if r[3] == 0:
+                    await sql.sql_insert(f"Update registrator SET down = 1 WHERE ip = '{row[0]}'")
                     text = f"{r[0]} \nРегистратор {r[1]}\nНе доступен"
                     await send_mess(r[2], text)
-                    print("GLOBAL ERROR")
+            else:
+                disk = data_r[0]
+                cam_down = data_r[1].split()[0]
+                select = await sql.sql_selectone(f"SELECT disk, cam_down, kod, cam, down FROM registrator WHERE ip = '{row[0]}'")
+                disk_old, cam_down_old, kod, cam, down = select
+                if down == "":
+                    await info_registrator(row[0])
+                    continue
+                elif down == 1:
+                    text = "Регистратор работает\n"
+                    text += await info_filial(row[0], 'up')
+                    await send_mess(kod, text)
+
+                    await sql.sql_insert(f"Update registrator SET down = 0 WHERE ip = '{row[0]}'")
+                if disk_old == disk:
+                    pass
+                else:
+                    print(f"Ошибка диска {row[0]}")
+                    await sql.sql_insert(
+                        f"Update registrator SET disk = '{data_r[0]}' WHERE ip = '{row[0]}'")
+                if cam_down == cam_down_old:
+                    pass
+                else:
+                    if cam_down == cam:
+                        print(f"Камера работает {row[0]}")
+                        text = await info_filial(row[0], 'cam_up')
+                        text += "Камеры работают"
+                        await send_mess(kod, text)
+                    else:
+                        print(f"Камера не работает {row[0]}")
+                        text = await info_filial(row[0], 'cam_down')
+                        text += "Камеры не работают"
+                        await send_mess(kod, text)
+                    await sql.sql_insert(f"Update registrator SET cam_down ='{cam_down}' WHERE ip = '{row[0]}'")
+                # except:
+                #     r = (await sql.sql_selectone(f"""
+                #     SELECT filial.name, registrator.hostname, filial.kod FROM filial LEFT JOIN registrator ON filial.kod = registrator.kod
+                #     WHERE registrator.ip = '{row[0]}'
+                #     """))
+                #     text = f"{r[0]} \nРегистратор {r[1]}\nНе доступен"
+                #     await send_mess(r[2], text)
+                #     print("GLOBAL ERROR")
 
 
 async def info_filial(ip, data):
@@ -122,48 +127,36 @@ async def info_filial(ip, data):
         mib = [
            '1.3.6.1.4.1.3333.1.2',  # archive
            '1.3.6.1.4.1.3333.1.3',  # disk
-           # '1.3.6.1.4.1.3333.1.4',  # network
            '1.3.6.1.4.1.3333.1.5',  # cameras
-           # '1.3.6.1.4.1.3333.1.6',  # script
-           # '1.3.6.1.4.1.3333.1.7',  # name
-           # '1.3.6.1.4.1.3333.1.8',  # cam_down
-           # '1.3.6.1.4.1.3333.1.9',  # ip address
-           # '1.3.6.1.4.1.3333.1.10',  # firmware
            '1.3.6.1.4.1.3333.1.11',  # up_time
            ]
+        print("dddd")
         info = await info_snmp_registrator(ip, mib)
         print(info)
-        request = f"""SELECT filial.name, hostname FROM filial LEFT JOIN registrator ON filial.kod = registrator.kod 
+        request = f"""SELECT filial.name, registrator.hostname FROM filial LEFT JOIN registrator ON filial.kod = registrator.kod 
                     WHERE registrator.ip = '{ip}'"""
-        row = await sql.sql_select(request)
+        print(request)
+        row = await sql.sql_selectone(request)
         text = f"""
         {row[0]}
         💻 Сервер {row[1]}
         💽 Диски {info[1]}
         📃 Глубина архива дней {info[0]}
         🎥 Камеры {info[2]}
-        ⌛  Время работы сервера  {info[3]}\n
-        """
+        ⌛  Время работы сервера  {info[3]}\n """
         return text
     elif data == 'cam_down':
         mib = [
            '1.3.6.1.4.1.3333.1.2',  # archive
            '1.3.6.1.4.1.3333.1.3',  # disk
-           # '1.3.6.1.4.1.3333.1.4',  # network
            '1.3.6.1.4.1.3333.1.5',  # cameras
-           # '1.3.6.1.4.1.3333.1.6',  # script
-           # '1.3.6.1.4.1.3333.1.7',  # name
-
-           # '1.3.6.1.4.1.3333.1.9',  # ip address
-           # '1.3.6.1.4.1.3333.1.10',  # firmware
            '1.3.6.1.4.1.3333.1.11',  # up_time
-            '1.3.6.1.4.1.3333.1.8',  # cam_down
+           '1.3.6.1.4.1.3333.1.8',  # cam_down
            ]
         info = await info_snmp_registrator(ip, mib)
-        print(info)
-        request = f"""SELECT filial.name, hostname FROM filial LEFT JOIN registrator ON filial.kod = registrator.kod 
+        request = f"""SELECT filial.name, registrator.hostname FROM filial LEFT JOIN registrator ON filial.kod = registrator.kod 
                     WHERE registrator.ip = '{ip}'"""
-        row = await sql.sql_select(request)
+        row = await sql.sql_selectone(request)
         text = f"""
         {row[0]}
         💻 Сервер {row[1]}
@@ -174,8 +167,34 @@ async def info_filial(ip, data):
         🔍 Не работает камера: {info[4]} 
         """
         return text
-    # elif data == 'reg_down':
-
+    elif data == 'up':
+        mib = [
+            # '1.3.6.1.4.1.3333.1.1',  # db
+            '1.3.6.1.4.1.3333.1.2',  # archive
+            '1.3.6.1.4.1.3333.1.3',  # disk
+            # '1.3.6.1.4.1.3333.1.4',  # network
+            '1.3.6.1.4.1.3333.1.5',  # cameras
+            '1.3.6.1.4.1.3333.1.6',  # script
+            # '1.3.6.1.4.1.3333.1.7',  # name
+            '1.3.6.1.4.1.3333.1.8',  # cam_down
+            # '1.3.6.1.4.1.3333.1.9',  # ip address
+            '1.3.6.1.4.1.3333.1.10',  # firmware
+            '1.3.6.1.4.1.3333.1.11',  # up_time
+        ]
+        info = await info_snmp_registrator(ip, mib)
+        print(info)
+        request = f"""SELECT filial.name, registrator.hostname FROM filial LEFT JOIN registrator 
+ON filial.kod = registrator.kod WHERE registrator.ip = '{ip}'"""
+        row = await sql.sql_selectone(request)
+        print(row)
+        text = f"{row[0]}\n" \
+               f"💻 Сервер {row[1]}\n" \
+               f"💽 Диски {info[1]}\n" \
+               f"📃 Глубина архива дней {info[0]}\n" \
+               f"🎥 Камеры {info[2]}\n" \
+               f"🔍 Не работает камера: {info[4]}\n" \
+               f"⌛  Время работы сервера  {info[6]}\n"
+        return text
 
 async def info_registrator(ip):
     row = await info_snmp_registrator(ip, trassir)
@@ -185,7 +204,7 @@ async def info_registrator(ip):
     cam_down = row[2].split()[0]
     request = f"""UPDATE registrator 
 SET archive = '{row[0]}', disk = '{row[1]}', cam = '{cam}', 
-cam_down = '{cam_down}', script = '{row[3]}', firmware = '{row[4]}', uptime = '{row[5]}' WHERE ip = '{ip}'"""
+cam_down = '{cam_down}', script = '{row[3]}', firmware = '{row[4]}', uptime = '{row[5]}', down = 0 WHERE ip = '{ip}'"""
     # print(request)
     await sql.sql_insert(request)
     #     f"UPDATE disk = '{disk}', cam_down = '{cam_down}', cam = '{cam}' FROM registrator WHERE ip = '{row[0]}'")

@@ -15,21 +15,19 @@ async def start_snmp():
     while i < 2:
         rows = await sql.sql_select("SELECT loopback, kod, sdwan FROM filial")
         for row in rows:
-            await asyncio.sleep(1)
             if row[2] == 1:
                 if (await sql.sql_selectone(f"SELECT count(loopback) FROM status WHERE loopback = '{row[0]}'"))[0] == 0:
                     await oid(row[0], row[1])
                 else:
                     await snmp(row[0])
             elif row[2] == 0:
-                print(await sql.sql_selectone(f"SELECT count(loopback) FROM status WHERE loopback = '{row[0]}'"))
                 if (await sql.sql_selectone(f"SELECT count(loopback) FROM status WHERE loopback = '{row[0]}'"))[0] == 0:
                     await oid_mikrotik(row[0], row[1])
                 else:
-                    try:
+                    # try:
                         await check_snmp(row[0])
-                    except ValueError:
-                        pass
+                    # except ValueError:
+                    #     pass
             else:
                 print("Ошибка")
             # await monitoring()
@@ -45,23 +43,28 @@ async def oid_mikrotik(ip, kod):
             try:
                 for res in await s.get(f"{mib}{i}"):
                     name_rou = res.value.decode('UTF-8')
-            except Exception as n:
-                print(f"oid_mikrotik {n}")
-            try:
-                name = name_rou.find("gre")
-            except:
+            except AttributeError:
                 continue
-            if name == 0:
-                id = name_rou.split("_")[3]
-                if id == "rou1":
-                    await sql.sql_insert(f"UPDATE status SET In_isp1 = '{i}' WHERE loopback = '{ip}'")
-                    # sql_insert(INSERT INTO status (loopback, In_isp1, In_isp1, kod) VALUES ()
-                elif id == "rou2":
-                    await sql.sql_insert(f"UPDATE status SET In_isp2= '{i}' WHERE loopback = '{ip}'")
+            except aiosnmp.exceptions.SnmpTimeoutError:
+                print(f"timeout {ip}")
+                await sql.sql_insert(f"DElETE FROM status WHERE loopback = '{ip}'")
+                break
+            try:
+                if name_rou.split("_")[0] == "gre":
+                    id = name_rou.split("_")[3]
+                    if id == "rou1":
+                        await sql.sql_insert(f"UPDATE status SET In_isp1 = '{i}' WHERE loopback = '{ip}'")
+                    elif id == "rou2":
+                        await sql.sql_insert(f"UPDATE status SET In_isp2= '{i}' WHERE loopback = '{ip}'")
+            except UnboundLocalError:
+                continue
 
 
 async def check_snmp(ip):
-    status1, status2 = await snmp_mikrotik(ip)
+    try:
+        status1, status2 = await snmp_mikrotik(ip)
+    except ValueError:
+        status1, status2 = 0, 0
     if status1 == 1:
         status1 = 1
     elif status1 == 2:
@@ -79,7 +82,7 @@ async def snmp_mikrotik(ip):
                                       f"WHERE loopback = '{ip}'")
     status = []
     for mib_old in mib_all:
-        with aiosnmp.Snmp(host=ip, port=161, community="public", timeout=5, retries=1, max_repetitions=2, ) as s:
+        with aiosnmp.Snmp(host=ip, port=161, community="public", timeout=5, retries=2, ) as s:
             try:
                 for res in await s.get(f"{mib}{mib_old}"):
                     status.append(res.value)
@@ -206,6 +209,7 @@ async def check_all(loopback, status1, status2):
                    f"ISP_1: {data[3]}\n {data[6]}\nISP_2: {data[4]}"
 
             await sql.sql_insert(f"UPDATE status SET status_1 = 0, status_2 = 0 WHERE loopback = '{loopback}'")
+            await sql.sql_insert(f"Update registrator SET down = 1 WHERE kod = '{kod}'")
             await send_mess(kod, text)
     elif status1 == 1 and status2 == 0:
         if status_t1 == status1 and status_t2 == status2:
