@@ -7,13 +7,17 @@ import aiosnmp
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 
-async def start_snmp():
+async def start_snmp(order="null"):
     print("start")
     await asyncio.sleep(10)
     i = 0
     while i < 2:
-        rows = await sql.sql_select("SELECT loopback, kod, sdwan FROM filial")
+        if order == "null":
+            rows = await sql.sql_select(f"SELECT loopback, kod, sdwan FROM filial")
+        else:
+            rows = await sql.sql_select(f"SELECT loopback, kod, sdwan FROM filial ORDER BY kod {order}")
         for row in rows:
+            print(f"{order} {row}")
             if row[2] == 1:
                 if (await sql.sql_selectone(f"SELECT count(loopback) FROM status WHERE loopback = '{row[0]}'"))[0] == 0:
                     await oid(row[0], row[1])
@@ -30,6 +34,7 @@ async def start_snmp():
             else:
                 print("Ошибка")
             # await monitoring()
+        print(f"{order} Завершено")
 
 
 async def oid_mikrotik(ip, kod):
@@ -81,7 +86,7 @@ async def snmp_mikrotik(ip):
                                       f"WHERE loopback = '{ip}'")
     status = []
     for mib_old in mib_all:
-        with aiosnmp.Snmp(host=ip, port=161, community="public", timeout=5, retries=2, ) as s:
+        with aiosnmp.Snmp(host=ip, port=161, community="public", timeout=10, retries=2, max_repetitions=2 ) as s:
                 try:
                     for res in await s.get(f"{mib}{mib_old}"):
                         status.append(res.value)
@@ -134,29 +139,16 @@ async def oid(loopback, kod):
 
 
 async def snmp(loopback):
-    # print("snmp")
-    # oid_all = await sql.sql_selectone(f"SELECT In_isp1, Out_isp1, In_isp2, Out_isp2 FROM status "
-    #                                   f"WHERE loopback = '{loopback}'")
-    mib_all = await sql.sql_selectone(f"SELECT In_isp1, In_isp2 FROM status "
-                                      f"WHERE loopback = '{loopback}'")
+    mib_all = await sql.sql_selectone(f"SELECT In_isp1, In_isp2 FROM status WHERE loopback = '{loopback}'")
     d = []
     for mib in mib_all:
-        await asyncio.sleep(1)
-        error_indication, error_status, error_index, var_binds = next(
-            getCmd(SnmpEngine(),
-                   UsmUserData(userName='dvsnmp', authKey='55GjnJwtPfk', authProtocol=usmHMACSHAAuthProtocol),
-                   UdpTransportTarget((str(loopback), 161)),
-                   ContextData(),
-                   ObjectType(ObjectIdentity(mib)))
-        )
-
+        error_indication, error_status, error_index, var_binds = await snmp_v3(loopback, mib)
         if error_indication:
             print(error_indication)
             print("Loopback не доступен")
             r = await sql.sql_selectone(f"SELECT In1_two, In2_two FROM status WHERE loopback = '{loopback}'")
             d.append(r[0])
             d.append(r[1])
-
             break
         elif error_status:
             print('%s at %s' % (error_status.prettyPrint(),
@@ -166,12 +158,22 @@ async def snmp(loopback):
                 #                print(' = '.join([x.prettyPrint() for x in varBind]))
                 m = (' = '.join([x.prettyPrint() for x in varBind]).split("= ")[1])
                 d.append(m)
-    # request = f"UPDATE status SET In1_one = In1_two, Out1_one = Out1_two, In2_one = In2_two, Out2_one = Out2_two, " \
-    #           f"In1_two = {d[0]}, Out1_two = {d[1]},In2_two = {d[2]}, Out2_two = {d[3]} WHERE loopback = '{loopback}'"
+    print(d)
     request = f"UPDATE status SET In1_one = In1_two, In2_one = In2_two, In1_two = {d[0]}, In2_two = {d[1]} " \
               f"WHERE loopback = '{loopback}'"
     await sql.sql_insert(request)
     await check_cisco(loopback)
+
+
+async def snmp_v3(loopback, mib):
+    error_indication, error_status, error_index, var_binds = next(
+        getCmd(SnmpEngine(),
+               UsmUserData(userName='dvsnmp', authKey='55GjnJwtPfk', authProtocol=usmHMACSHAAuthProtocol),
+               UdpTransportTarget((str(loopback), 161)),
+               ContextData(),
+               ObjectType(ObjectIdentity(mib)))
+    )
+    return error_indication, error_status, error_index, var_binds
 
 
 async def check_cisco(loopback):

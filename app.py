@@ -20,16 +20,20 @@ async def on_startup(dp):
 #     asyncio.ensure_future(start())
 #     asyncio.ensure_future(thread_check())
 #     loop.run_forever()
+async def check():
+    asyncio.ensure_future(start_snmp("ASC"))
+    # asyncio.ensure_future(start_snmp("DESC"))
+    # asyncio.ensure_future(start_snmp())
+    asyncio.ensure_future(start_check_registrator())
 
 def startbot():
     if __name__ == '__main__':
         executor.start_polling(dp, skip_updates=True, on_startup=on_startup)
 
 
-loop = asyncio.get_event_loop()
-asyncio.ensure_future(start_snmp())
-asyncio.ensure_future(start_check_registrator())
+# loop = asyncio.get_event_loop()
+asyncio.ensure_future(check())
 asyncio.ensure_future(startbot())
-loop.run_forever()
+# loop.run_forever()
 
 

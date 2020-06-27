@@ -69,57 +69,53 @@ async def start_check_registrator():
         rows = await sql.sql_select("SELECT ip FROM registrator")
         for row in rows:
             data_r = await snmpregist(row[0])
-            if data_r is False:
-                request = f"""SELECT filial.name, registrator.hostname, filial.kod, down FROM filial LEFT JOIN registrator 
-                ON filial.kod = registrator.kod WHERE registrator.ip = '{row[0]}'
-                    """
-                r = await sql.sql_selectone(request)
-                if r[3] == 0:
-                    await sql.sql_insert(f"Update registrator SET down = 1 WHERE ip = '{row[0]}'")
-                    text = f"{r[0]} \nРегистратор {r[1]}\nНе доступен"
-                    await send_mess(r[2], text)
-            else:
-                disk = data_r[0]
-                cam_down = data_r[1].split()[0]
-                select = await sql.sql_selectone(f"SELECT disk, cam_down, kod, cam, down FROM registrator WHERE ip = '{row[0]}'")
-                disk_old, cam_down_old, kod, cam, down = select
-                if down == "":
-                    await info_registrator(row[0])
-                    continue
-                elif down == 1:
-                    text = "Регистратор работает\n"
-                    text += await info_filial(row[0], 'up')
-                    await send_mess(kod, text)
+            dara_r_old = await snmpregist(row[0])
+            if data_r == dara_r_old:
+                if data_r is False:
+                    request = f"""SELECT filial.name, registrator.hostname, filial.kod, down FROM filial LEFT JOIN registrator 
+                    ON filial.kod = registrator.kod WHERE registrator.ip = '{row[0]}'
+                        """
+                    r = await sql.sql_selectone(request)
+                    if r[3] == 0:
+                        await sql.sql_insert(f"Update registrator SET down = 1 WHERE ip = '{row[0]}'")
+                        text = f"{r[0]} \nРегистратор {r[1]}\nНе доступен"
+                        await send_mess(r[2], text)
+                else:
+                    disk = data_r[0]
+                    cam_down = data_r[1].split()[0]
+                    select = await sql.sql_selectone(f"SELECT disk, cam_down, kod, cam, down FROM registrator WHERE ip = '{row[0]}'")
+                    disk_old, cam_down_old, kod, cam, down = select
+                    if down == "":
+                        await info_registrator(row[0])
+                        continue
+                    elif down == 1:
+                        text = "Регистратор работает\n"
+                        text += await info_filial(row[0], 'up')
+                        await send_mess(kod, text)
 
-                    await sql.sql_insert(f"Update registrator SET down = 0 WHERE ip = '{row[0]}'")
-                if disk_old == disk:
-                    pass
-                else:
-                    print(f"Ошибка диска {row[0]}")
-                    await sql.sql_insert(
-                        f"Update registrator SET disk = '{data_r[0]}' WHERE ip = '{row[0]}'")
-                if cam_down == cam_down_old:
-                    pass
-                else:
-                    if cam_down == cam:
-                        print(f"Камера работает {row[0]}")
-                        text = await info_filial(row[0], 'cam_up')
-                        text += "Камеры работают"
-                        await send_mess(kod, text)
+                        await sql.sql_insert(f"Update registrator SET down = 0 WHERE ip = '{row[0]}'")
+                    if disk_old == disk:
+                        pass
                     else:
-                        print(f"Камера не работает {row[0]}")
-                        text = await info_filial(row[0], 'cam_down')
-                        text += "Камеры не работают"
-                        await send_mess(kod, text)
-                    await sql.sql_insert(f"Update registrator SET cam_down ='{cam_down}' WHERE ip = '{row[0]}'")
-                # except:
-                #     r = (await sql.sql_selectone(f"""
-                #     SELECT filial.name, registrator.hostname, filial.kod FROM filial LEFT JOIN registrator ON filial.kod = registrator.kod
-                #     WHERE registrator.ip = '{row[0]}'
-                #     """))
-                #     text = f"{r[0]} \nРегистратор {r[1]}\nНе доступен"
-                #     await send_mess(r[2], text)
-                #     print("GLOBAL ERROR")
+                        print(f"Ошибка диска {row[0]}")
+                        await sql.sql_insert(
+                            f"Update registrator SET disk = '{data_r[0]}' WHERE ip = '{row[0]}'")
+                    if cam_down == cam_down_old:
+                        pass
+                    else:
+                        if cam_down == cam:
+                            print(f"Камера работает {row[0]}")
+                            text = await info_filial(row[0], 'cam_up')
+                            text += "Камеры работают"
+                            await send_mess(kod, text)
+                        else:
+                            print(f"Камера не работает {row[0]}")
+                            text = await info_filial(row[0], 'cam_down')
+                            text += "Камеры не работают"
+                            await send_mess(kod, text)
+                        await sql.sql_insert(f"Update registrator SET cam_down ='{cam_down}' WHERE ip = '{row[0]}'")
+            else:
+                continue
 
 
 async def info_filial(ip, data):
@@ -137,6 +133,7 @@ async def info_filial(ip, data):
         text = f"""
         {row[0]}
 💻 Сервер {row[1]}
+   IP address {ip}
 💽 Диски {info[1]}
 📃 Глубина архива дней {info[0]}
 🎥 Камеры {info[2]}
@@ -157,6 +154,7 @@ async def info_filial(ip, data):
         text = f"""
         {row[0]}
 💻 Сервер {row[1]}
+   IP address {ip}
 💽 Диски {info[1]}
 📃 Глубина архива дней {info[0]}
 🎥 Камеры {info[2]}
@@ -184,6 +182,7 @@ ON filial.kod = registrator.kod WHERE registrator.ip = '{ip}'"""
         row = await sql.sql_selectone(request)
         text = f"{row[0]}\n" \
                f"💻 Сервер {row[1]}\n" \
+               f"   IP address {ip}\n" \
                f"💽 Диски {info[1]}\n" \
                f"📃 Глубина архива дней {info[0]}\n" \
                f"🎥 Камеры {info[2]}\n" \
