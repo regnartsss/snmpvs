@@ -320,8 +320,8 @@ async def monitoring():
 
 
 async def edit_mess(keyboard, q):
-    # chat = "@test_moni"
-    chat = "@sdwan_monitoring"
+    chat = "@test_moni"
+    # chat = "@sdwan_monitoring"
     text = "<---------------->\n Время проверки %s" % data_monitor()
     try:
         message_id = (await sql.sql_selectone(f"SELECT username FROM users WHERE id = 123456789 and first_name = 'mess_{q}'"))[0]
