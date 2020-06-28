@@ -33,7 +33,7 @@ async def start_snmp(order="null"):
                     #     pass
             else:
                 print("Ошибка")
-        await monitoring()
+   #     await monitoring()
         print(f"{order} Завершено")
 
 
