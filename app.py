@@ -24,7 +24,8 @@ async def check():
     asyncio.ensure_future(start_snmp("ASC"))
     # asyncio.ensure_future(start_snmp("DESC"))
     # asyncio.ensure_future(start_snmp())
-    asyncio.ensure_future(start_check_registrator())
+    asyncio.ensure_future(start_check_registrator("ASC"))
+    asyncio.ensure_future(start_check_registrator("DESC"))
 
 def startbot():
     if __name__ == '__main__':

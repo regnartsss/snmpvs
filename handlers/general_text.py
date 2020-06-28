@@ -126,6 +126,7 @@ async def process_name(message: types.Message, state: FSMContext):
 @rate_limit(0.5)
 async def all_other_messages(message: types.Message, state: FSMContext):
     print(message.from_user.id)
+    print(message.message_id)
     if message.chat.id in admin_id:
         if message.text == "Разное":
             await message.answer("Разное", reply_markup=keyboard_other())

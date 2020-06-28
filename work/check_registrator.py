@@ -63,12 +63,17 @@ async def info_snmp_registrator(ip, mib_all):
         return d
 
 
-async def start_check_registrator():
+async def start_check_registrator(order):
     while 0 < 1:
         await asyncio.sleep(5)
-        rows = await sql.sql_select("SELECT ip FROM registrator")
+        if order == "ASC":
+            rows = await sql.sql_select(f"SELECT ip FROM registrator ORDER BY ip {order}")
+        else:
+            rows = await sql.sql_select(f"SELECT ip FROM registrator ORDER BY ip {order}")
+
         for row in rows:
             data_r = await snmpregist(row[0])
+            await asyncio.sleep(5)
             dara_r_old = await snmpregist(row[0])
             if data_r == dara_r_old:
                 if data_r is False:
@@ -111,7 +116,7 @@ async def start_check_registrator():
                         else:
                             print(f"Камера не работает {row[0]}")
                             text = await info_filial(row[0], 'cam_down')
-                            text += "Камеры не работают"
+                            text += "Камера не работает"
                             await send_mess(kod, text)
                         await sql.sql_insert(f"Update registrator SET cam_down ='{cam_down}' WHERE ip = '{row[0]}'")
             else:
