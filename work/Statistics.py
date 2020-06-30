@@ -180,7 +180,9 @@ async def link():
     url_button = types.InlineKeyboardButton(text="График дежурств", url=url)
     vpn_button = types.InlineKeyboardButton(text="Настройка VPN", url="https://telegra.ph/Nastrojka-VPN-06-29")
     reg_button = types.InlineKeyboardButton(text="Настройка видеорегистратора", url="https://telegra.ph/11-01-23-10")
+    domen_button = types.InlineKeyboardButton(text="Ввод компьютера в домен", url="https://telegra.ph/Vvod-kompyutera-v-domen-06-30")
     keyboard.add(url_button)
     keyboard.add(vpn_button)
     keyboard.add(reg_button)
+    keyboard.add(domen_button)
     return keyboard

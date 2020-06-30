@@ -190,5 +190,6 @@ async def all_other_messages(message: types.Message, state: FSMContext):
         elif message.text == "Проверить регистратор":
             await message.answer(await check_registrator(message))
         elif message.text == "Ссылки":
-            await message.answer("Ссылки", reply_markup=await link())
+            await message.answer("Возможны проблемы с открытием инструкций через браузер компьютера\n"
+                                 "Попробуйте открыть с мобильного приложения ", reply_markup=await link())
 
