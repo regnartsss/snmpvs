@@ -1,5 +1,8 @@
 from work.sql import sql_selectone, sql_select
 import aiosnmp
+from aiogram import types
+from loader import bot
+
 
 async def info_filial(kod):
     # if st == "all":
@@ -44,6 +47,7 @@ async def info_registrator(call):
     for row in rows:
         text += f"{row[2]} {row[0]}\n"
     return text
+
 
 async def check_registrator(message):
     rows = await sql_select(f"SELECT kod FROM sub WHERE user_id = {message.from_user.id}")
@@ -169,3 +173,14 @@ async def info_snmp_registrator(ip, mib_all):
 #             dat[self.kod]["IP_500"]
 #             )
 #     return text
+
+async def link():
+    keyboard = types.InlineKeyboardMarkup()
+    url = "https://docs.google.com/spreadsheets/d/1068DuSdyrtRYG3kDDL3oXx2GnqqC5CDMRlF4ZSfDvpU/edit?usp=sharing"
+    url_button = types.InlineKeyboardButton(text="График дежурств", url=url)
+    vpn_button = types.InlineKeyboardButton(text="Настройка VPN", url="https://telegra.ph/Nastrojka-VPN-06-29")
+    reg_button = types.InlineKeyboardButton(text="Настройка видеорегистратора", url="https://telegra.ph/11-01-23-10")
+    keyboard.add(url_button)
+    keyboard.add(vpn_button)
+    keyboard.add(reg_button)
+    return keyboard

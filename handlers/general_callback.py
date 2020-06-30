@@ -1,8 +1,9 @@
 from loader import dp, bot
 from aiogram import types
 from work.Keyboard_menu import ssh
-from work.Ssh import ssh_t
+from work.Ssh import ssh_t, ssh_console
 from work.Statistics import info_registrator
+from work.keyboard import cancel
 import asyncio
 
 # from Map import goto
@@ -57,6 +58,8 @@ async def handler(call: types.CallbackQuery):
         await call.message.edit_text(text=data[0], reply_markup=data[1])
     elif call.data.split("_")[0] == "registrator":
         await call.message.edit_text(await info_registrator(call))
+    elif call.data.split("_")[0] == "console":
+        await call.message.answer(text=await ssh_console(call), reply_markup=cancel())
 
 
     # if (await sql.sql_selectone("select start_bot from data"))[0] == 1:

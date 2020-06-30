@@ -52,4 +52,11 @@ def main_menu_user():
     keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
     keyboard.row("Проверить регистратор")
     keyboard.row("Подписаться на уведомления")
+    keyboard.row("Ссылки")
+    return keyboard
+
+
+def cancel():
+    keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
+    keyboard.row("🚫 Отмена")
     return keyboard
