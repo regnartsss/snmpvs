@@ -4,6 +4,7 @@ from data.data import admin_id
 from aiogram.dispatcher import FSMContext
 from work import sql
 from work.Ssh import ssh_console, Ssh_console, ssh_console_command
+from work.admin import mess, AllMessage
 from work.keyboard import main_menu
 from work.Add_filial import NewFilial, Add_snmp
 from work.Statistics import info_filial, check_registrator, link
@@ -19,6 +20,11 @@ from middlewares.middleware_and_antiflood import rate_limit
 async def process_name(message: types.Message, state: FSMContext):
     text = await ssh_console_command(message, state)
     await message.answer(text=text)
+
+
+@dp.message_handler(state=AllMessage.message)
+async def process_name(message: types.Message, state: FSMContext):
+    await mess(message, state)
 
 
 @dp.message_handler(state=SearchFilial.Filial)
@@ -182,14 +188,17 @@ async def all_other_messages(message: types.Message, state: FSMContext):
             await message.answer(await check_registrator(message))
         elif message.text == "🚫 Отмена":
             await message.answer("🚫 Отмена", reply_markup=main_menu())
-        elif message.text == "Ссылки":
-            await message.answer("Ссылки", reply_markup=await link())
+        elif message.text == "Инструкции":
+            text = "Возможны проблемы с открытием через браузер компьютера\n" \
+                   "Попробуйте открыть с мобильного приложения"
+            await message.answer(text=text, reply_markup=await link())
     else:
         if message.text == "Подписаться на уведомления":
             await message.answer("Выберите регион", reply_markup=await worksub(message, call=""))
         elif message.text == "Проверить регистратор":
             await message.answer(await check_registrator(message))
-        elif message.text == "Ссылки":
-            await message.answer("Возможны проблемы с открытием инструкций через браузер компьютера\n"
-                                 "Попробуйте открыть с мобильного приложения ", reply_markup=await link())
+        elif message.text == "Инструкции":
+            text = "Возможны проблемы с открытием через браузер компьютера\n" \
+                   "Попробуйте открыть с мобильного приложения"
+            await message.answer(text=text, reply_markup=await link())
 
