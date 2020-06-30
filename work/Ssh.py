@@ -7,7 +7,7 @@ from loader import bot
 import asyncio
 import socket
 import os
-import wmi
+# import wmi
 # import wmi_client_wrapper as wmi
 
 #
