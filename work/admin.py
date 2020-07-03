@@ -11,10 +11,11 @@ async def message_all():
     await AllMessage.message.set()
     return "Введите сообщение"
 
+
 async def send_mess(message):
     text = "Бот обновлен, внесены следующие изменения:\n"
     text += message.text
-    text += "❓ По вопросам и предложениям обращаться сюда \n➡️ @regnartsss"
+    text += "\n❓ По вопросам и предложениям обращаться сюда \n➡️ @regnartsss"
     rows = await sql_select("SELECT id FROM Users")
     for row in rows:
         try:

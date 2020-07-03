@@ -19,6 +19,6 @@ async def register_user(message):
     username = message.from_user.username
     firstname = message.from_user.first_name
     lastname = message.from_user.last_name
-    request = f"INSERT INTO users VALUES ({message.chat.id}, '{username}', '{firstname}', '{lastname}')"
+    request = f"INSERT INTO users (id, username, first_name, lastname) VALUES ({message.chat.id}, '{username}', '{firstname}', '{lastname}')"
     print(request)
     await sql_insert(request)

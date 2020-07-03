@@ -7,6 +7,7 @@ from loader import bot
 import asyncio
 import socket
 import os
+import re
 # import wmi
 # import wmi_client_wrapper as wmi
 
@@ -84,15 +85,20 @@ async def console_command(message):
         return text
 
 
-# async def ip_dhcp_binding():
-#     loopback = "10.255.64.1"
-#     command = "show ip dhcp binding"
-#     user = 'operator'
-#     secret = '71LtkJnrYjn'
-#     async with asyncssh.connect(loopback, username=user, password=secret, known_hosts=None) as conn:
-#         result = await conn.run(command, check=True)
-#         text = result.stdout.split("\n")
-#         for line in text:
+# async def ssh_test():
+       # loopback = "10.255.64.1"
+    # # command = "show ip dhcp binding"
+    # command ='sh ver'
+    # user = 'operator'
+    # secret = '71LtkJnrYjn'
+    # async with asyncssh.connect(loopback, username=user, password=secret, known_hosts=None) as conn:
+    #     result = await conn.run(command, check=True)
+    #     text = result.stdout.split("\n")
+               # if line.find("Cisco IOS XE Software") != -1:
+            #     version = line.split()[5]
+            #     print(version)
+
+        #     print(line)
 #             if line.split() != []:
 #                 if line.split()[0].split(".")[0] == '10':
 #                     try:
@@ -119,7 +125,7 @@ async def console_command(message):
 #
 #
 # loop = asyncio.get_event_loop()
-# loop.run_until_complete(ip_dhcp_binding())
+# loop.run_until_complete(ssh_test())
 
 #         command = "sh port add"
 #         user = 'itkras'
