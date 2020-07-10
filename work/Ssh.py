@@ -80,7 +80,7 @@ async def console_command(message):
         result = await conn.run(command, check=True)
         text = result.stdout
         while len(text) > 4000:
-            await bot.send_message(chat_id=message.chat.id, text = text[:4000])
+            await bot.send_message(chat_id=message.chat.id, text=text[:4000])
             text = text[4000:]
         return text
 

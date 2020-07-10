@@ -95,7 +95,10 @@ async def start_check_registrator(order):
                         continue
                     elif down == 1:
                         text = "Регистратор работает\n"
-                        text += await info_filial(row[0], 'up')
+                        try:
+                            text += await info_filial(row[0], 'up')
+                        except Exception as n:
+                            print(f"ERROR = Регистратор работает {n}")
                         await send_mess(kod, text)
 
                         await sql.sql_insert(f"Update registrator SET down = 0 WHERE ip = '{row[0]}'")
