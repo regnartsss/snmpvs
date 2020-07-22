@@ -45,7 +45,10 @@ async def snmpregist(ip):
                           max_repetitions=5, ) as snmp:
             try:
                 for res in await snmp.get(r):
-                    status = res.value.decode('UTF-8')
+                    try:
+                        status = res.value.decode('UTF-8')
+                    except AttributeError:
+                        continue
                     d.append(status)
             except aiosnmp.exceptions.SnmpTimeoutError:
                 return False
