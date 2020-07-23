@@ -89,7 +89,10 @@ async def start_check_registrator(order):
                         text = f"{r[0]} \nРегистратор {r[1]}\nНе доступен"
                         await send_mess(r[2], text)
                 else:
-                    disk = data_r[0]
+                    try:
+                        disk = data_r[0]
+                    except IndexError:
+                        continue
                     cam_down = data_r[1].split()[0]
                     select = await sql.sql_selectone(f"SELECT disk, cam_down, kod, cam, down FROM registrator WHERE ip = '{row[0]}'")
                     disk_old, cam_down_old, kod, cam, down = select
