@@ -4,4 +4,6 @@ venv/
 .idea/
 *.txt
 *.json
+*.db
+data/config.py
 

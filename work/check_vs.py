@@ -266,10 +266,10 @@ async def notif():
     time_max = time(8, 00)
     time_old = time(int(H), int(M))
     if time_min < time_old > time_max:
-         print("Без звука")
+         # print("Без звука")
          return True
     else:
-         print("Со звуком")
+         # print("Со звуком")
          return None
 
 
