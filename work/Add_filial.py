@@ -8,7 +8,7 @@ import time
 from loader import bot
 import asyncio
 import aiosnmp
-import aioping
+# import aioping
 
 
 def find_location():

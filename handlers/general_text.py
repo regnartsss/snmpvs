@@ -124,22 +124,13 @@ async def process_name(message: types.Message, state: FSMContext):
         status = await info_filial(kod)
         await message.answer(status)
 
+@dp.message_handler(text="123")
 
-# @dp.message_handler(state=Shop.Form.coordinates)
-# async def process_name(message: types.Message, state: FSMContext):
-#     if message.text == "11":
-#         await message.answer("Отмена")
-#         await state.finish()
-#     else:
-#         if await Shop.moving_heroes_win(message) is True:
-#             await state.finish()
+
 
 
 @dp.message_handler(content_types=types.ContentTypes.ANY)
-@rate_limit(0.5)
 async def all_other_messages(message: types.Message, state: FSMContext):
-    print(message.from_user.id)
-    print(message.message_id)
     if message.chat.id in admin_id:
         if message.text == "Разное":
             await message.answer("Разное", reply_markup=keyboard_other())

@@ -8,9 +8,6 @@ import handlers
 import concurrent.futures
 import time
 
-
-
-
 #
 async def on_startup(dp):
     import middlewares
@@ -33,7 +30,7 @@ def startbot():
 
 
 # loop = asyncio.get_event_loop()
-asyncio.ensure_future(check())
+#asyncio.ensure_future(check())
 asyncio.ensure_future(startbot())
 # loop.run_forever()
 
