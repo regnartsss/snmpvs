@@ -7,3 +7,4 @@ venv/
 *.db
 data/config.py
 
+work/sdwan.db
