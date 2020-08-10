@@ -156,6 +156,7 @@ async def info_filial(ip, data):
 🎥 Камеры {info[2]}
 ⌛  Время работы сервера  {info[3]}\n """
         return text
+
     elif data == 'cam_down':
         mib = [
            '1.3.6.1.4.1.3333.1.2',  # archive
@@ -179,6 +180,7 @@ async def info_filial(ip, data):
 🔍 Не работает камера: {info[4]} 
         """
         return text
+
     elif data == 'up':
         mib = [
             # '1.3.6.1.4.1.3333.1.1',  # db

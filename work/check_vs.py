@@ -255,9 +255,9 @@ async def send_mess(kod, text):
         rows = await sql.sql_selectone(f"SELECT user_id FROM sub WHERE kod = {kod}")
         for row in rows:
             await asyncio.sleep(1)
-            await bot.send_message(chat_id=row, text=text,disable_notification=await notif())
+            await bot.send_message(chat_id=row, text=text, disable_notification=await notif())
     except TypeError:
-        print("Ошибка отправки")
+        print(f"Ошибка отправки {row}")
 
 
 async def notif():
