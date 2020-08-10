@@ -251,13 +251,13 @@ async def request_name(loopback):
 
 
 async def send_mess(kod, text):
-    try:
         rows = await sql.sql_selectone(f"SELECT user_id FROM sub WHERE kod = {kod}")
         for row in rows:
             await asyncio.sleep(1)
-            await bot.send_message(chat_id=row, text=text, disable_notification=await notif())
-    except TypeError:
-        print(f"Ошибка отправки {row}")
+            try:
+                await bot.send_message(chat_id=row, text=text, disable_notification=await notif())
+            except TypeError:
+                print(f"Ошибка отправки {row}")
 
 
 async def notif():
