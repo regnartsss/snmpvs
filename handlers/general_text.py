@@ -151,13 +151,7 @@ async def market(call: types.CallbackQuery, callback_data: dict):
     await call.message.edit_text(text=text, reply_markup=keyboard)
 
 
-@dp.message_handler(content_types=types.ContentTypes.ANY)
-async def message(message: types.Message):
-    # print(message.text)
-    text = message.text[1:]
-    kod = (await sql.sql_selectone(f"SELECT ssh_kod FROM users WHERE id = {message.from_user.id}"))[0]
-    text = await search_mac(message.from_user.id, kod, text, message)
-    await message.answer(text)
+
 
 @dp.message_handler(content_types=types.ContentTypes.ANY)
 async def all_other_messages(message: types.Message, state: FSMContext):
@@ -220,3 +214,10 @@ async def all_other_messages(message: types.Message, state: FSMContext):
                    "Попробуйте открыть с мобильного приложения"
             await message.answer(text=text, reply_markup=await link())
 
+@dp.message_handler(content_types=types.ContentTypes.ANY)
+async def message(message: types.Message):
+    # print(message.text)
+    text = message.text[1:]
+    kod = (await sql.sql_selectone(f"SELECT ssh_kod FROM users WHERE id = {message.from_user.id}"))[0]
+    text = await search_mac(message.from_user.id, kod, text, message)
+    await message.answer(text)
