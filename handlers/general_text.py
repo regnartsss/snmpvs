@@ -224,10 +224,13 @@ async def work(message: types.Message):
 
 @dp.message_handler(content_types=types.ContentTypes.ANY)
 async def work(message: types.Message):
-    text = message.text[1:]
-    kod = (await sql.sql_selectone(f"SELECT ssh_kod FROM users WHERE id = {message.from_user.id}"))[0]
-    text = await search_mac(message.from_user.id, kod, text, message)
-    await message.answer(text)
+    if message.text[:1] == "/":
+        text = message.text[1:]
+        kod = (await sql.sql_selectone(f"SELECT ssh_kod FROM users WHERE id = {message.from_user.id}"))[0]
+        text = await search_mac(message.from_user.id, kod, text, message)
+        await message.answer(text)
+    else:
+        await message.answer("Повторите попытку")
 
 # elif message.text == "Просканировать":
 #     await sql.sql_insert(f'DELETE FROM cisco')
