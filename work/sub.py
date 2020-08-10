@@ -3,6 +3,14 @@ from work import sql
 from loader import bot
 
 
+async def reg_menu():
+    keyboard = InlineKeyboardMarkup()
+    rows = await sql.sql_select("SELECT id, name FROM region")
+    for row in rows:
+        keyboard.row(InlineKeyboardButton(text=f"{row[1]}", callback_data=f"regionsub_{row[0]}"))
+    return keyboard
+
+
 async def worksub(message, call):
     # print("text")
     keyboard = InlineKeyboardMarkup()

@@ -61,7 +61,10 @@ async def info_snmp_registrator(ip, mib_all):
             with aiosnmp.Snmp(host=ip, port=161, community="dssl", timeout=10, retries=3,
                               max_repetitions=5, ) as snmp:
                         for res in await snmp.get(r):
-                            status = res.value.decode('UTF-8')
+                            try:
+                                status = res.value.decode('UTF-8')
+                            except AttributeError:
+                                continue
                             d.append(status)
         return d
 

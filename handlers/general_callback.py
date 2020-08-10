@@ -65,8 +65,8 @@ async def handler(call: types.CallbackQuery):
     # # elif call.data.split("_")[0] == "ssh":
     # #     data = await ssh(call=call)
     # #     await call.message.edit_text(text=data[0], reply_markup=data[1])
-    # elif call.data.split("_")[0] == "registrator":
-    #     await call.message.edit_text(await info_registrator(call))
+    elif call.data.split("_")[0] == "registrator":
+        await call.message.edit_text(await info_registrator(call))
     # elif call.data.split("_")[0] == "console":
     #     await call.message.answer(text=await ssh_console(call), reply_markup=cancel())
 
