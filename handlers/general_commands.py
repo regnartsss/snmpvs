@@ -18,3 +18,5 @@ async def start_message(message: types.Message):
 @dp.message_handler(commands=['message'])
 async def message(message: types.Message):
     await message.answer(text=await message_all(), reply_markup=cancel())
+
+

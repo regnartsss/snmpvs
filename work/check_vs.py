@@ -217,7 +217,7 @@ async def check_all(loopback, status1, status2):
             pass
         else:
             data = await request_name(loopback)
-            text = f"{data[0]}\nКод: {data[1]}\n🔵 🔴 Резервный провайдер не работает \n" \
+            text = f"{data[0]}\nКод: {data[1]}\n🟢 🔴 Резервный провайдер не работает \n" \
                    f"Loopback: {data[2]}\n{data[6]}\nISP_2: {data[4]}"
             await sql.sql_insert(f"UPDATE status SET status_1 = 1, status_2 = 0 WHERE loopback = '{loopback}'")
             await send_mess(kod, text)
@@ -227,7 +227,7 @@ async def check_all(loopback, status1, status2):
             pass
         else:
             data = await request_name(loopback)
-            text = f"{data[0]}\nКод: {data[1]}\n🔴 🔵 Основной провайдер не работает\n\n" \
+            text = f"{data[0]}\nКод: {data[1]}\n🔴 🟢 Основной провайдер не работает\n\n" \
                    f"Loopback: {data[2]}\n{data[5]}\nISP_1: {data[3]}\n"
             await sql.sql_insert(f"UPDATE status SET status_1 = 0, status_2 = 1 WHERE loopback = '{loopback}'")
             await send_mess(kod, text)
@@ -237,7 +237,7 @@ async def check_all(loopback, status1, status2):
             pass
         else:
             data = await request_name(loopback)
-            text = f"{data[0]}\nКод: {data[1]}\n🔵 🔵 Филиал работает"
+            text = f"{data[0]}\nКод: {data[1]}\n🟢 🟢 Филиал работает"
             await sql.sql_insert(f"UPDATE status SET status_1 = 1, status_2 = 1 WHERE loopback = '{loopback}'")
             await send_mess(kod, text)
     else:

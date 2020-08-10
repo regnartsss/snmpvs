@@ -5,7 +5,6 @@ from loader import bot
 
 
 async def info_filial(kod):
-    # if st == "all":
     request = f"SELECT * FROM filial INNER JOIN region ON filial.region = region.id WHERE kod = {kod}"
     row = await sql_selectone(request)
     text = f"""
@@ -26,7 +25,27 @@ ISP2_name: {row[13]}
 ISP2: {row[6]}
 gateway_isp2: {row[15]}
 serial: {row[16]}
+cisco: {await cisco(kod)}
+регистратор: {await registrator(kod)}
 """
+    return text
+
+
+async def cisco(kod):
+    request = f"SELECT * FROM cisco WHERE kod = {kod}"
+    rows = await sql_select(request)
+    text = ""
+    for row in rows:
+        print(row)
+        text += f"\n{row[1]} {row[2]}"
+    return text
+
+async def registrator(kod):
+    request = f"SELECT * FROM registrator WHERE kod = {kod}"
+    rows = await sql_select(request)
+    text = ""
+    for row in rows:
+        text += f"\n{row[1]} {row[2]}"
     return text
 
 

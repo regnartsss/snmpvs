@@ -4,6 +4,7 @@ from work.sql import sql_selectone, sql_select, sql_insert
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from work.keyboard import main_menu
 from loader import bot
+import paramiko
 import asyncio
 import socket
 import os
@@ -16,7 +17,7 @@ import re
 #     return os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__))).replace('\\', '/') + '/'
 #
 # PATH = find_location()
-
+from pprint import pprint
 
 class Ssh_console(StatesGroup):
     command = State()
@@ -50,9 +51,9 @@ async def kod_loopback(call):
     return loopback[0]
 
 
-async def ssh_console(call):
-    kod = call.data.split("_")[1]
-    user_id = call.message.chat.id
+async def ssh_console(callback_data, user_id):
+    kod = callback_data["kod"]
+    # user_id = call.message.chat.id
     await Ssh_console.command.set()
     await sql_insert(f"UPDATE users SET ssh_kod = {kod} WHERE id = {user_id}")
     text = "Введите команду SSH для отправки на циску или 444 для отмены\n" \
@@ -83,6 +84,40 @@ async def console_command(message):
             await bot.send_message(chat_id=message.chat.id, text=text[:4000])
             text = text[4000:]
         return text
+
+
+async def search_mac(user_id, kod, mac, message):
+    print(user_id, kod, mac)
+    request = f"SELECT ip, hostname FROM cisco WHERE kod = {kod}"
+    user = "itkras"
+    passwors = "miccis-96kraS"
+    command = "sh port add"
+    rows = await sql_select(request)
+    t = ""
+    for row in rows:
+        ip = row[0]
+        await message.answer(f"Проверка {ip} {row[1]}")
+        client = paramiko.SSHClient()
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        try:
+            client.connect(hostname=ip, username=user, password=passwors, port=22)
+        except paramiko.ssh_exception.NoValidConnectionsError:
+            # text += f"Нет подключения к циско {ip} {row[1]}"
+            # print(f"Нет подключения к циско {ip} {row[1]}")
+            await message.answer(f"🔴 Нет подключения к циско {ip} {row[1]}")
+            continue
+        stdin, stdout, stderr = client.exec_command(command)
+        text = stdout.read().decode("utf-8").split("\r\n")
+        for line in text:
+            try:
+                mac_old = line.split()[1]
+                mac_old = f"{mac_old.split('.')[0]}{mac_old.split('.')[1]}{mac_old.split('.')[2]}"
+                if mac == mac_old:
+                    return f"🟢Устройство подключено в порт {line.split()[3]} на {ip} {row[1]}"
+            except IndexError:
+                pass
+    return f"Ничего не найдено, возможно устройство подключено по wi-fi"
+
 
 
 # async def ssh_test():

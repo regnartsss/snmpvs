@@ -4,37 +4,46 @@ from work.Keyboard_menu import ssh
 from work.Ssh import ssh_t, ssh_console
 from work.Statistics import info_registrator
 from work.keyboard import cancel
-import asyncio
-
-# from Map import goto
-# from Build import build
-# from Fight import fight, field_goto
-# import sql
-# from Training import entry
-# import importlib
-# import Shop
-# from Shop import shop
-#
-# #
-# @dp.callback_query_handler()
-# async def handler(call: types.CallbackQuery):
-from work.Keyboard_menu import work
+from work.Keyboard_menu import menu_filial
 from work.sub import worksub
 from work.Add_filial import filial_check
 from work.check_vs import call_name
+from filters.loc import ssh_cb, lease_cb, console_ssh_cb
+from work.Lease import lease
+
+
+@dp.callback_query_handler(ssh_cb.filter())
+async def market(call: types.CallbackQuery, callback_data: dict):
+    await call.message.edit_reply_markup(reply_markup=await ssh(callback_data))
+
+
+@dp.callback_query_handler(console_ssh_cb.filter())
+async def market(call: types.CallbackQuery, callback_data: dict):
+    await call.message.answer(text=await ssh_console(callback_data, call.from_user.id), reply_markup=cancel())
+
+
+@dp.callback_query_handler(lease_cb.filter())
+async def market(call: types.CallbackQuery, callback_data: dict):
+    await call.answer("Ожидайте...", cache_time=10)
+    text = await lease(callback_data)
+    keyboard = await menu_filial(callback_data)
+    await call.message.edit_text(text=text, reply_markup=keyboard)
+
+
 
 @dp.callback_query_handler(lambda callback_query: True)
 async def handler(call: types.CallbackQuery):
     print(call.data)
-    if call.data.split("_")[0] == "region":
-        await call.message.edit_text("Выберите филиал", reply_markup=await work(message=call.message, call=call))
-    elif call.data.split("_")[0] == "filial":
-        data = await work(message=call.message, call=call)
-        await call.message.edit_text(text=data[0], reply_markup=data[1])
-    elif call.data.split("_")[0] == "menu":
-        await call.message.edit_text("Выберите регион", reply_markup=await work(message=call.message, call=call))
-
-    elif call.data.split("_")[0] == "regionsub":
+    # if call.data.split("_")[0] == "region":
+    #     pass
+    #     # await call.message.edit_text("Выберите филиал", reply_markup=await work(message=call.message, call=call))
+    # # elif call.data.split("_")[0] == "filial":
+    # #     data = await work(message=call.message, call=call)
+    # #     await call.message.edit_text(text=data[0], reply_markup=data[1])
+    # # elif call.data.split("_")[0] == "menu":
+    # #     await call.message.edit_text("Выберите регион", reply_markup=await work(message=call.message, call=call))
+    #
+    if call.data.split("_")[0] == "regionsub":
         await worksub(message=call.message, call=call)
         # await call.message.edit_text("Выберите филиал", reply_markup=await worksub(message=call.message, call=call))
 
@@ -44,22 +53,22 @@ async def handler(call: types.CallbackQuery):
     elif call.data.split("_")[0] == "menusub":
         await call.message.edit_text("Выберите регион", reply_markup=await worksub(message=call.message, call=call))
 
-    elif call.data.split("_")[0] == "check":
-        await call.message.answer(await filial_check(call))
-    elif call.data.split("_")[0] == "sub":
-        await call_name(call)
-    elif call.data.split("_")[1] == "trac":
-        # asyncio.ensure_future(ssh_t("10.96.25.1"))
-        await bot.answer_callback_query(text="Ожидайте, запрос занимает некоторое время", callback_query_id=call.id,
-                                  cache_time=100)
-        await ssh_t(call)
-    elif call.data.split("_")[0] == "ssh":
-        data = await ssh(call=call)
-        await call.message.edit_text(text=data[0], reply_markup=data[1])
-    elif call.data.split("_")[0] == "registrator":
-        await call.message.edit_text(await info_registrator(call))
-    elif call.data.split("_")[0] == "console":
-        await call.message.answer(text=await ssh_console(call), reply_markup=cancel())
+    # elif call.data.split("_")[0] == "check":
+    #     await call.message.answer(await filial_check(call))
+    # elif call.data.split("_")[0] == "sub":
+    #     await call_name(call)
+    # elif call.data.split("_")[1] == "trac":
+    #     # asyncio.ensure_future(ssh_t("10.96.25.1"))
+    #     await bot.answer_callback_query(text="Ожидайте, запрос занимает некоторое время", callback_query_id=call.id,
+    #                               cache_time=100)
+    #     await ssh_t(call)
+    # # elif call.data.split("_")[0] == "ssh":
+    # #     data = await ssh(call=call)
+    # #     await call.message.edit_text(text=data[0], reply_markup=data[1])
+    # elif call.data.split("_")[0] == "registrator":
+    #     await call.message.edit_text(await info_registrator(call))
+    # elif call.data.split("_")[0] == "console":
+    #     await call.message.answer(text=await ssh_console(call), reply_markup=cancel())
 
 
     # if (await sql.sql_selectone("select start_bot from data"))[0] == 1:

@@ -3,18 +3,18 @@ from loader import dp, bot
 from data.data import admin_id
 from aiogram.dispatcher import FSMContext
 from work import sql
-from work.Ssh import ssh_console, Ssh_console, ssh_console_command
+from work.Ssh import ssh_console, Ssh_console, ssh_console_command, search_mac
 from work.admin import mess, AllMessage
 from work.keyboard import main_menu
 from work.Add_filial import NewFilial, Add_snmp
 from work.Statistics import info_filial, check_registrator, link
 from work.keyboard import keyboard_other, region, keyboard_back, keyboard_search, main_menu_user
-from work.Keyboard_menu import work, key_registrator
+from work.Keyboard_menu import key_registrator, menu_region, menu_filials, menu_filial
 from work.sub import worksub
 from work.search import SearchFilial, search_name, search_kod, search_serial, search_kod_win, search_name_win, \
     search_serial_win
 from middlewares.middleware_and_antiflood import rate_limit
-
+from filters.loc import region_cb, send_lease_cb, filials_cb
 
 @dp.message_handler(state=Ssh_console.command)
 async def process_name(message: types.Message, state: FSMContext):
@@ -124,10 +124,40 @@ async def process_name(message: types.Message, state: FSMContext):
         status = await info_filial(kod)
         await message.answer(status)
 
-@dp.message_handler(text="123")
+
+@dp.message_handler(text="Филиалы")
+async def menu(message: types.Message):
+    await message.answer("Выберите регион", reply_markup=await menu_region())
 
 
+@dp.callback_query_handler(text="menu")
+async def market(call: types.CallbackQuery):
+    await call.message.edit_text(text="Выберите регион", reply_markup=await menu_region())
 
+
+@dp.callback_query_handler(region_cb.filter())
+async def market(call: types.CallbackQuery, callback_data: dict):
+    print(callback_data)
+    await call.message.edit_text(text="Выберите филиал", reply_markup=await menu_filials(callback_data))
+
+
+@dp.callback_query_handler(filials_cb.filter())
+async def market(call: types.CallbackQuery, callback_data: dict):
+    print(callback_data)
+    kod = callback_data["kod"]
+    await sql.sql_insert(f"UPDATE users SET ssh_kod = {kod} WHERE id = {call.from_user.id}")
+    text = await info_filial(kod)
+    keyboard = await menu_filial(callback_data)
+    await call.message.edit_text(text=text, reply_markup=keyboard)
+
+
+@dp.message_handler(content_types=types.ContentTypes.ANY)
+async def message(message: types.Message):
+    # print(message.text)
+    text = message.text[1:]
+    kod = (await sql.sql_selectone(f"SELECT ssh_kod FROM users WHERE id = {message.from_user.id}"))[0]
+    text = await search_mac(message.from_user.id, kod, text, message)
+    await message.answer(text)
 
 @dp.message_handler(content_types=types.ContentTypes.ANY)
 async def all_other_messages(message: types.Message, state: FSMContext):
@@ -141,9 +171,6 @@ async def all_other_messages(message: types.Message, state: FSMContext):
         elif message.text == "Назад":
             await state.finish()
             await message.answer("Главное меню", reply_markup=main_menu())
-        elif message.text == "Филиалы":
-            # bot.send_message(message.chat.id, "Меню", reply_markup=main_menu())
-            await message.answer("Выберите регион", reply_markup=await work(message))
         elif message.text == "Просканировать":
             await sql.sql_insert(f'DELETE FROM cisco')
             await sql.sql_insert(f'DELETE FROM registrator')
