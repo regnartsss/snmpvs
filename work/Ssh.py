@@ -91,7 +91,8 @@ async def search_mac(user_id, kod, mac, message):
     request = f"SELECT ip, hostname FROM cisco WHERE kod = {kod}"
     user = "itkras"
     passwors = "miccis-96kraS"
-    command = "sh port add"
+    # command = "sh port add"
+    command = "sh mac-"
     rows = await sql_select(request)
     t = ""
     for row in rows:
@@ -119,6 +120,38 @@ async def search_mac(user_id, kod, mac, message):
     return f"Ничего не найдено, возможно устройство подключено по wi-fi"
 
 
+async def arp():
+    mac = "2857beda96cd"
+    request = f"SELECT ip, hostname FROM cisco WHERE kod = 71"
+    user = "itkras"
+    passwors = "miccis-96kraS"
+    command = "sh mac-"
+    rows = await sql_select(request)
+    t = ""
+    for row in rows:
+        ip = row[0]
+        print(f"Проверка {ip} {row[1]}")
+        # await message.answer(f"Проверка {ip} {row[1]}")
+        client = paramiko.SSHClient()
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        try:
+            client.connect(hostname=ip, username=user, password=passwors, port=22)
+        except paramiko.ssh_exception.NoValidConnectionsError:
+            # text += f"Нет подключения к циско {ip} {row[1]}"
+            # print(f"Нет подключения к циско {ip} {row[1]}")
+            print(f"🔴 Нет подключения к циско {ip} {row[1]}")
+            continue
+        stdin, stdout, stderr = client.exec_command(command)
+        text = stdout.read().decode("utf-8").split("\r\n")
+        for line in text:
+            try:
+                mac_old = line.split()[1]
+                mac_old = f"{mac_old.split('.')[0]}{mac_old.split('.')[1]}{mac_old.split('.')[2]}"
+                if mac == mac_old:
+                    print(f"🟢Устройство подключено в порт {line.split()[3]} на {ip} {row[1]}")
+            except IndexError:
+                pass
+    print(f"Ничего не найдено, возможно устройство подключено по wi-fi")
 
 # async def ssh_test():
        # loopback = "10.255.64.1"
