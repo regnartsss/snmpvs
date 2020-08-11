@@ -3,7 +3,7 @@ from loader import dp
 from work.new_user import new_user
 from work.admin import message_all
 from work.keyboard import cancel, main_menu_user
-from work.Ssh import arp
+# from work.Ssh import arp
 
 @dp.message_handler(commands=['start'])
 async def start_message(message: types.Message):
