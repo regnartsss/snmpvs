@@ -144,8 +144,6 @@ async def snmp(loopback):
     for mib in mib_all:
         error_indication, error_status, error_index, var_binds = await snmp_v3(loopback, mib)
         if error_indication:
-            print(error_indication)
-            print("Loopback не доступен")
             r = await sql.sql_selectone(f"SELECT In1_two, In2_two FROM status WHERE loopback = '{loopback}'")
             d.append(r[0])
             d.append(r[1])
@@ -251,9 +249,7 @@ async def request_name(loopback):
 
 
 async def send_mess(kod, text):
-    print(f"SELECT user_id FROM sub WHERE kod = {kod}")
     rows = await sql.sql_selectone(f"SELECT user_id FROM sub WHERE kod = {kod}")
-    print(rows)
     try:
         for row in rows:
             print(row)
