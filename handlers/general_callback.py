@@ -53,8 +53,8 @@ async def handler(call: types.CallbackQuery):
     elif call.data.split("_")[0] == "menusub":
         await call.message.edit_text("Выберите регион", reply_markup=await worksub(message=call.message, call=call))
 
-    # elif call.data.split("_")[0] == "check":
-    #     await call.message.answer(await filial_check(call))
+    elif call.data.split("_")[0] == "check":
+        await call.message.answer(await filial_check(call))
     # elif call.data.split("_")[0] == "sub":
     #     await call_name(call)
     # elif call.data.split("_")[1] == "trac":
