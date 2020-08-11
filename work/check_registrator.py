@@ -166,7 +166,6 @@ async def info_filial(ip, data):
            '1.3.6.1.4.1.3333.1.8',  # cam_down
            ]
         info = await info_snmp_registrator(ip, mib)
-        print(info)
         request = f"""SELECT filial.name, registrator.hostname FROM filial LEFT JOIN registrator ON filial.kod = registrator.kod 
                     WHERE registrator.ip = '{ip}'"""
         row = await sql.sql_selectone(request)
@@ -180,7 +179,6 @@ async def info_filial(ip, data):
 ⌛  Время работы сервера  {info[3]}\n
 🔍 Не работает камера: {info[4]} 
                 """
-        print(text)
         return text
 
     elif data == 'up':

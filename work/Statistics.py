@@ -68,17 +68,25 @@ async def info_registrator(call):
     return text
 
 
+async def version_po(message):
+    text=""
+    rows_old = await sql_select(f"SELECT ip, hostname, firmware FROM registrator")
+    for row_old in rows_old:
+        print(row_old)
+        text += f"{row_old[2]} {row_old[1]} {row_old[0]}\n"
+    while len(text) > 4000:
+        await message.answer(text=text[:4000])
+        text = text[4000:]
+    return text
+
+
 async def check_registrator(message):
     rows = await sql_select(f"SELECT kod FROM sub WHERE user_id = {message.from_user.id}")
-    print(rows)
     if len(rows) > 20:
         return "Слишком много филиалов для проверки"
     else:
         for row in rows:
-            print(f"SELECT ip FROM registrator WHERE kod = {row[0]}")
             rows_old = await sql_select(f"SELECT ip FROM registrator WHERE kod = {row[0]}")
-            print(rows_old)
-
             for row_old in rows_old:
                 print(row_old[0])
                 mib = [

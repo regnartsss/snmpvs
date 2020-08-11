@@ -373,7 +373,6 @@ class Add_snmp():
             try:
                 for res in await snmp.get("1.3.6.1.4.1.3333.1.7"):
                     data["registrator"][ip] = res.value.decode('UTF-8')
-
             except Exception as n:
                 print(f"Ошибка_trassir {n}")
 

@@ -20,6 +20,6 @@ async def message(message: types.Message):
     await message.answer(text=await message_all(), reply_markup=cancel())
 
 
-@dp.message_handler(commands=['arp'])
-async def message(message: types.Message):
-    await arp()
+# @dp.message_handler(commands=['arp'])
+# async def message(message: types.Message):
+#     await arp()

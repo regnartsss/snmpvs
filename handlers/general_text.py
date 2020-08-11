@@ -7,7 +7,7 @@ from work.Ssh import ssh_console, Ssh_console, ssh_console_command, search_mac
 from work.admin import mess, AllMessage
 from work.keyboard import main_menu
 from work.Add_filial import NewFilial, Add_snmp
-from work.Statistics import info_filial, check_registrator, link
+from work.Statistics import info_filial, check_registrator, link, version_po
 from work.keyboard import keyboard_other, region, keyboard_back, keyboard_search, main_menu_user
 from work.Keyboard_menu import key_registrator, menu_region, menu_filials, menu_filial
 from work.sub import worksub, reg_menu
@@ -178,6 +178,11 @@ async def work(message: types.Message):
 @dp.message_handler(lambda c: c.from_user.id in admin_id, text="🚫 Отмена")
 async def work(message: types.Message):
     await message.answer("🚫 Отмена", reply_markup=main_menu())
+
+
+@dp.message_handler(lambda c: c.from_user.id in admin_id, text="Версия ПО регистраторов")
+async def work(message: types.Message):
+    await message.answer(text=await version_po(message))
 
 
 @dp.message_handler(lambda c: c.from_user.id in admin_id, text="Поиск")
