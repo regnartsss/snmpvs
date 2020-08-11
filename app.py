@@ -30,7 +30,7 @@ def startbot():
 
 
 # loop = asyncio.get_event_loop()
-# asyncio.ensure_future(check())
+asyncio.ensure_future(check())
 asyncio.ensure_future(startbot())
 # loop.run_forever()
 
