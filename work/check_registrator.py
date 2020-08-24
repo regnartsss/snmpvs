@@ -72,15 +72,16 @@ async def info_snmp_registrator(ip, mib_all):
 async def start_check_registrator(order):
     while 0 < 1:
         await asyncio.sleep(5)
-        if order == "ASC":
-            rows = await sql.sql_select(f"SELECT ip FROM registrator ORDER BY ip {order}")
-        else:
-            rows = await sql.sql_select(f"SELECT ip FROM registrator ORDER BY ip {order}")
-
+        rows = await sql.sql_select(f"SELECT ip FROM registrator ORDER BY ip {order}")
+        # if order == "ASC":
+        #     rows = await sql.sql_select(f"SELECT ip FROM registrator ORDER BY ip {order}")
+        # else:
+        #     rows = await sql.sql_select(f"SELECT ip FROM registrator ORDER BY ip {order}")
         for row in rows:
             data_r = await snmpregist(row[0])
             await asyncio.sleep(5)
             dara_r_old = await snmpregist(row[0])
+            print(data_r, dara_r_old)
             if data_r == dara_r_old:
                 if data_r is False:
                     request = f"""SELECT filial.name, registrator.hostname, filial.kod, down FROM filial LEFT JOIN registrator 
@@ -92,14 +93,12 @@ async def start_check_registrator(order):
                         text = f"{r[0]} \nРегистратор {r[1]}\nНе доступен"
                         await send_mess(r[2], text)
                 else:
-                    try:
-                        disk = data_r[0]
-                    except IndexError:
-                        continue
+                    disk = data_r[0]
                     cam_down = data_r[1].split()[0]
                     select = await sql.sql_selectone(f"SELECT disk, cam_down, kod, cam, down FROM registrator WHERE ip = '{row[0]}'")
                     disk_old, cam_down_old, kod, cam, down = select
-                    if down == "":
+                    print(down)
+                    if down is None:
                         await info_registrator(row[0])
                         continue
                     elif down == 1:
@@ -109,8 +108,8 @@ async def start_check_registrator(order):
                         except Exception as n:
                             print(f"ERROR = Регистратор работает {n}")
                         await send_mess(kod, text)
-
                         await sql.sql_insert(f"Update registrator SET down = 0 WHERE ip = '{row[0]}'")
+
                     if disk_old == disk:
                         pass
                     else:
@@ -216,5 +215,6 @@ async def info_registrator(ip):
     request = f"""UPDATE registrator 
 SET archive = '{row[0]}', disk = '{row[1]}', cam = '{cam}', 
 cam_down = '{cam_down}', script = '{row[3]}', firmware = '{row[4]}', uptime = '{row[5]}', down = 0 WHERE ip = '{ip}'"""
+    print(request)
     await sql.sql_insert(request)
 
