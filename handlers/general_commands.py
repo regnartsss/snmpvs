@@ -19,6 +19,7 @@ async def start_message(message: types.Message):
 
 @dp.message_handler(lambda c: c.from_user.id in admin_id, commands=['button'])
 async def start_message(message: types.Message):
+    print("кнопки админ")
     await message.answer(text="Кнопки", reply_markup=main_menu())
 
 
