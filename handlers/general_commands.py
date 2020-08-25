@@ -9,6 +9,10 @@ from work.keyboard import cancel, main_menu_user
 async def start_message(message: types.Message):
     await new_user(message)
 
+@dp.message_handler(commands=['id'])
+async def start_message(message: types.Message):
+    await message.answer(text=f"id: {message.from_user.id}")
+
 
 @dp.message_handler(commands=['button'])
 async def start_message(message: types.Message):

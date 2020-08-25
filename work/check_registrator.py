@@ -79,12 +79,11 @@ async def start_check_registrator(order):
             rows = await sql.sql_select(f"SELECT ip FROM registrator ORDER BY ip {order}")
         for row in rows:
             data_r = await snmpregist(row[0])
-            print(row[0])
             await asyncio.sleep(5)
             dara_r_old = await snmpregist(row[0])
             if data_r == dara_r_old:
                 if data_r is False:
-                    print(f"data_r - {data_r}")
+                    # print(f"data_r - {data_r}")
                     request = f"""SELECT filial.name, registrator.hostname, filial.kod, down FROM filial LEFT JOIN registrator 
                     ON filial.kod = registrator.kod WHERE registrator.ip = '{row[0]}'
                         """
@@ -100,7 +99,6 @@ async def start_check_registrator(order):
                     cam_down = data_r[1].split()[0]
                     select = await sql.sql_selectone(f"SELECT disk, cam_down, kod, cam, down FROM registrator WHERE ip = '{row[0]}'")
                     disk_old, cam_down_old, kod, cam, down = select
-                    print(f"down - {down}")
                     if down is None:
                         await info_registrator(row[0])
                         continue
@@ -116,19 +114,19 @@ async def start_check_registrator(order):
                     if disk_old == disk:
                         pass
                     else:
-                        print(f"Ошибка диска {row[0]}")
+                        # print(f"Ошибка диска {row[0]}")
                         await sql.sql_insert(
                             f"Update registrator SET disk = '{data_r[0]}' WHERE ip = '{row[0]}'")
                     if cam_down == cam_down_old:
                         pass
                     else:
                         if cam_down == cam:
-                            print(f"Камера работает {row[0]}")
+                            # print(f"Камера работает {row[0]}")
                             text = await info_filial(row[0], 'cam_up')
                             text += "Камеры работают"
                             await send_mess(kod, text)
                         else:
-                            print(f"Камера не работает {row[0]}")
+                            # print(f"Камера не работает {row[0]}")
                             text = await info_filial(row[0], 'cam_down')
                             text += "Камера не работает"
                             await send_mess(kod, text)
