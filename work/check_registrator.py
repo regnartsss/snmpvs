@@ -48,7 +48,7 @@ async def snmpregist(ip):
                     try:
                         status = res.value.decode('UTF-8')
                     except AttributeError:
-                        continue
+                        return "Null"
                     d.append(status)
             except aiosnmp.exceptions.SnmpTimeoutError:
                 return False
@@ -72,18 +72,19 @@ async def info_snmp_registrator(ip, mib_all):
 async def start_check_registrator(order):
     while 0 < 1:
         await asyncio.sleep(5)
-        rows = await sql.sql_select(f"SELECT ip FROM registrator ORDER BY ip {order}")
-        # if order == "ASC":
-        #     rows = await sql.sql_select(f"SELECT ip FROM registrator ORDER BY ip {order}")
-        # else:
-        #     rows = await sql.sql_select(f"SELECT ip FROM registrator ORDER BY ip {order}")
+        # rows = await sql.sql_select(f"SELECT ip FROM registrator ORDER BY ip {order}")
+        if order == "ASC":
+            rows = await sql.sql_select(f"SELECT ip FROM registrator ORDER BY ip {order}")
+        else:
+            rows = await sql.sql_select(f"SELECT ip FROM registrator ORDER BY ip {order}")
         for row in rows:
             data_r = await snmpregist(row[0])
+            print(row[0])
             await asyncio.sleep(5)
             dara_r_old = await snmpregist(row[0])
-            print(data_r, dara_r_old)
             if data_r == dara_r_old:
                 if data_r is False:
+                    print(f"data_r - {data_r}")
                     request = f"""SELECT filial.name, registrator.hostname, filial.kod, down FROM filial LEFT JOIN registrator 
                     ON filial.kod = registrator.kod WHERE registrator.ip = '{row[0]}'
                         """
@@ -92,6 +93,8 @@ async def start_check_registrator(order):
                         await sql.sql_insert(f"Update registrator SET down = 1 WHERE ip = '{row[0]}'")
                         text = f"{r[0]} \nРегистратор {r[1]}\nНе доступен"
                         await send_mess(r[2], text)
+                elif data_r == "Null":
+                    print(f"Ошибка скрипта snmp {row}")
                 else:
                     disk = data_r[0]
                     cam_down = data_r[1].split()[0]

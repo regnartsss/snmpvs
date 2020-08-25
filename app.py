@@ -18,7 +18,7 @@ async def on_startup(dp):
 #     asyncio.ensure_future(thread_check())
 #     loop.run_forever()
 async def check():
-    asyncio.ensure_future(start_snmp("ASC"))
+    # asyncio.ensure_future(start_snmp("ASC"))
     # asyncio.ensure_future(start_snmp("DESC"))
     # asyncio.ensure_future(start_snmp())
     asyncio.ensure_future(start_check_registrator("ASC"))

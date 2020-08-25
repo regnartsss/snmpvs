@@ -5,7 +5,7 @@ from loader import bot
 import asyncio
 import aiosnmp
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-
+from aiogram.utils.exceptions import ChatNotFound
 
 async def start_snmp(order="null"):
     print("start")
@@ -249,6 +249,7 @@ async def request_name(loopback):
 
 
 async def send_mess(kod, text):
+
     rows = await sql.sql_selectone(f"SELECT user_id FROM sub WHERE kod = {kod}")
     try:
         for row in rows:
@@ -257,6 +258,9 @@ async def send_mess(kod, text):
                 await bot.send_message(chat_id=row, text=text, disable_notification=await notif())
             except TypeError:
                 print(f"Ошибка отправки {row}")
+            except ChatNotFound:
+                print(f"Юзер не найден {row}")
+
     except TypeError:
         print("Никто не подписан")
 
