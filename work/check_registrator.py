@@ -97,7 +97,7 @@ async def start_check_registrator(order):
                     cam_down = data_r[1].split()[0]
                     select = await sql.sql_selectone(f"SELECT disk, cam_down, kod, cam, down FROM registrator WHERE ip = '{row[0]}'")
                     disk_old, cam_down_old, kod, cam, down = select
-                    print(down)
+                    print(f"down - {down}")
                     if down is None:
                         await info_registrator(row[0])
                         continue
