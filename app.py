@@ -20,7 +20,7 @@ async def on_startup(dp):
 async def check():
     # asyncio.ensure_future(start_snmp("ASC"))
     # asyncio.ensure_future(start_snmp("DESC"))
-    # asyncio.ensure_future(start_snmp())
+    asyncio.ensure_future(start_snmp())
     asyncio.ensure_future(start_check_registrator("ASC"))
     asyncio.ensure_future(start_check_registrator("DESC"))
 
