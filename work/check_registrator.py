@@ -78,6 +78,7 @@ async def start_check_registrator(order):
         else:
             rows = await sql.sql_select(f"SELECT ip FROM registrator ORDER BY ip {order}")
         for row in rows:
+            print(row)
             data_r = await snmpregist(row[0])
             await asyncio.sleep(5)
             dara_r_old = await snmpregist(row[0])
