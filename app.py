@@ -1,5 +1,6 @@
 from work.check_vs import start_snmp
 from work.check_registrator import start_check_registrator
+from loader import dp
 
 
 async def on_startup(dp):
@@ -14,7 +15,8 @@ async def on_startup(dp):
 
 if __name__ == '__main__':
     from aiogram import executor
-    from handlers import dp
+    import handlers
+    # from handlers import dp
     executor.start_polling(dp, skip_updates=True, on_startup=on_startup)
 
 
