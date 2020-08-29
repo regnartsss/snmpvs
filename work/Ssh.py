@@ -92,7 +92,7 @@ async def search_mac(user_id, kod, mac, message):
     user = "itkras"
     passwors = "miccis-96kraS"
     # command = "sh port add"
-    command = "sh mac-"
+    command = "show mac address-table"
     rows = await sql_select(request)
     t = ""
     for row in rows:

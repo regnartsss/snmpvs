@@ -69,6 +69,7 @@ async def info_snmp_registrator(ip, mib_all):
 
 
 async def start_check_registrator(order):
+    print("reg")
     while 0 < 1:
         rows = await sql.sql_select(f"SELECT ip FROM registrator ORDER BY ip {order}")
         # if order == "ASC":

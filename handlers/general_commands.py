@@ -1,10 +1,13 @@
 from aiogram import types
 from loader import dp
+import loader
 from work.new_user import new_user
 from work.admin import message_all
 from work.keyboard import cancel, main_menu_user, main_menu
 # rom work.Ssh import arp
 from data.data import admin_id
+import importlib
+from work import text
 
 
 @dp.message_handler(commands=['start'])
@@ -21,6 +24,14 @@ async def start_message(message: types.Message):
 async def start_message(message: types.Message):
     print("кнопки админ")
     await message.answer(text="Кнопки", reply_markup=main_menu())
+
+
+@dp.message_handler(lambda c: c.from_user.id in admin_id, commands=['reload'])
+async def start_message(message: types.Message):
+    # from handlers import general_text
+
+    importlib.reload(dp)
+    await message.answer(text=text.update)
 
 
 @dp.message_handler(commands=['button'])

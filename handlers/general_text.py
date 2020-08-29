@@ -17,7 +17,6 @@ from middlewares.middleware_and_antiflood import rate_limit
 from filters.loc import region_cb, send_lease_cb, filials_cb
 
 
-
 @dp.message_handler(state=Ssh_console.command)
 async def process_name(message: types.Message, state: FSMContext):
     text = await ssh_console_command(message, state)

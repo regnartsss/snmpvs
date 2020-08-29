@@ -7,6 +7,7 @@ import aiosnmp
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.exceptions import ChatNotFound
 
+
 async def start_snmp(order="null"):
     print("start")
     await asyncio.sleep(10)

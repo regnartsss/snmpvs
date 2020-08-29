@@ -1,5 +1,6 @@
 from loader import dp, bot
 from aiogram import types
+from aiogram.utils.exceptions import MessageNotModified
 from work.Keyboard_menu import ssh
 from work.Ssh import ssh_t, ssh_console
 from work.Statistics import info_registrator
@@ -27,8 +28,10 @@ async def market(call: types.CallbackQuery, callback_data: dict):
     await call.answer("Ожидайте...", cache_time=10)
     text = await lease(callback_data)
     keyboard = await menu_filial(callback_data)
-    await call.message.edit_text(text=text, reply_markup=keyboard)
-
+    try:
+        await call.message.edit_text(text=text, reply_markup=keyboard)
+    except MessageNotModified:
+        pass
 
 
 @dp.callback_query_handler(lambda callback_query: True)
