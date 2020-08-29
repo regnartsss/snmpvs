@@ -2,6 +2,7 @@ from aiogram import types
 from loader import dp, bot
 from data.data import admin_id
 from aiogram.dispatcher import FSMContext
+from aiogram.utils.exceptions import MessageNotModified
 from work import sql
 from work.Ssh import ssh_console, Ssh_console, ssh_console_command, search_mac
 from work.admin import mess, AllMessage
@@ -139,7 +140,10 @@ async def market(call: types.CallbackQuery):
 @dp.callback_query_handler(region_cb.filter())
 async def market(call: types.CallbackQuery, callback_data: dict):
     print(callback_data)
-    await call.message.edit_text(text="Выберите филиал", reply_markup=await menu_filials(callback_data))
+    try:
+        await call.message.edit_text(text="Выберите филиал", reply_markup=await menu_filials(callback_data))
+    except MessageNotModified:
+        pass
 
 
 @dp.callback_query_handler(filials_cb.filter())
