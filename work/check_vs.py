@@ -240,7 +240,7 @@ async def check_all(loopback, status1, status2):
             await sql.sql_insert(f"UPDATE status SET status_1 = 1, status_2 = 1 WHERE loopback = '{loopback}'")
             await send_mess(kod, text)
     else:
-        print("тест")
+        pass
 
 
 async def request_name(loopback):
