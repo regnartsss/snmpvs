@@ -7,6 +7,7 @@ from work.check_vs import send_mess
 import time
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from sqlite3 import OperationalError
+from aiosnmp.exceptions import SnmpTimeoutError
 trassir = [
            # '1.3.6.1.4.1.3333.1.1',  # db
            '1.3.6.1.4.1.3333.1.2',  # archive
@@ -80,14 +81,23 @@ async def info_snmp_registrator(ip, mib_all):
 
 async def cam_snmp(ip):
     d = []
-    with aiosnmp.Snmp(host=ip, port=161, community="dssl", timeout=10, retries=3,
-                      max_repetitions=5, ) as snmp:
-        for res in await snmp.get('1.3.6.1.4.1.3333.1.5'):
-            try:
+    with aiosnmp.Snmp(host=ip, port=161, community="dssl", timeout=5, retries=3, max_repetitions=2, ) as snmp:
+        try:
+            for res in await snmp.get('1.3.6.1.4.1.3333.1.5'):
                 status = res.value.decode('UTF-8')
-            except AttributeError:
-                d.append("ERROR")
-            d.append(status)
+                d.append(status)
+        except SnmpTimeoutError:
+            return False
+
+    # try:
+        #     for res in await snmp.get('1.3.6.1.4.1.3333.1.5'):
+        #         try:
+        #             status = res.value.decode('UTF-8')
+        #             d.append(status)
+        #         except AttributeError:
+        #             d.append("ERROR")
+        # except SnmpTimeoutError:
+        #     d.append("ERROR")
     return d
 
 
@@ -99,19 +109,22 @@ async def shed():
 
 async def start_check_registrator_cam():
     print("reg_cam_start")
-    rows = await sql.sql_select(f"SELECT ip FROM registrator ORDER BY ip ASC")
+    rows = await sql.sql_select(f"SELECT ip FROM registrator")
     for row in rows:
         data_r = await cam_snmp(row[0])
         if data_r is False:
-            request = f"""SELECT filial.name, registrator.hostname, filial.kod, down FROM filial LEFT JOIN registrator
-            ON filial.kod = registrator.kod WHERE registrator.ip = '{row[0]}'"""
-            r = await sql.sql_selectone(request)
-            if r[3] == 0:
-                await sql.sql_insert(f"Update registrator SET down = 1 WHERE ip = '{row[0]}'")
-                text = f"{r[0]} \nРегистратор {r[1]}\nНе доступен"
-                await send_mess(r[2], text)
-        elif data_r == "Null":
-            print(f"Ошибка скрипта snmp {row}")
+            print(f"Регистратор не доступен, камеры не проверить {row[0]}")
+            pass
+        # if data_r is False:
+        #     request = f"""SELECT filial.name, registrator.hostname, filial.kod, down FROM filial LEFT JOIN registrator
+        #     ON filial.kod = registrator.kod WHERE registrator.ip = '{row[0]}'"""
+        #     r = await sql.sql_selectone(request)
+        #     if r[3] == 0:
+        #         await sql.sql_insert(f"Update registrator SET down = 1 WHERE ip = '{row[0]}'")
+        #         text = f"{r[0]} \nРегистратор {r[1]}\nНе доступен"
+        #         await send_mess(r[2], text)
+        # elif data_r == "Null":
+        #     print(f"Ошибка скрипта snmp {row}")
         else:
             cam_down = data_r[0].split()[0]
             select = await sql.sql_selectone(f"SELECT disk, cam_down, kod, cam, down, script FROM registrator WHERE ip = '{row[0]}'")
