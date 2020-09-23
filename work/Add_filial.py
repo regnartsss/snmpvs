@@ -88,9 +88,10 @@ class Add_snmp():
             except Exception as n:
                 print(f"Удаление старого филиала {self.kod}")
             try:
-                request = f"DELETE FROM filial WHERE kod = {self.kod}"
-                print(request)
-                await sql.sql_insert(request)
+                await sql.sql_insert(f"DELETE FROM filial WHERE kod = {self.kod}")
+                await sql.sql_insert(f"DELETE FROM cisco WHERE kod = {self.kod}")
+                await sql.sql_insert(f"DELETE FROM registrator WHERE kod = {self.kod}")
+                await sql.sql_insert(f"DELETE FROM status WHERE kod = {self.kod}")
             except Exception as n:
                 print(self.kod)
                 await bot.send_message(chat_id=765333440, text=f"Удаление старого филиала {self.kod} - {n}")

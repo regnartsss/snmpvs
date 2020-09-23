@@ -65,7 +65,7 @@ async def ssh(callback_data):
 
 async def key_registrator(message):
     keyboard = InlineKeyboardMarkup()
-    rows = await sql.sql_select("SELECT id, name FROM region")
+    rows = await sql.sql_select("SELECT id, name FROM region ORDER BY name")
     for row in rows:
         keyboard.row(InlineKeyboardButton(text=f"{row[1]}", callback_data=f"registrator_{row[0]}"))
     return keyboard
