@@ -6,7 +6,7 @@ from loader import bot
 from work.check_vs import send_mess
 import time
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-
+from sqlite3 import OperationalError
 trassir = [
            # '1.3.6.1.4.1.3333.1.1',  # db
            '1.3.6.1.4.1.3333.1.2',  # archive
@@ -19,6 +19,7 @@ trassir = [
            # '1.3.6.1.4.1.3333.1.9',  # ip address
            '1.3.6.1.4.1.3333.1.10',  # firmware
            '1.3.6.1.4.1.3333.1.11',  # up_time
+            '1.3.6.1.4.1.3333.1.12',  # version
            ]
 
 
@@ -37,7 +38,7 @@ trassir = [
 #     u'\U0001F3A5' + ' Камеры': '1.3.6.1.4.1.3333.1.5',
 #     u'\U0000231B' + ' Время работы сервера ': '1.3.6.1.4.1.3333.1.11'
 # }
-trassirmonitoring = ['1.3.6.1.4.1.3333.1.3', '1.3.6.1.4.1.3333.1.5', '1.3.6.1.4.1.3333.1.6']
+trassirmonitoring = ['1.3.6.1.4.1.3333.1.3', '1.3.6.1.4.1.3333.1.5', '1.3.6.1.4.1.3333.1.6', '1.3.6.1.4.1.3333.1.12']
 
 
 async def snmpregist(ip):
@@ -46,11 +47,18 @@ async def snmpregist(ip):
         with aiosnmp.Snmp(host=ip, port=161, community="dssl", timeout=10, retries=3, max_repetitions=5, ) as snmp:
             try:
                 for res in await snmp.get(r):
-                    try:
-                        status = res.value.decode('UTF-8')
-                    except AttributeError:
-                        return "Null"
-                    d.append(status)
+                    if r == '1.3.6.1.4.1.3333.1.12':
+                        try:
+                            status = res.value.decode('UTF-8')
+                            d.append(status)
+                        except AttributeError:
+                            d.append('0')
+                    else:
+                        try:
+                            status = res.value.decode('UTF-8')
+                        except AttributeError:
+                            return "Null"
+                        d.append(status)
             except aiosnmp.exceptions.SnmpTimeoutError:
                 return False
     return d
@@ -70,6 +78,19 @@ async def info_snmp_registrator(ip, mib_all):
         return d
 
 
+async def cam_snmp(ip):
+    d = []
+    with aiosnmp.Snmp(host=ip, port=161, community="dssl", timeout=10, retries=3,
+                      max_repetitions=5, ) as snmp:
+        for res in await snmp.get('1.3.6.1.4.1.3333.1.5'):
+            try:
+                status = res.value.decode('UTF-8')
+            except AttributeError:
+                d.append("ERROR")
+            d.append(status)
+    return d
+
+
 async def shed():
     scheduler = AsyncIOScheduler()
     scheduler.add_job(start_check_registrator_cam, 'interval', hours=3)
@@ -78,10 +99,9 @@ async def shed():
 
 async def start_check_registrator_cam():
     print("reg_cam_start")
-# while 0 < 1:
     rows = await sql.sql_select(f"SELECT ip FROM registrator ORDER BY ip ASC")
     for row in rows:
-        data_r = await snmpregist(row[0])
+        data_r = await cam_snmp(row[0])
         if data_r is False:
             request = f"""SELECT filial.name, registrator.hostname, filial.kod, down FROM filial LEFT JOIN registrator
             ON filial.kod = registrator.kod WHERE registrator.ip = '{row[0]}'"""
@@ -93,8 +113,7 @@ async def start_check_registrator_cam():
         elif data_r == "Null":
             print(f"Ошибка скрипта snmp {row}")
         else:
-            cam_down = data_r[1].split()[0]
-            script = data_r[2]
+            cam_down = data_r[0].split()[0]
             select = await sql.sql_selectone(f"SELECT disk, cam_down, kod, cam, down, script FROM registrator WHERE ip = '{row[0]}'")
             disk_old, cam_down_old, kod, cam, down, script_old = select
             if cam_down != cam_down_old:
@@ -116,6 +135,12 @@ async def start_check_registrator(order):
         rows = await sql.sql_select(f"SELECT ip FROM registrator ORDER BY ip {order}")
         for row in rows:
             data_r = await snmpregist(row[0])
+            try:
+                await sql.sql_insert(f"UPDATE registrator SET ver_snmp = {data_r[3]}")
+            except OperationalError:
+                await sql.sql_insert("ALTER TABLE registrator ADD ver_snmp TEXT")
+            except TypeError:
+                pass
             if data_r is False:
                 request = f"""SELECT filial.name, registrator.hostname, filial.kod, down FROM filial LEFT JOIN registrator 
                 ON filial.kod = registrator.kod WHERE registrator.ip = '{row[0]}'
