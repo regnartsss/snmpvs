@@ -60,7 +60,7 @@ async def info_registrator(call):
     region = call.data.split("_")[1]
     request=f"SELECT registrator.ip, registrator.hostname, filial.name, region.id, region.name FROM filial " \
             f"LEFT JOIN registrator, region " \
-            f"ON region.id = filial.region and registrator.kod = filial.kod WHERE region.id = {region}"
+            f"ON region.id = filial.region and registrator.kod = filial.kod WHERE region.id = {region} ORDER BY registrator.hostname"
     rows = await sql_select(request)
     text = f"{(await sql_selectone(f'SELECT name FROM region WHERE id = {region}'))[0]}\n"
     for row in rows:
