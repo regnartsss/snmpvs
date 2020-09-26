@@ -147,7 +147,9 @@ async def start_check_registrator(order):
     while 0 < 1:
         rows = await sql.sql_select(f"SELECT ip FROM registrator ORDER BY ip {order}")
         for row in rows:
+            print(row[0])
             data_r = await snmpregist(row[0])
+            print(data_r)
             try:
                 await sql.sql_insert(f"UPDATE registrator SET ver_snmp = '{data_r[3]}'")
             except OperationalError:
