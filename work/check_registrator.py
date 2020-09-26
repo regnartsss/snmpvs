@@ -150,7 +150,7 @@ async def start_check_registrator(order):
         for row in rows:
             data_r = await snmpregist(row[0])
             try:
-                await sql.sql_insert(f"UPDATE registrator SET ver_snmp = '{data_r[3]}' WHERE ip = {row[0]}")
+                await sql.sql_insert(f"UPDATE registrator SET ver_snmp = '{data_r[3]}' WHERE ip = '{row[0]}'")
             except OperationalError:
                 await sql.sql_insert("ALTER TABLE registrator ADD ver_snmp TEXT")
             except TypeError:
