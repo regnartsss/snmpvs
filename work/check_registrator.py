@@ -48,7 +48,6 @@ async def snmpregist(ip):
         with aiosnmp.Snmp(host=ip, port=161, community="dssl", timeout=10, retries=3, max_repetitions=5, ) as snmp:
             try:
                 for res in await snmp.get(r):
-                    # print(res.value.decode('UTF-8'))
                     if r == '1.3.6.1.4.1.3333.1.12':
                         try:
                             status = res.value.decode('UTF-8')
@@ -150,9 +149,8 @@ async def start_check_registrator(order):
         rows = await sql.sql_select(f"SELECT ip FROM registrator ORDER BY ip {order}")
         for row in rows:
             data_r = await snmpregist(row[0])
-            # data_r = await snmpregist('19.8.56.11')
             try:
-                await sql.sql_insert(f"UPDATE registrator SET ver_snmp = '{data_r[3]}'")
+                await sql.sql_insert(f"UPDATE registrator SET ver_snmp = '{data_r[3]}' WHERE ip = {row[0]}")
             except OperationalError:
                 await sql.sql_insert("ALTER TABLE registrator ADD ver_snmp TEXT")
             except TypeError:
