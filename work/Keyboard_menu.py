@@ -14,12 +14,14 @@ async def menu_region():
 
 async def menu_filials(callback_data):
     region = callback_data["num"]
-    keyboard = InlineKeyboardMarkup()
+    print("ddd")
+    keyboard = InlineKeyboardMarkup(row_width=2)
     rows = await sql.sql_select(f"SELECT name, kod FROM filial WHERE region = {region} ORDER BY name")
     for row in rows:
-        keyboard.row(
+
+        keyboard.insert(
             InlineKeyboardButton(text=f"{row[1]} {row[0]}", callback_data=filials_cb.new(region=region, kod=row[1])))
-    keyboard.row(InlineKeyboardButton(text="Назад", callback_data="menu"))
+    keyboard.add(InlineKeyboardButton(text="Назад", callback_data="menu"))
     return keyboard
 
 
@@ -63,7 +65,7 @@ async def ssh(callback_data):
 #     return keyboard
 
 
-async def key_registrator(message):
+async def key_registrator():
     keyboard = InlineKeyboardMarkup()
     rows = await sql.sql_select("SELECT id, name FROM region")
     for row in rows:

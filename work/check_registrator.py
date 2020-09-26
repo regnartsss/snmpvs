@@ -45,9 +45,10 @@ trassirmonitoring = ['1.3.6.1.4.1.3333.1.3', '1.3.6.1.4.1.3333.1.5', '1.3.6.1.4.
 async def snmpregist(ip):
     d = []
     for r in trassirmonitoring:
-        with aiosnmp.Snmp(host=ip, port=161, community="dssl", timeout=15, retries=3, max_repetitions=7, ) as snmp:
+        with aiosnmp.Snmp(host=ip, port=161, community="dssl", timeout=10, retries=3, max_repetitions=5, ) as snmp:
             try:
                 for res in await snmp.get(r):
+                    # print(res.value.decode('UTF-8'))
                     if r == '1.3.6.1.4.1.3333.1.12':
                         try:
                             status = res.value.decode('UTF-8')
@@ -148,9 +149,8 @@ async def start_check_registrator(order):
     while 0 < 1:
         rows = await sql.sql_select(f"SELECT ip FROM registrator ORDER BY ip {order}")
         for row in rows:
-            print(row[0])
             data_r = await snmpregist(row[0])
-            print(data_r)
+            # data_r = await snmpregist('19.8.56.11')
             try:
                 await sql.sql_insert(f"UPDATE registrator SET ver_snmp = '{data_r[3]}'")
             except OperationalError:
