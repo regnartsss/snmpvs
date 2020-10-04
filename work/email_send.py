@@ -31,11 +31,11 @@ async def send_email(kod, message):
     msg['From'] = "vs_sdwan_bot@dns-shop.ru"
     print(email)
     # msg['To'] = email
-    msg['To'] = ['podkopaev.k@dns-shop.ru']
+    msg['To'] = 'podkopaev.k@dns-shop.ru'
     server = smtplib.SMTP('mail.dns-shop.ru: 587')
     server.starttls()
     server.login(user, password)
-    msg['Subject'] = "Проблемы с регистратором"
+    msg['Subject'] = "Отчет о видеорегистраторе"
     # message = "Thank you"
     msg.attach(MIMEText(message, 'plain'))
     server.sendmail(msg['From'], msg['To'], msg.as_string())
