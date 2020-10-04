@@ -11,7 +11,6 @@ async def send_email(kod, message):
     AD_USER = 'podkopaev.k@partner.ru'
     AD_PASSWORD = 'z15X3vdy'
     AD_SEARCH_TREE ='DC=partner,DC=ru'
-
     name = await sql_selectone(f"SELECT name FROM filial WHERE kod = {kod}")
     email_address = f"Администратор магазина {name[0]}"
     print(email_address)
