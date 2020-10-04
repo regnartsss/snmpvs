@@ -31,7 +31,7 @@ async def send_email(kod, message):
     msg['From'] = "vs_sdwan_bot@dns-shop.ru"
     print(email)
     # msg['To'] = email
-    msg['To'] = ['podkopaev.k@dns-shop.ru', 'regnartsss@gmail.com']
+    msg['To'] = ['podkopaev.k@dns-shop.ru']
     server = smtplib.SMTP('mail.dns-shop.ru: 587')
     server.starttls()
     server.login(user, password)
