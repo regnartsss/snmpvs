@@ -6,7 +6,7 @@ import asyncio
 import aiosnmp
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.exceptions import ChatNotFound
-
+from work.email_send import send_email
 
 async def start_snmp(order="null"):
     print("start")
@@ -249,7 +249,7 @@ async def request_name(loopback):
         f"SELECT name, kod, loopback, ISP1, ISP2, isp1_name, isp2_name FROM filial WHERE loopback = '{loopback}'")
 
 
-async def send_mess(kod, text):
+async def send_mess(kod, text, name=None, email=0):
 
     rows = await sql.sql_selectone(f"SELECT user_id FROM sub WHERE kod = {kod}")
     try:
@@ -257,6 +257,8 @@ async def send_mess(kod, text):
             await asyncio.sleep(1)
             try:
                 await bot.send_message(chat_id=row, text=text, disable_notification=await notif())
+                if email == 1:
+                    await send_email(kod, text)
             except TypeError:
                 print(f"Ошибка отправки {row}")
             except ChatNotFound:

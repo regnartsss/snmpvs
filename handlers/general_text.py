@@ -211,7 +211,7 @@ async def work(message: types.Message):
 
 @dp.message_handler(lambda c: c.from_user.id in admin_id, text="Регистраторы")
 async def work(message: types.Message):
-    await message.answer("Регистраторы", reply_markup=await key_registrator(message))
+    await message.answer("Регистраторы", reply_markup=await key_registrator())
 
 
 @dp.message_handler(text="Подписаться на уведомления")

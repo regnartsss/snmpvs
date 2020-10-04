@@ -51,7 +51,6 @@ async def ssh(callback_data):
     return keyboard
 
 
-
 # async def lease(call):
 #     kod = call.data.split("_")[1]
 #     keyboard = InlineKeyboardMarkup()
