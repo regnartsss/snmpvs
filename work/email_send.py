@@ -24,7 +24,8 @@ async def send_email(kod, message):
         email = str(conn.entries[0]['mail'])
     except IndexError:
         print("Нет почтового адреса")
-        return
+        email = 'it.vostsib@dns-shop.ru'
+        message += f"\n\nНет потового адреса {email_address}"
     msg = MIMEMultipart()
     password = "q1w2e3r4"
     user = "vs_sdwan_bot"
