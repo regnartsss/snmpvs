@@ -162,7 +162,7 @@ async def start_check_registrator(order):
                 r = await sql.sql_selectone(request)
                 if r[3] == 0:
                     await sql.sql_insert(f"Update registrator SET down = 1 WHERE ip = '{row[0]}'")
-                    text = f"{r[0]} \nРегистратор {r[1]}\nНе доступен"
+                    text = f"{r[0]} \nРегистратор {r[1]}\nНе доступен\n{row[0]}"
                     await send_mess(r[2], text, email=1)
             elif data_r == "Null":
                 print(f"Ошибка скрипта snmp {row}")
