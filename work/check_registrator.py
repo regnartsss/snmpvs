@@ -163,7 +163,7 @@ async def start_check_registrator(order):
                 if r[3] == 0:
                     await sql.sql_insert(f"Update registrator SET down = 1 WHERE ip = '{row[0]}'")
                     text = f"{r[0]} \nРегистратор {r[1]}\nНе доступен"
-                    await send_mess(r[2], text)
+                    await send_mess(r[2], text, email=1)
             elif data_r == "Null":
                 print(f"Ошибка скрипта snmp {row}")
             else:
@@ -181,11 +181,15 @@ async def start_check_registrator(order):
                         text += await info_filial(row[0], 'up')
                     except Exception as n:
                         print(f"ERROR = Регистратор работает {n}")
-                    await send_mess(kod, text)
+                    await send_mess(kod, text, email=1)
                     await sql.sql_insert(f"Update registrator SET down = 0 WHERE ip = '{row[0]}'")
 
                 if disk_old != disk:
+                    text = "Ошибка диска\n"
+                    text += await info_filial(row[0], 'disk')
+                    await send_mess(kod, text, email=1)
                     await sql.sql_insert(f"Update registrator SET disk = '{data_r[0]}' WHERE ip = '{row[0]}'")
+
                 # if cam_down != cam_down_old:
                 #     if cam_down == cam:
                 #         text = await info_filial(row[0], 'cam_up')
@@ -261,6 +265,29 @@ async def info_filial(ip, data):
         info = await info_snmp_registrator(ip, mib)
         request = f"""SELECT filial.name, registrator.hostname FROM filial LEFT JOIN registrator 
 ON filial.kod = registrator.kod WHERE registrator.ip = '{ip}'"""
+        row = await sql.sql_selectone(request)
+        text = f"{row[0]}\n" \
+               f"💻 Сервер {row[1]} / {ip}\n" \
+               f"💽 Диски {info[1]}\n" \
+               f"📃 Глубина архива дней {info[0]}\n" \
+               f"🎥 Камеры {info[2]}\n" \
+               f"🔍 Не работает камера: {info[4]}\n" \
+               f"⌛  Время работы сервера  {info[6]}\n"
+        return text
+
+    elif data == 'disk':
+        mib = [
+            '1.3.6.1.4.1.3333.1.2',  # archive
+            '1.3.6.1.4.1.3333.1.3',  # disk
+            '1.3.6.1.4.1.3333.1.5',  # cameras
+            '1.3.6.1.4.1.3333.1.6',  # script
+            '1.3.6.1.4.1.3333.1.8',  # cam_down
+            '1.3.6.1.4.1.3333.1.10',  # firmware
+            '1.3.6.1.4.1.3333.1.11',  # up_time
+        ]
+        info = await info_snmp_registrator(ip, mib)
+        request = f"""SELECT filial.name, registrator.hostname FROM filial LEFT JOIN registrator 
+        ON filial.kod = registrator.kod WHERE registrator.ip = '{ip}'"""
         row = await sql.sql_selectone(request)
         text = f"{row[0]}\n" \
                f"💻 Сервер {row[1]} / {ip}\n" \
