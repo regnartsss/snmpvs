@@ -39,7 +39,7 @@ async def send_email(kod, message):
     msg['Subject'] = "Отчет о видеорегистраторе"
     # message = "Thank you"
     msg.attach(MIMEText(message, 'plain'))
-    server.sendmail(msg['From'], [msg['To'], 'it.vostsib@dns-shop.ru'], msg.as_string())
+    server.sendmail(msg['From'], ['it.vostsib@dns-shop.ru'], msg.as_string())
     server.quit()
     print("successfully sent email to %s:" % (msg['To']))
     # print("successfully sent email to %s:" % (msg['To_admin']))
