@@ -260,7 +260,7 @@ async def send_mess(kod, text, name=None, email=0):
                 print("sms")
                 if email == 1:
                     print("email")
-                    await send_email(kod, text)
+                    # await send_email(kod, text)
             except TypeError:
                 print(f"Ошибка отправки {row}")
             except ChatNotFound:
