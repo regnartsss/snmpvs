@@ -12,7 +12,7 @@ async def on_startup(dp):
     # await bot.send_message(765333440, "Бот запущен")
     asyncio.ensure_future(start_snmp())
     # asyncio.ensure_future(shed())
-    # asyncio.ensure_future(start_check_registrator("ASC"))
+    asyncio.ensure_future(start_check_registrator("ASC"))
     # asyncio.ensure_future(start_check_registrator_cam())
 
 
