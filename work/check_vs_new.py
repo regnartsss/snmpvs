@@ -125,11 +125,11 @@ async def oid(loopback, kod):
                 oi = (' = '.join([x.prettyPrint() for x in varBind]).split("= ")[1])
                 if oi == "Tu0":
                     num_oid = (' = '.join([x.prettyPrint() for x in varBind]).split("= ")[0].split(".")[6])
-                    tu0 = "1.3.6.1.2.1.2.2.1.7.%s" % num_oid
+                    tu0 = "1.3.6.1.2.1.2.2.1.8.%s" % num_oid
                     # out_isp1 = "1.3.6.1.2.1.31.1.1.1.10.%s" % num_oid
                 elif oi == "Tu1":
                     num_oid = (' = '.join([x.prettyPrint() for x in varBind]).split("= ")[0].split(".")[6])
-                    tu1 = "1.3.6.1.2.1.2.2.1.7.%s" % num_oid
+                    tu1 = "1.3.6.1.2.1.2.2.1.8.%s" % num_oid
                     # out_isp2 = "1.3.6.1.2.1.31.1.1.1.10.%s" % num_oid
                 else:
                     pass
@@ -154,6 +154,7 @@ async def snmp(loopback):
                 #                print(' = '.join([x.prettyPrint() for x in varBind]))
                 m = (' = '.join([x.prettyPrint() for x in varBind]).split("= ")[1])
                 d.append(m)
+    print(d)
     # request = f"UPDATE status SET In1_one = In1_two, In2_one = In2_two, In1_two = {d[0]}, In2_two = {d[1]} " \
     #           f"WHERE loopback = '{loopback}'"
     # await sql.sql_insert(request)
