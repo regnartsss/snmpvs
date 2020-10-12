@@ -1,5 +1,5 @@
-# from work.check_vs import start_snmp
-from work.check_vs_new import start_snmp
+from work.check_vs import start_snmp
+# from work.check_vs_new import start_snmp
 
 from work.check_registrator import shed, start_check_registrator, start_check_registrator_cam
 from loader import dp
