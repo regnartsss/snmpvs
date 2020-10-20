@@ -240,6 +240,7 @@ async def cisco_ssh_serial(loopback):
 async def check_zabbix():
     user = "podkopaev.k"
     password = "z15X3vdy"
+    print(user, password)
     z = ZabbixAPI('https://zabbix.partner.ru/')
     print(user, password)
     z.session.auth = (user, password)
