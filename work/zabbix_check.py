@@ -238,11 +238,16 @@ async def cisco_ssh_serial(loopback):
 
 
 async def check_zabbix():
+    user = "podkopaev.k"
+    password = "z15X3vdy"
     z = ZabbixAPI('https://zabbix.partner.ru/')
-    z.session.auth = ("partner\podkopaev.k", "z15X3vdy")
+    print(user, password)
+    z.session.auth = (user, password)
     z.session.verify = False
     z.timeout = 5.1
-    z.login(user="partner\podkopaev.k", password="z15X3vdy")
+    print(user, password)
+
+    z.login(user=user, password=password)
     print("Connected to Zabbix API Version %s" % z.api_version())
     try:
         rows = await sql_select("SELECT name, loopback FROM zabbix")
