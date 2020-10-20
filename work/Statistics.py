@@ -5,7 +5,7 @@ from loader import bot
 
 
 async def info_filial(kod):
-    request = f"SELECT * FROM filial INNER JOIN region ON filial.region = region.id WHERE kod = {kod}"
+    request = f"SELECT * FROM zabbix INNER JOIN zb_region ON zabbix.region = zb_region.id WHERE kod = {kod}"
     row = await sql_selectone(request)
     text = f"""
 {await sdwan_mikrotik(row[17])}

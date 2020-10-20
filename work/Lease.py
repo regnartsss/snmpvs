@@ -8,7 +8,7 @@ async def lease(callback_data):
     print(callback_data)
     kod = callback_data["kod"]
     vlan = callback_data["data"]
-    loopback = await sql_selectone(f"SELECT loopback, {vlan} FROM filial WHERE kod = {kod}")
+    loopback = await sql_selectone(f"SELECT loopback, {vlan} FROM zabbix WHERE kod = {kod}")
     command = "show ip dhcp binding"
     # command = "sh arp vrf 100"
 

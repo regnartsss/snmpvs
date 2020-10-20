@@ -3,14 +3,15 @@ from aiogram import types
 from aiogram.utils.exceptions import MessageNotModified
 from work.Keyboard_menu import ssh
 from work.Ssh import ssh_t, ssh_console
-from work.Statistics import info_registrator
+from work.Statistics import info_registrator, info_filial
 from work.keyboard import cancel
-from work.Keyboard_menu import menu_filial
+from work.Keyboard_menu import menu_filial, check_filial
 from work.sub import worksub
 from work.Add_filial import filial_check
 from work.check_vs import call_name
-from filters.loc import ssh_cb, lease_cb, console_ssh_cb
+from filters.loc import ssh_cb, lease_cb, console_ssh_cb, update_cb
 from work.Lease import lease
+from work.zabbix_check import vlan_cisco, update_vlan
 
 
 @dp.callback_query_handler(ssh_cb.filter())
@@ -34,9 +35,23 @@ async def market(call: types.CallbackQuery, callback_data: dict):
         pass
 
 
+@dp.callback_query_handler(update_cb.filter(data="update"))
+async def market(call: types.CallbackQuery, callback_data: dict):
+    await call.message.edit_reply_markup(reply_markup=await check_filial(callback_data))
+
+
+@dp.callback_query_handler(update_cb.filter(data="gateway"))
+async def market(call: types.CallbackQuery, callback_data: dict):
+    await call.answer("Ожидайте")
+    await update_vlan(callback_data['kod'])
+    text = await info_filial(callback_data['kod'])
+    await call.message.edit_text(text=text + "\n💥 Обновлено", reply_markup=await menu_filial(callback_data))
+
+
 @dp.callback_query_handler(lambda callback_query: True)
 async def handler(call: types.CallbackQuery):
     print(call.data)
+    print("не отловил")
     # if call.data.split("_")[0] == "region":
     #     pass
     #     # await call.message.edit_text("Выберите филиал", reply_markup=await work(message=call.message, call=call))
@@ -55,9 +70,12 @@ async def handler(call: types.CallbackQuery):
 
     elif call.data.split("_")[0] == "menusub":
         await call.message.edit_text("Выберите регион", reply_markup=await worksub(message=call.message, call=call))
-
-    elif call.data.split("_")[0] == "check":
-        await call.message.answer(await filial_check(call))
+    #
+    # elif call.data.split("_")[0] == "check":
+    #     await call.message.answer(await filial_check(call))
+    #     await call.message.edit_text("Выберите регион", reply_markup=await check_filial())
+    #
+    #
     # elif call.data.split("_")[0] == "sub":
     #     await call_name(call)
     # elif call.data.split("_")[1] == "trac":

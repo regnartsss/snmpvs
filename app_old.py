@@ -14,22 +14,24 @@ import middlewares
 
 middlewares.setup(dp)
 
+
 async def zabb():
     scheduler = AsyncIOScheduler()
     scheduler.add_job(check, 'interval', hours=24)
     scheduler.start()
 
 
-def on_startup():
-    bot.send_message(765333440, "Бот запущен")
+async def on_startup():
+    await bot.send_message(765333440, "Бот запущен")
     asyncio.ensure_future(start_snmp())
     asyncio.ensure_future(zabb())
     asyncio.ensure_future(check())
-    # asyncio.ensure_future(start_check_registrator("ASC"))
+    asyncio.ensure_future(start_check_registrator())
     # asyncio.ensure_future(check_equipment())
 
 
 if __name__ == '__main__':
-    executor.start_polling(dp, skip_updates=True)
-
+    loop = asyncio.get_event_loop()
+    asyncio.ensure_future(on_startup())
+    loop.run_forever()
 

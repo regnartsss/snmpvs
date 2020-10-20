@@ -2,7 +2,6 @@ from aiogram import types
 from loader import dp, bot
 from data.data import admin_id
 from aiogram.dispatcher import FSMContext
-from aiogram.utils.exceptions import MessageNotModified
 from work import sql
 from work.Ssh import ssh_console, Ssh_console, ssh_console_command, search_mac
 from work.admin import mess, AllMessage
@@ -12,10 +11,6 @@ from work.Statistics import info_filial, check_registrator, link, version_po
 from work.keyboard import keyboard_other, region, keyboard_back, keyboard_search, main_menu_user
 from work.Keyboard_menu import key_registrator, menu_region, menu_filials, menu_filial
 from work.sub import worksub, reg_menu
-from work.search import SearchFilial, search_name, search_kod, search_serial, search_kod_win, search_name_win, \
-    search_serial_win
-from middlewares.middleware_and_antiflood import rate_limit
-from filters.loc import region_cb, send_lease_cb, filials_cb
 
 
 @dp.message_handler(state=Ssh_console.command)
@@ -27,55 +22,6 @@ async def process_name(message: types.Message, state: FSMContext):
 @dp.message_handler(state=AllMessage.message)
 async def process_name(message: types.Message, state: FSMContext):
     await mess(message, state)
-
-
-@dp.message_handler(state=SearchFilial.Filial)
-async def process_name(message: types.Message, state: FSMContext):
-    if message.text == "Нет" or message.text == "нет":
-        await state.finish()
-    else:
-        if len(message.text) < 5:
-            await message.answer("Мало символов для поиска")
-        else:
-            text = await search_name_win(message)
-            try:
-                await message.answer(text=text)
-                await state.finish()
-            except Exception as n:
-                print(n)
-                await message.answer("Ничего не найдено")
-                await state.finish()
-
-
-@dp.message_handler(state=SearchFilial.Kod)
-async def process_name(message: types.Message, state: FSMContext):
-    if message.text == "Нет" or message.text == "нет":
-        await state.finish()
-    else:
-        text = await search_kod_win(message)
-        try:
-            await message.answer(text=text)
-            await state.finish()
-        except Exception as n:
-            print(n)
-            await message.answer("Ничего не найдено")
-            await state.finish()
-
-
-@dp.message_handler(state=SearchFilial.Serial)
-async def process_name(message: types.Message, state: FSMContext):
-    if message.text == "Нет" or message.text == "нет":
-        await state.finish()
-    else:
-        text = await search_serial_win(message)
-        try:
-            await message.answer(text=text)
-            await state.finish()
-        except Exception as n:
-            print(n)
-            await message.answer("Ничего не найдено")
-            await state.finish()
-
 
 data = {}
 
@@ -127,9 +73,6 @@ async def process_name(message: types.Message, state: FSMContext):
         await message.answer(status)
 
 
-@dp.message_handler(text="Филиалы")
-async def menu(message: types.Message):
-    await message.answer("Выберите регион", reply_markup=await menu_region())
 
 
 @dp.callback_query_handler(text="menu")
@@ -137,23 +80,6 @@ async def market(call: types.CallbackQuery):
     await call.message.edit_text(text="Выберите регион", reply_markup=await menu_region())
 
 
-@dp.callback_query_handler(region_cb.filter())
-async def market(call: types.CallbackQuery, callback_data: dict):
-    print(callback_data)
-    try:
-        await call.message.edit_text(text="Выберите филиал", reply_markup=await menu_filials(callback_data))
-    except MessageNotModified:
-        pass
-
-
-@dp.callback_query_handler(filials_cb.filter())
-async def market(call: types.CallbackQuery, callback_data: dict):
-    print(callback_data)
-    kod = callback_data["kod"]
-    await sql.sql_insert(f"UPDATE users SET ssh_kod = {kod} WHERE id = {call.from_user.id}")
-    text = await info_filial(kod)
-    keyboard = await menu_filial(callback_data)
-    await call.message.edit_text(text=text, reply_markup=keyboard)
 
 
 @dp.message_handler(lambda c: c.from_user.id in admin_id, text="Разное")
@@ -194,19 +120,7 @@ async def work(message: types.Message):
     await message.answer("Поиск", reply_markup=keyboard_search())
 
 
-@dp.message_handler(lambda c: c.from_user.id in admin_id, text="Поиск по названию")
-async def work(message: types.Message):
-    await search_name(message)
 
-
-@dp.message_handler(lambda c: c.from_user.id in admin_id, text="Поиск по коду")
-async def work(message: types.Message):
-    await search_kod(message)
-
-
-@dp.message_handler(lambda c: c.from_user.id in admin_id, text="Поиск по серийнику")
-async def work(message: types.Message):
-    await search_serial(message)
 
 
 @dp.message_handler(lambda c: c.from_user.id in admin_id, text="Регистраторы")

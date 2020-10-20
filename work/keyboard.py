@@ -12,7 +12,7 @@ async def region():
 
 def main_menu():
     keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
-    keyboard.row("Филиалы", "Разное")
+    keyboard.row("Филиалы")
     keyboard.row("Регистраторы")
     keyboard.row("Поиск")
     keyboard.row("Кнопки пользователя")
@@ -24,6 +24,7 @@ def keyboard_search():
     keyboard.row("Поиск по названию")
     keyboard.row("Поиск по коду")
     keyboard.row("Поиск по серийнику")
+    keyboard.row("Поиск по ip")
     keyboard.row("Назад")
     return keyboard
 

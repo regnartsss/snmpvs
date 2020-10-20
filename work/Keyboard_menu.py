@@ -1,14 +1,14 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from work import sql
 from work.Statistics import info_filial
-from filters.loc import send_lease_cb, region_cb, filials_cb, ssh_cb, lease_cb, console_ssh_cb
+from filters.loc import send_lease_cb, region_cb, filials_cb, ssh_cb, lease_cb, console_ssh_cb, update_cb
 
 
 async def menu_region():
     keyboard = InlineKeyboardMarkup()
-    rows = await sql.sql_select("SELECT id, name FROM region")
-    for row in rows:
-        keyboard.row(InlineKeyboardButton(text=f"{row[1]}", callback_data=region_cb.new(num=row[0])))
+    rows = await sql.sql_select("SELECT id, name FROM zb_region ORDER BY name")
+    for id, name in rows:
+        keyboard.row(InlineKeyboardButton(text=f"{name}", callback_data=region_cb.new(num=id)))
     return keyboard
 
 
@@ -16,18 +16,17 @@ async def menu_filials(callback_data):
     region = callback_data["num"]
     print("ddd")
     keyboard = InlineKeyboardMarkup(row_width=2)
-    rows = await sql.sql_select(f"SELECT name, kod FROM filial WHERE region = {region} ORDER BY name")
-    for row in rows:
-
-        keyboard.insert(
-            InlineKeyboardButton(text=f"{row[1]} {row[0]}", callback_data=filials_cb.new(region=region, kod=row[1])))
+    rows = await sql.sql_select(f"SELECT name, kod FROM zabbix WHERE region = {region} ORDER BY name")
+    for name, kod in rows:
+        if kod is not None:
+            keyboard.insert(
+                InlineKeyboardButton(text=f"{kod} {name}", callback_data=filials_cb.new(region=region, kod=kod)))
     keyboard.add(InlineKeyboardButton(text="Назад", callback_data="menu"))
     return keyboard
 
 
 async def menu_filial(callback_data):
         keyboard = InlineKeyboardMarkup()
-        print("Филиал")
         kod = callback_data["kod"]
         region= callback_data["region"]
         LAN = InlineKeyboardButton(text="LAN", callback_data=lease_cb.new(data="vlan100", kod=kod, region=region))
@@ -35,9 +34,18 @@ async def menu_filial(callback_data):
         SC = InlineKeyboardButton(text="SC", callback_data=lease_cb.new(data="vlan500", kod=kod, region=region))
         keyboard.row(LAN, CAM, SC)
         keyboard.row(InlineKeyboardButton(text="ssh", callback_data=ssh_cb.new(kod=kod, region=region)))
-        keyboard.row(InlineKeyboardButton(text="Обновить информацию", callback_data=f"check_{kod}"))
+        keyboard.row(InlineKeyboardButton(text="Обновить информацию", callback_data=update_cb.new(data="update", kod=kod, region=region)))
         keyboard.row(InlineKeyboardButton(text="Назад", callback_data=region_cb.new(num=region)))
         return keyboard
+
+
+async def check_filial(callback_data):
+    keyboard = InlineKeyboardMarkup()
+    kod = callback_data["kod"]
+    region = callback_data["region"]
+    keyboard.row(InlineKeyboardButton(text="Обновить провайдеров", callback_data=update_cb.new(data="gateway", kod=kod, region=region)))
+    keyboard.row(InlineKeyboardButton(text="Назад", callback_data=filials_cb.new(region=region, kod=kod)))
+    return keyboard
 
 
 async def ssh(callback_data):
@@ -66,7 +74,7 @@ async def ssh(callback_data):
 
 async def key_registrator():
     keyboard = InlineKeyboardMarkup()
-    rows = await sql.sql_select("SELECT id, name FROM region")
+    rows = await sql.sql_select("SELECT id, name FROM zb_region")
     for row in rows:
         keyboard.row(InlineKeyboardButton(text=f"{row[1]}", callback_data=f"registrator_{row[0]}"))
     return keyboard

@@ -5,7 +5,7 @@ from loader import bot
 import asyncio
 import aiosnmp
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from aiogram.utils.exceptions import ChatNotFound
+from aiogram.utils.exceptions import ChatNotFound, BotBlocked
 from work.email_send import send_email
 
 async def start_snmp(order="null"):
@@ -265,7 +265,8 @@ async def send_mess(kod, text, name=None, email=0):
                 print(f"Ошибка отправки {row}")
             except ChatNotFound:
                 print(f"Юзер не найден {row}")
-
+            except BotBlocked:
+                print(f"Юзер заблокировал {row}")
     except TypeError:
         print("Никто не подписан")
 

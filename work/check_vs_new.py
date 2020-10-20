@@ -139,6 +139,7 @@ async def oid(loopback, kod):
 async def snmp(loopback):
     mib_all = await sql.sql_selectone(f"SELECT Tu0, Tu1 FROM status WHERE loopback = '{loopback}'")
     d = []
+    print(loopback)
     for mib in mib_all:
         error_indication, error_status, error_index, var_binds = await snmp_v3(loopback, mib)
         if error_indication:

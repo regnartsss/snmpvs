@@ -45,6 +45,7 @@ def sql_select_no_await(request):
     cursor.execute(request)
     rows = cursor.fetchall()
     return rows
+
 def sql_selectone_no_await(request):
     conn = sqlite3.connect(PATH+'sdwan.db')
     cursor = conn.cursor()
