@@ -12,7 +12,7 @@ from aiosnmp.asn1 import Error
 
 async def start_snmp():
     print("start")
-    # await asyncio.sleep(120)
+    await asyncio.sleep(120)
     i = 0
     while i < 2:
         rows = await sql.sql_select(f"SELECT loopback, kod, sdwan FROM zabbix")

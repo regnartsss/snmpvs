@@ -246,7 +246,6 @@ async def check_zabbix():
     z.session.verify = False
     z.timeout = 5.1
     print(user, password)
-
     z.login(user=user, password=password)
     print("Connected to Zabbix API Version %s" % z.api_version())
     try:

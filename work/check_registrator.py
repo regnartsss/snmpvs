@@ -145,6 +145,7 @@ async def start_check_registrator_cam():
 
 async def start_check_registrator():
     print("reg")
+    await asyncio.sleep(120)
     while 0 < 1:
         rows = await sql.sql_select(f"SELECT ip FROM registrator")
         for row in rows:
