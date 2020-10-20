@@ -242,7 +242,7 @@ async def check_zabbix():
     z.session.auth = ("partner\podkopaev.k", "z15X3vdy")
     z.session.verify = False
     z.timeout = 5.1
-    z.login(user="podkopaev.k", password="z15X3vdy")
+    z.login(user="partner\podkopaev.k", password="z15X3vdy")
     print("Connected to Zabbix API Version %s" % z.api_version())
     try:
         rows = await sql_select("SELECT name, loopback FROM zabbix")
