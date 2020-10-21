@@ -24,8 +24,8 @@ async def zabb():
 async def on_startup():
     await bot.send_message(765333440, "Бот запущен")
     asyncio.ensure_future(start_snmp())
-    asyncio.ensure_future(zabb())
-    asyncio.ensure_future(check())
+    # asyncio.ensure_future(zabb())
+    # asyncio.ensure_future(check())
     asyncio.ensure_future(start_check_registrator())
     # asyncio.ensure_future(check_equipment())
 

@@ -88,8 +88,6 @@ async def snmp_mikrotik(ip):
     for mib_old in mib_all:
         with aiosnmp.Snmp(host=ip, port=161, community="public", timeout=5, retries=2, max_repetitions=2) as s:
             try:
-                print(ip)
-                print(f"{mib}{mib_old}")
                 for res in await s.get(f"{mib}{mib_old}"):
                     status.append(res.value)
             except aiosnmp.exceptions.TimeoutError:
@@ -168,12 +166,10 @@ async def oid(loopback, kod, repeat=0):
 
 
 async def snmp(loopback, kod):
-    print(loopback, kod)
     mib_all = await sql.sql_selectone(
         f"SELECT In_isp1, In_isp2, Oper_isp1, Oper_isp2, OperISP2 FROM zb_st WHERE loopback = '{loopback}'")
-    print(mib_all[0:4])
     if mib_all[0:4] == ('0', '0', '0', '0') or mib_all[0:4] == (None, None, None, None):
-        print("Проверить ", loopback, kod)
+        print("Нет oid, проверить", loopback, kod)
         await oid(loopback, kod, 1)
         return
     d = []

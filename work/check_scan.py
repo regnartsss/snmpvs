@@ -93,8 +93,8 @@ async def snmp_trassir(ip, kod):
                 name = res.value.decode('UTF-8')
                 request = f"INSERT INTO registrator (kod, ip, hostname) VALUES ({kod}, '{ip}','{name}')"
                 await sql_insert(request)
-        except Exception as n:
-            print(f"Ошибка_trassir {n}")
+        except SnmpTimeoutError:
+            print("snmp_trassir_timeout ", ip)
 
 
 async def mikrotik_cisco(ip, kod):

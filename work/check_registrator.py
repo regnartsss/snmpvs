@@ -39,7 +39,8 @@ trassir = [
 #     u'\U0001F3A5' + ' Камеры': '1.3.6.1.4.1.3333.1.5',
 #     u'\U0000231B' + ' Время работы сервера ': '1.3.6.1.4.1.3333.1.11'
 # }
-trassirmonitoring = ['1.3.6.1.4.1.3333.1.3', '1.3.6.1.4.1.3333.1.5', '1.3.6.1.4.1.3333.1.6', '1.3.6.1.4.1.3333.1.12']
+# trassirmonitoring = ['1.3.6.1.4.1.3333.1.3', '1.3.6.1.4.1.3333.1.5', '1.3.6.1.4.1.3333.1.6', '1.3.6.1.4.1.3333.1.12']
+trassirmonitoring = ['1.3.6.1.4.1.3333.1.3', '1.3.6.1.4.1.3333.1.5', '1.3.6.1.4.1.3333.1.6']
 
 
 async def snmpregist(ip):
@@ -48,18 +49,11 @@ async def snmpregist(ip):
         with aiosnmp.Snmp(host=ip, port=161, community="dssl", timeout=10, retries=3, max_repetitions=5, ) as snmp:
             try:
                 for res in await snmp.get(r):
-                    if r == '1.3.6.1.4.1.3333.1.12':
-                        try:
-                            status = res.value.decode('UTF-8')
-                            d.append(status)
-                        except AttributeError:
-                            d.append('0')
-                    else:
-                        try:
-                            status = res.value.decode('UTF-8')
-                        except AttributeError:
-                            return "Null"
-                        d.append(status)
+                    try:
+                        status = res.value.decode('UTF-8')
+                    except AttributeError:
+                        return "Null"
+                    d.append(status)
             except aiosnmp.exceptions.SnmpTimeoutError:
                 print(f"timeout {ip}")
                 return False
@@ -71,12 +65,12 @@ async def info_snmp_registrator(ip, mib_all):
         for r in mib_all:
             with aiosnmp.Snmp(host=ip, port=161, community="dssl", timeout=10, retries=3,
                               max_repetitions=5, ) as snmp:
-                        for res in await snmp.get(r):
-                            try:
-                                status = res.value.decode('UTF-8')
-                            except AttributeError:
-                                d.append("ERROR")
-                            d.append(status)
+                for res in await snmp.get(r):
+                    try:
+                        status = res.value.decode('UTF-8')
+                    except AttributeError:
+                        d.append("ERROR")
+                    d.append(status)
         return d
 
 
@@ -145,31 +139,25 @@ async def start_check_registrator_cam():
 
 async def start_check_registrator():
     print("reg")
-    await asyncio.sleep(120)
+    # await asyncio.sleep(120)
     while 0 < 1:
         rows = await sql.sql_select(f"SELECT ip FROM registrator")
         for row in rows:
             data_r = await snmpregist(row[0])
-            try:
-                await sql.sql_insert(f"UPDATE registrator SET ver_snmp = '{data_r[3]}' WHERE ip = '{row[0]}'")
-            except OperationalError:
-                await sql.sql_insert("ALTER TABLE registrator ADD ver_snmp TEXT")
-            except TypeError:
-                pass
+            # await sql.sql_insert(f"UPDATE registrator SET ver_snmp = '{data_r[3]}' WHERE ip = '{row[0]}'")
             if data_r is False:
                 request = f"""SELECT zabbix.name, registrator.hostname, zabbix.kod, down FROM zabbix LEFT JOIN registrator 
                 ON zabbix.kod = registrator.kod WHERE registrator.ip = '{row[0]}'
                     """
-                r = await sql.sql_selectone(request)
-                if r[3] == 0:
+                name, hostname, kod, down = await sql.sql_selectone(request)
+                if down == 0:
                     await sql.sql_insert(f"Update registrator SET down = 1 WHERE ip = '{row[0]}'")
-                    text = f"{r[0]} \nРегистратор {r[1]}\nНе доступен\n{row[0]}"
-                    await send_mess(r[2], text, email=1)
+                    text = f"{name} \nРегистратор {hostname}\nНе доступен\n{row[0]}"
+                    await send_mess(kod, text, email=1)
             elif data_r == "Null":
                 print(f"Ошибка скрипта snmp {row}")
             else:
                 disk = data_r[0]
-                cam_down = data_r[1].split()[0]
                 script = data_r[2]
                 select = await sql.sql_selectone(f"SELECT disk, cam_down, kod, cam, down, script FROM registrator WHERE ip = '{row[0]}'")
                 disk_old, cam_down_old, kod, cam, down, script_old = select
