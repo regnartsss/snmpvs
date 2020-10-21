@@ -172,7 +172,7 @@ async def snmp(loopback, kod):
     mib_all = await sql.sql_selectone(
         f"SELECT In_isp1, In_isp2, Oper_isp1, Oper_isp2, OperISP2 FROM zb_st WHERE loopback = '{loopback}'")
     print(mib_all[0:4])
-    if mib_all[0:4] == ('0', '0', '0', '0'):
+    if mib_all[0:4] == ('0', '0', '0', '0') or mib_all[0:4] == (None, None, None, None):
         print("Проверить ", loopback, kod)
         await oid(loopback, kod, 1)
         return
