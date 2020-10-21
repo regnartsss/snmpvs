@@ -12,7 +12,7 @@ from work.check_vs import call_name
 from filters.loc import ssh_cb, lease_cb, console_ssh_cb, update_cb
 from work.Lease import lease
 from work.zabbix_check import vlan_cisco, update_vlan
-
+from work.check_scan import update_reg_cis
 
 @dp.callback_query_handler(ssh_cb.filter())
 async def market(call: types.CallbackQuery, callback_data: dict):
@@ -44,6 +44,14 @@ async def market(call: types.CallbackQuery, callback_data: dict):
 async def market(call: types.CallbackQuery, callback_data: dict):
     await call.answer("Ожидайте")
     await update_vlan(callback_data['kod'])
+    text = await info_filial(callback_data['kod'])
+    await call.message.edit_text(text=text + "\n💥 Обновлено", reply_markup=await menu_filial(callback_data))
+
+
+@dp.callback_query_handler(update_cb.filter(data="reg_cis"))
+async def market(call: types.CallbackQuery, callback_data: dict):
+    await call.answer("Ожидайте")
+    await update_reg_cis(callback_data['kod'])
     text = await info_filial(callback_data['kod'])
     await call.message.edit_text(text=text + "\n💥 Обновлено", reply_markup=await menu_filial(callback_data))
 

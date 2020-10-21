@@ -44,6 +44,7 @@ async def check_filial(callback_data):
     kod = callback_data["kod"]
     region = callback_data["region"]
     keyboard.row(InlineKeyboardButton(text="Обновить провайдеров", callback_data=update_cb.new(data="gateway", kod=kod, region=region)))
+    keyboard.row(InlineKeyboardButton(text="Найти рег и циско", callback_data=update_cb.new(data="reg_cis", kod=kod, region=region)))
     keyboard.row(InlineKeyboardButton(text="Назад", callback_data=filials_cb.new(region=region, kod=kod)))
     return keyboard
 

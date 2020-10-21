@@ -96,7 +96,6 @@ def new_zb_region():
         sql_insert_no_await("""CREATE TABLE zb_region (id      INT, name TEXT);""")
 
 
-check_region()
 # result = list(set(frows) - set(hrows))
 # for h in result:
 #     print(f"Нет в забиксе {h} - {all_f[h]}")

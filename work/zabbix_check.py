@@ -173,7 +173,6 @@ async def vlan_cisco(loopback):
     await sql_insert(request)
 
 
-
 async def isp_name_cisco(loopback):
     command = "sh int GigabitEthernet0/0/0 "
     user = 'operator'
@@ -307,6 +306,8 @@ async def update_vlan(kod):
     await vlan_cisco(loopback[0])
 
 
+
+
 async def new_table_zb_region():
     await sql_insert("""CREATE TABLE zb_region (id      INT, name TEXT, id_monitor, INT);""")
 
@@ -316,8 +317,7 @@ async def new_table_zabbix():
                                                       kod          INT,
     loopback     TEXT,
     name         TEXT,
-    region       INT,
-    region_mon       INT,
+    region       INT,    
     hostname     TEXT,
     ISP1         TEXT,
     ISP2         TEXT,
@@ -331,6 +331,7 @@ async def new_table_zabbix():
     gateway_isp1 TEXT,
     gateway_isp2 TEXT,
     serial       TEXT,
-    sdwan        INT
+    sdwan        INT,
+    region_mon    INT
                                                   );"""
                      )

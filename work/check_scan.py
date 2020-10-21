@@ -150,6 +150,18 @@ async def mikrotik_registrator(ip, kod):
                         pass
 
 
+async def update_reg_cis(kod):
+    loopback, sdwan = await sql_selectone(f"SELECT loopback, sdwan FROM zabbix WHERE kod = {kod}")
+    if sdwan == 1:
+        await sql_insert(f"DELETE FROM registrator WHERE kod = {kod}")
+        await sql_insert(f"DELETE FROM cisco WHERE kod = {kod}")
+        await cisco_registrator(loopback)
+    elif sdwan == 0:
+        await sql_insert(f"DELETE FROM registrator WHERE kod = {kod}")
+        await sql_insert(f"DELETE FROM cisco WHERE kod = {kod}")
+        await mikrotik_cisco(loopback, kod)
+        await mikrotik_registrator(loopback, kod)
+
 async def table_registrator():
     request = """CREATE TABLE registrator (
     kod      INT,
