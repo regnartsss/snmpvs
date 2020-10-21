@@ -1,7 +1,7 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from work import sql
 from work.Statistics import info_filial
-from filters.loc import send_lease_cb, region_cb, filials_cb, ssh_cb, lease_cb, console_ssh_cb, update_cb
+from filters.loc import send_lease_cb, region_cb, filials_cb, ssh_cb, lease_cb, console_ssh_cb, update_cb, region_registr_cb
 
 
 async def menu_region():
@@ -75,9 +75,9 @@ async def ssh(callback_data):
 
 async def key_registrator():
     keyboard = InlineKeyboardMarkup()
-    rows = await sql.sql_select("SELECT id, name FROM zb_region")
+    rows = await sql.sql_select("SELECT id, name FROM zb_region ORDER BY zb_region.name")
     for row in rows:
-        keyboard.row(InlineKeyboardButton(text=f"{row[1]}", callback_data=f"registrator_{row[0]}"))
+        keyboard.row(InlineKeyboardButton(text=f"{row[1]}", callback_data=region_registr_cb.new(num=row[0])))
     return keyboard
 
 

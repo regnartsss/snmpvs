@@ -56,6 +56,7 @@ async def market(call: types.CallbackQuery, callback_data: dict):
     await call.message.edit_text(text=text + "\n💥 Обновлено", reply_markup=await menu_filial(callback_data))
 
 
+
 @dp.callback_query_handler(lambda callback_query: True)
 async def handler(call: types.CallbackQuery):
     print(call.data)

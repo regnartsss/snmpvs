@@ -40,6 +40,7 @@ async def cisco(kod):
         text += f"\n{row[1]} {row[2]}"
     return text
 
+
 async def registrator(kod):
     request = f"SELECT * FROM registrator WHERE kod = {kod}"
     rows = await sql_select(request)
@@ -56,13 +57,12 @@ async def sdwan_mikrotik(data):
         return "Mikrotik"
 
 
-async def info_registrator(call):
-    region = call.data.split("_")[1]
-    request=f"SELECT registrator.ip, registrator.hostname, filial.name, region.id, region.name FROM filial " \
-            f"LEFT JOIN registrator, region " \
-            f"ON region.id = filial.region and registrator.kod = filial.kod WHERE region.id = {region} ORDER BY registrator.hostname"
+async def info_registrator(region):
+    request=f"SELECT registrator.ip, registrator.hostname, zabbix.name, zb_region.id, zb_region.name FROM zabbix " \
+            f"LEFT JOIN registrator, zb_region " \
+            f"ON zb_region.id = zabbix.region and registrator.kod = zabbix.kod WHERE zb_region.id = {region} ORDER BY zabbix.name"
     rows = await sql_select(request)
-    text = f"{(await sql_selectone(f'SELECT name FROM region WHERE id = {region}'))[0]}\n"
+    text = f"{(await sql_selectone(f'SELECT name FROM zb_region WHERE id = {region}'))[0]}\n"
     for row in rows:
         text += f"{row[2]} {row[0]}\n"
     return text

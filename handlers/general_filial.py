@@ -1,11 +1,11 @@
 from loader import dp, bot
-from filters.loc import region_cb, send_lease_cb, filials_cb
+from filters.loc import region_cb, send_lease_cb, filials_cb, region_registr_cb
 from aiogram.utils.exceptions import MessageNotModified
 from aiogram import types
 from work.Keyboard_menu import key_registrator, menu_region, menu_filials, menu_filial
 from work.sql import sql_insert
 from work.Statistics import info_filial, check_registrator, link, version_po
-
+from work.Statistics import info_registrator, info_filial
 
 @dp.message_handler(text="Филиалы")
 async def menu(message: types.Message):
@@ -30,3 +30,9 @@ async def market(call: types.CallbackQuery, callback_data: dict):
     text = await info_filial(kod)
     keyboard = await menu_filial(callback_data)
     await call.message.edit_text(text=text, reply_markup=keyboard)
+
+
+@dp.callback_query_handler(region_registr_cb.filter())
+async def market(call: types.CallbackQuery, callback_data: dict):
+    region = callback_data['num']
+    await call.message.edit_text(await info_registrator(region))
