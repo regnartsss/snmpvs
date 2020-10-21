@@ -159,6 +159,7 @@ async def start_check_registrator():
             else:
                 disk = data_r[0]
                 script = data_r[2]
+                print(f"SELECT disk, cam_down, kod, cam, down, script FROM registrator WHERE ip = '{row[0]}'")
                 select = await sql.sql_selectone(f"SELECT disk, cam_down, kod, cam, down, script FROM registrator WHERE ip = '{row[0]}'")
                 disk_old, cam_down_old, kod, cam, down, script_old = select
                 if down is None:
