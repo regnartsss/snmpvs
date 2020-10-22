@@ -9,17 +9,21 @@ from aiogram.utils.exceptions import ChatNotFound
 from work.email_send import send_email
 from sqlite3 import OperationalError
 from aiosnmp.asn1 import Error
+import aioping
+import logging
 
-async def start_snmp():
-    print("start")
-    await asyncio.sleep(120)
+
+async def start_snmp(data):
     i = 0
     while i < 2:
-        rows = await sql.sql_select(f"SELECT loopback, kod, sdwan FROM zabbix")
+        logging.info("start")
+        rows = await sql.sql_select(f"SELECT loopback, kod, sdwan FROM zabbix ORDER BY kod {data}")
         for loopback, kod, sdwan in rows:
+            logging.info(loopback)
             if sdwan == 1:
                 try:
-                    if (await sql.sql_selectone(f"SELECT count(loopback) FROM zb_st WHERE loopback = '{loopback}'"))[0] == 0:
+                    if (await sql.sql_selectone(f"SELECT count(loopback) FROM zb_st WHERE loopback = '{loopback}'"))[
+                        0] == 0:
                         await oid(loopback, kod)
                     else:
                         await snmp(loopback, kod)
@@ -27,12 +31,27 @@ async def start_snmp():
                     await new_table_zb_st()
             elif sdwan == 0:
                 try:
-                    if (await sql.sql_selectone(f"SELECT count(loopback) FROM zb_st WHERE loopback = '{loopback}'"))[0] == 0:
+                    if (await sql.sql_selectone(f"SELECT count(loopback) FROM zb_st WHERE loopback = '{loopback}'"))[
+                        0] == 0:
                         await oid_mikrotik(loopback, kod)
                     else:
                         await check_snmp(loopback)
                 except OperationalError:
                     await new_table_zb_st()
+            else:
+                print("Ошибка")
+
+
+async def start_snmp_operstatus():
+    i = 0
+    # await asyncio.sleep(60)
+    while i < 2:
+        rows = await sql.sql_select(f"SELECT loopback, kod, sdwan FROM zabbix WHERE sdwan = 1")
+        for loopback, kod, sdwan in rows:
+            if sdwan == 1:
+                logging.info(f"operstatus {loopback}")
+
+                await snmp_operstatus(loopback)
             else:
                 print("Ошибка")
 
@@ -86,15 +105,30 @@ async def snmp_mikrotik(ip):
     mib_all = await sql.sql_selectone(f"SELECT In_isp1, In_isp2 FROM zb_st WHERE loopback = '{ip}'")
     status = []
     for mib_old in mib_all:
-        with aiosnmp.Snmp(host=ip, port=161, community="public", timeout=5, retries=2, max_repetitions=2) as s:
-            try:
+        try:
+            with aiosnmp.Snmp(host=ip, port=161, community="public") as s:
                 for res in await s.get(f"{mib}{mib_old}"):
                     status.append(res.value)
-            except aiosnmp.exceptions.TimeoutError:
-                pass
-            except Error:
-                status.append(0)
+        except Error as n:
+            print(ip, n)
+            return await ping_mikrotik(ip)
+        except aiosnmp.exceptions.SnmpTimeoutError as n:
+            print(ip, n)
+            return await ping_mikrotik(ip)
+        except TimeoutError as n:
+            print(ip, n)
+            continue
     return status
+
+
+async def ping_mikrotik(host):
+    try:
+        delay = await aioping.ping(host) * 1000
+        print("Ping response in %s ms" % delay)
+        await snmp_mikrotik(host)
+    except TimeoutError:
+        print("Timed out ", host)
+        return [2, 2]
 
 
 async def new_table_zb_st():
@@ -125,7 +159,7 @@ async def new_table_zb_st():
 async def oid(loopback, kod, repeat=0):
     mib = "1.3.6.1.2.1.31.1.1.1.1"
     i = 0
-    in_isp1, Oper_isp1, in_isp2, Oper_isp2, Oper_tu1, Oper_tu2 = "0", "0", "0", "0", "0", "0"
+    in_isp1, Oper_isp1, in_isp2, Oper_isp2, Oper_tu1, Oper_tu2, OperISP2 = "0", "0", "0", "0", "0", "0", "0"
     if kod is not None:
         if repeat == 0:
             await sql.sql_insert(f"INSERT INTO zb_st (loopback, kod) VALUES ('{loopback}', {kod})")
@@ -150,55 +184,174 @@ async def oid(loopback, kod, repeat=0):
                     #                print(oi)
                     if oi == "Tu0":
                         num_oid = (' = '.join([x.prettyPrint() for x in varBind]).split("= ")[0].split(".")[6])
-                        in_isp1 = "1.3.6.1.2.1.31.1.1.1.6.%s" % num_oid
-                        Oper_tu1 = "1.3.6.1.2.1.2.2.1.8.%s" % num_oid
-
+                        in_isp1 = f"1.3.6.1.2.1.31.1.1.1.6.{num_oid.strip()}"
+                        Oper_tu1 = f"1.3.6.1.2.1.2.2.1.8.{num_oid.strip()}"
                     elif oi == "Tu1":
                         num_oid = (' = '.join([x.prettyPrint() for x in varBind]).split("= ")[0].split(".")[6])
-                        in_isp2 = "1.3.6.1.2.1.31.1.1.1.6.%s" % num_oid
-                        Oper_tu2 = "1.3.6.1.2.1.2.2.1.8.%s" % num_oid
+                        in_isp2 = f"1.3.6.1.2.1.31.1.1.1.6.{num_oid.strip()}"
+                        Oper_tu2 = f"1.3.6.1.2.1.2.2.1.8.{num_oid.strip()}"
+                        Oper_isp2 = "1.3.6.1.2.1.2.2.1.8.2"
+
                     else:
                         pass
-            Oper_isp2 = "1.3.6.1.2.1.2.2.1.8.2"
             await sql.sql_insert(
                 f"UPDATE zb_st SET In_isp1 = '{in_isp1}', Oper_isp1 = '{Oper_tu1}', "
                 f"In_isp2 = '{in_isp2}', Oper_isp2 ='{Oper_tu2}', OperISP2 = '{Oper_isp2}' WHERE loopback = '{loopback}'")
 
 
+async def ping_cisco(loopback, kod):
+    try:
+        delay = await aioping.ping(loopback) * 1000
+        print("Ping response in %s ms" % delay)
+        await oid(loopback, kod, 1)
+    except TimeoutError:
+        print("Timed out ", loopback)
+        return False
+
+
+async def ping_cisco_old(loopback, kod):
+    try:
+        delay = await aioping.ping(loopback) * 1000
+        print("Ping response in %s ms" % delay)
+        await snmp(loopback, kod)
+    except TimeoutError:
+        # print("Timed out ", loopback)
+        return False
+
+
 async def snmp(loopback, kod):
     mib_all = await sql.sql_selectone(
         f"SELECT In_isp1, In_isp2, Oper_isp1, Oper_isp2, OperISP2 FROM zb_st WHERE loopback = '{loopback}'")
-    if mib_all[0:4] == ('0', '0', '0', '0') or mib_all[0:4] == (None, None, None, None):
-        print("Нет oid, проверить", loopback, kod)
-        await oid(loopback, kod, 1)
-        return
-    d = []
-    for mib in mib_all:
-        error_indication, error_status, error_index, var_binds = await snmp_v3(loopback, mib)
-        if error_indication:
-            print(error_indication)
-            r = await sql.sql_selectone(f"SELECT In1_two, In2_two FROM zb_st WHERE loopback = '{loopback}'")
-            d.append(r[0])
-            d.append(r[1])
-        elif error_status:
-            print('%s at %s' % (error_status.prettyPrint(),
-                                error_index and var_binds[int(error_index) - 1][0] or '?'))
+    if mib_all[0:2] == ('0', '0') or mib_all[0:2] == (None, None):
+        logging.info(f"{loopback} oid не найден")
+        if await ping_cisco(loopback, kod) is False:
+            return
+    d, op1, op2, st_op2 = [], '2', '2', '2'
+    for errorIndication, errorStatus, \
+        errorIndex, varBinds in bulkCmd(
+        SnmpEngine(),
+        UsmUserData(userName='dvsnmp', authKey='55GjnJwtPfk', authProtocol=usmHMACSHAAuthProtocol),
+        UdpTransportTarget((str(loopback), 161)),
+        ContextData(),
+        0, 100,  # GETBULK specific: request up to 50 OIDs in a single response
+        ObjectType(ObjectIdentity('1.3.6.1.2.1.31.1.1.1.6')),
+        ObjectType(ObjectIdentity('1.3.6.1.2.1.2.2.1.8')),
+        lexicographicMode=False
+    ):
+        if errorIndication:
+            if await ping_cisco_old(loopback, kod) is False:
+                logging.info(f"{loopback} не доступен")
+                # r = await sql.sql_selectone(f"SELECT In1_two, In2_two FROM zb_st WHERE loopback = '{loopback}'")
+                # d.append(r[0])
+                # d.append(r[1])
+                request = f"UPDATE zb_st SET In1_one = In1_two, In2_one = In2_two WHERE loopback = '{loopback}'"
+                await sql.sql_insert(request)
+                await check_cisco(loopback)
+                return
+        elif errorStatus:
+            print('%s at %s' % (errorStatus.prettyPrint(),
+                                errorIndex and varBinds[int(errorIndex) - 1][0] or '?'))
+            break
         else:
-            for varBind in var_binds:
-                #                print(' = '.join([x.prettyPrint() for x in varBind]))
-                m = (' = '.join([x.prettyPrint() for x in varBind]).split("= ")[1])
-                d.append(m)
-    # print(d)
+            for varBind in varBinds:
+                data = [x.prettyPrint() for x in varBind]
+                oid = '.'.join(data[0].split(".")[5:7])
+                In_isp1 = '.'.join(mib_all[0].split(".")[10:12]).strip()
+                In_isp2 = '.'.join(mib_all[1].split(".")[10:12]).strip()
+                Oper1 = '.'.join(mib_all[2].split(".")[10:12]).strip()
+                Oper2 = '.'.join(mib_all[3].split(".")[10:12]).strip()
+                status_oper1 = '.'.join(mib_all[4].split(".")[10:12]).strip()
+
+                if In_isp1 == oid:
+                    d.append(data[1])
+                if In_isp2 == oid:
+                    d.append(data[1])
+                if Oper1 == oid:
+                    op1 = data[1]
+                if Oper2 == oid:
+                    op2 = data[1]
+                if status_oper1 == oid:
+                    st_op2 = data[1]
+
     try:
         request = f"UPDATE zb_st SET In1_one = In1_two, In2_one = In2_two, In1_two = {d[0]}, In2_two = {d[1]}, " \
-                  f"Oper1 = {d[2]}, Oper2 = {d[3]}, status_operisp2 = {d[4]}  WHERE loopback = '{loopback}'"
+                  f"Oper1 = {op1}, Oper2 = {op2}, status_operisp2 = {st_op2} WHERE loopback = '{loopback}'"
         await sql.sql_insert(request)
         await check_cisco(loopback)
-    except:
+    except Exception as n:
+        print("Cis_errr", n)
         pass
+    # if mib_all[0:4] == ('0', '0', '0', '0') or mib_all[0:4] == (None, None, None, None):
+    #     # print("Нет oid, проверить", loopback, kod)
+    #     if await ping_cisco(loopback, kod) is False:
+    #         return
+    # d = []
+    # logging.info(f"snmp_{mib_all}")
+    # for mib in mib_all:
+    #     error_indication, error_status, error_index, var_binds = await snmp_v3(loopback, mib)
+    #     logging.info("snmp_v3_start")
+    #     if error_indication:
+    #         if await ping_cisco_old(loopback, kod) is False:
+    #             print(loopback, "Не доступен")
+    #             print(error_indication)
+    #             r = await sql.sql_selectone(f"SELECT In1_two, In2_two FROM zb_st WHERE loopback = '{loopback}'")
+    #             d.append(r[0])
+    #             d.append(r[1])
+    #             return
+    #     elif error_status:
+    #         print("error")
+    #         print(loopback)
+    #         print('%s at %s' % (error_status.prettyPrint(),
+    #                             error_index and var_binds[int(error_index) - 1][0] or '?'))
+    #     else:
+    #         for varBind in var_binds:
+    #             #                print(' = '.join([x.prettyPrint() for x in varBind]))
+    #             m = (' = '.join([x.prettyPrint() for x in varBind]).split("= ")[1])
+    #             d.append(m)
+
+
+async def snmp_operstatus(loopback):
+    # mib_all = await sql.sql_selectone(f"SELECT Oper_isp1, Oper_isp2, OperISP2 FROM zb_st WHERE loopback = '{loopback}'")
+    # d = []
+
+    for errorIndication, errorStatus, errorIndex, varBinds in bulkCmd(
+            SnmpEngine(),
+            UsmUserData(userName='dvsnmp', authKey='55GjnJwtPfk', authProtocol=usmHMACSHAAuthProtocol),
+            UdpTransportTarget((loopback, 161)),
+            ContextData(),
+            0, 20,  # GETBULK specific: request up to 50 OIDs in a single response
+            ObjectType(ObjectIdentity('1.3.6.1.2.1.2.2.1.8.2')),
+            lexicographicMode=False
+    ):
+        if errorIndication:
+            print(errorIndication)
+            return
+        elif errorStatus:
+            print('%s at %s' % (errorStatus.prettyPrint(),
+                                errorIndex and varBinds[int(errorIndex) - 1][0] or '?'))
+        else:
+            for varBind in varBinds:
+                data = [x.prettyPrint() for x in varBind]
+                print(data)
+    #         oid = '.'.join(data[0].split(".")[5:7])
+    #         In_isp1 = '.'.join(mib_all[0].split(".")[10:12]).strip()
+    #         In_isp2 = '.'.join(mib_all[1].split(".")[10:12]).strip()
+    #         if In_isp1 == oid:
+    #             d.append(data[1])
+    #         if In_isp2 == oid:
+    #             d.append(data[1])
+    # try:
+    #     request = f"UPDATE zb_st SET In1_one = In1_two, In2_one = In2_two, In1_two = {d[0]}, In2_two = {d[1]} " \
+    #               f" WHERE loopback = '{loopback}'"
+    #     await sql.sql_insert(request)
+    #     await check_cisco(loopback)
+    # except Exception as n:
+    #     print("Cis_errr", n)
+    #     pass
 
 
 async def snmp_v3(loopback, mib):
+    logging.info("snmp_v3_start")
     error_indication, error_status, error_index, var_binds = next(
         getCmd(SnmpEngine(),
                UsmUserData(userName='dvsnmp', authKey='55GjnJwtPfk', authProtocol=usmHMACSHAAuthProtocol),
@@ -210,7 +363,6 @@ async def snmp_v3(loopback, mib):
 
 
 async def check_cisco(loopback):
-    await asyncio.sleep(1)
     request = f"""SELECT In1_two, In2_two, Out1_two, Out2_two, In1_one,  In2_one, Out1_one, Out2_one
                 FROM zb_st WHERE loopback = '{loopback}'"""
     st = await sql.sql_selectone(request)
@@ -233,7 +385,6 @@ async def check_cisco(loopback):
 async def check_all(loopback, status1, status2):
     status_t1, status_t2, kod = await sql.sql_selectone(
         f"SELECT status_1, status_2, kod FROM zb_st WHERE loopback = '{loopback}'")
-
     if status1 == 0 and status2 == 0:
         if status_t1 == status1 and status_t2 == status2:
             pass

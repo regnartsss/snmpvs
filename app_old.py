@@ -1,7 +1,7 @@
 # from work.check_vs import start_snmp
 # from work.check_vs_new import start_snmp
 from work.zabbix_check import check
-from work.zabbix_check_vs import start_snmp
+from work.zabbix_check_vs import start_snmp, start_snmp_operstatus
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from loader import bot
 from work.check_scan import check_equipment
@@ -11,6 +11,7 @@ import asyncio
 from aiogram import executor
 import handlers
 import middlewares
+from work.zabbix import scanning_cisco
 
 middlewares.setup(dp)
 
@@ -22,12 +23,15 @@ async def zabb():
 
 
 async def on_startup():
-    await bot.send_message(765333440, "Бот запущен")
-    asyncio.ensure_future(start_snmp())
+    # await bot.send_message(765333440, "Бот запущен")
+    asyncio.ensure_future(start_snmp("ASC"))
+    # asyncio.ensure_future(start_snmp_operstatus())
+    # asyncio.ensure_future(start_snmp("DESC"))
     # asyncio.ensure_future(zabb())
     # asyncio.ensure_future(check())
-    asyncio.ensure_future(start_check_registrator())
+    # asyncio.ensure_future(start_check_registrator())
     # asyncio.ensure_future(check_equipment())
+    # asyncio.ensure_future(scanning_cisco())
 
 
 if __name__ == '__main__':

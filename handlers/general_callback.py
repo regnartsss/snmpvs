@@ -14,6 +14,7 @@ from work.Lease import lease
 from work.zabbix_check import vlan_cisco, update_vlan
 from work.check_scan import update_reg_cis
 
+
 @dp.callback_query_handler(ssh_cb.filter())
 async def market(call: types.CallbackQuery, callback_data: dict):
     await call.message.edit_reply_markup(reply_markup=await ssh(callback_data))
