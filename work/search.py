@@ -43,12 +43,10 @@ async def search_ip(host):
         socket.inet_aton(host)
         loopback = ''.join(host.split(".")[0:2])
         if loopback == '10255':
-            print(f"SELECT name FROM zabbix WHERE loopback = '{host}'")
             row = (await sql.sql_selectone(f"SELECT name FROM zabbix WHERE loopback = '{host}'"))[0]
             return row
         else:
             ip = '.'.join(host.split(".")[0:3])
-            print(ip)
             rows = await sql.sql_select(f"SELECT vlan100, vlan200, vlan300, vlan400, vlan500, name FROM zabbix WHERE sdwan = 1")
             for row in rows:
                 for r in row:
