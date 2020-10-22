@@ -22,20 +22,16 @@ async def zabb():
     scheduler.start()
 
 
-async def on_startup():
-    # await bot.send_message(765333440, "Бот запущен")
+def on_startup():
+    bot.send_message(765333440, "Бот запущен")
+    loop = asyncio.get_event_loop()
     asyncio.ensure_future(start_snmp("ASC"))
-    # asyncio.ensure_future(start_snmp_operstatus())
-    # asyncio.ensure_future(start_snmp("DESC"))
-    # asyncio.ensure_future(zabb())
-    # asyncio.ensure_future(check())
-    # asyncio.ensure_future(start_check_registrator())
-    # asyncio.ensure_future(check_equipment())
-    # asyncio.ensure_future(scanning_cisco())
+    asyncio.ensure_future(zabb())
+    asyncio.ensure_future(check())
+    asyncio.ensure_future(start_check_registrator())
+    loop.run_forever()
 
 
 if __name__ == '__main__':
-    loop = asyncio.get_event_loop()
-    asyncio.ensure_future(on_startup())
-    loop.run_forever()
+    on_startup()
 

@@ -8,6 +8,8 @@ import time
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from sqlite3 import OperationalError
 from aiosnmp.exceptions import SnmpTimeoutError
+import logging
+
 trassir = [
            # '1.3.6.1.4.1.3333.1.1',  # db
            '1.3.6.1.4.1.3333.1.2',  # archive
@@ -139,10 +141,11 @@ async def start_check_registrator_cam():
 
 async def start_check_registrator():
     print("reg")
-    # await asyncio.sleep(120)
+    await asyncio.sleep(20)
     while 0 < 1:
         rows = await sql.sql_select(f"SELECT ip FROM registrator")
         for row in rows:
+            logging.info(f"regi {row[0]}")
             data_r = await snmpregist(row[0])
             # await sql.sql_insert(f"UPDATE registrator SET ver_snmp = '{data_r[3]}' WHERE ip = '{row[0]}'")
             if data_r is False:
@@ -159,7 +162,6 @@ async def start_check_registrator():
             else:
                 disk = data_r[0]
                 script = data_r[2]
-                print(f"SELECT disk, cam_down, kod, cam, down, script FROM registrator WHERE ip = '{row[0]}'")
                 select = await sql.sql_selectone(f"SELECT disk, cam_down, kod, cam, down, script FROM registrator WHERE ip = '{row[0]}'")
                 disk_old, cam_down_old, kod, cam, down, script_old = select
                 if down is None:

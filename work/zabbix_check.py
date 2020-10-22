@@ -10,6 +10,7 @@ from sqlite3 import OperationalError
 from loader import bot
 import re
 from work.check_scan import check_equipment
+import logging
 
 def find_location():
     return os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__))).replace('\\', '/') + '/'
@@ -23,7 +24,7 @@ async def check():
     await check_zabbix()
     rows = await sql_select(f"SELECT loopback, sdwan FROM zabbix WHERE hostname is Null")
     for loopback, sdwan in rows:
-        print(loopback)
+        logging.info(f"zabb {loopback}")
         if sdwan == 1:
             hostname = await hostname_cisco(loopback)
             if hostname is not None:

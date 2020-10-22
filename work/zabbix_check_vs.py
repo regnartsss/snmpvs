@@ -14,12 +14,13 @@ import logging
 
 
 async def start_snmp(data):
+    await asyncio.sleep(10)
     i = 0
     while i < 2:
         logging.info("start")
         rows = await sql.sql_select(f"SELECT loopback, kod, sdwan FROM zabbix ORDER BY kod {data}")
         for loopback, kod, sdwan in rows:
-            logging.info(loopback)
+            logging.info(f"snmp {loopback}")
             if sdwan == 1:
                 try:
                     if (await sql.sql_selectone(f"SELECT count(loopback) FROM zb_st WHERE loopback = '{loopback}'"))[
