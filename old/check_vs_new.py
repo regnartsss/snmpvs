@@ -5,8 +5,8 @@ from loader import bot
 import asyncio
 import aiosnmp
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from aiogram.utils.exceptions import ChatNotFound, BotBlocked
-from work.email_send import send_email
+from aiogram.utils.exceptions import ChatNotFound
+
 
 async def start_snmp(order="null"):
     print("start")
@@ -58,9 +58,9 @@ async def oid_mikrotik(ip, kod):
                 if name_rou.split("_")[0] == "gre":
                     id = name_rou.split("_")[3]
                     if id == "rou1":
-                        await sql.sql_insert(f"UPDATE status SET In_isp1 = '{i}' WHERE loopback = '{ip}'")
+                        await sql.sql_insert(f"UPDATE status SET Tu0 = '1.3.6.1.2.1.2.2.1.8.{i}' WHERE loopback = '{ip}'")
                     elif id == "rou2":
-                        await sql.sql_insert(f"UPDATE status SET In_isp2= '{i}' WHERE loopback = '{ip}'")
+                        await sql.sql_insert(f"UPDATE status SET Tu1= '1.3.6.1.2.1.2.2.1.8.{i}' WHERE loopback = '{ip}'")
             except UnboundLocalError:
                 continue
 
@@ -82,14 +82,14 @@ async def check_snmp(ip):
 
 
 async def snmp_mikrotik(ip):
-    mib = '1.3.6.1.2.1.2.2.1.8.'
-    mib_all = await sql.sql_selectone(f"SELECT In_isp1, In_isp2 FROM status "
+
+    mib_all = await sql.sql_selectone(f"SELECT Tu0, Tu1 FROM status "
                                       f"WHERE loopback = '{ip}'")
     status = []
     for mib_old in mib_all:
-        with aiosnmp.Snmp(host=ip, port=161, community="public", timeout=10, retries=2, max_repetitions=2 ) as s:
+        with aiosnmp.Snmp(host=ip, port=161, community="public", timeout=10, retries=2, max_repetitions=2) as s:
                 try:
-                    for res in await s.get(f"{mib}{mib_old}"):
+                    for res in await s.get(f"{mib_old}"):
                         status.append(res.value)
                 except aiosnmp.exceptions.SnmpTimeoutError:
                     pass
@@ -102,6 +102,7 @@ async def oid(loopback, kod):
     mib = "1.3.6.1.2.1.31.1.1.1.1"
     i = 0
     in_isp1, out_isp1, in_isp2, out_isp2 = "0", "0", "0", "0"
+    tu0, tu1 = "0", "0"
     await sql.sql_insert(f"INSERT INTO status (loopback, kod) VALUES ('{loopback}', {kod})")
     while i < 35:
         await asyncio.sleep(1)
@@ -121,33 +122,30 @@ async def oid(loopback, kod):
                                 error_index and var_binds[int(error_index) - 1][0] or '?'))
         else:
             for varBind in var_binds:
-
                 oi = (' = '.join([x.prettyPrint() for x in varBind]).split("= ")[1])
-                #                print(oi)
                 if oi == "Tu0":
                     num_oid = (' = '.join([x.prettyPrint() for x in varBind]).split("= ")[0].split(".")[6])
-                    in_isp1 = "1.3.6.1.2.1.31.1.1.1.6.%s" % num_oid
-                    out_isp1 = "1.3.6.1.2.1.31.1.1.1.10.%s" % num_oid
+                    tu0 = "1.3.6.1.2.1.2.2.1.8.%s" % num_oid
+                    # out_isp1 = "1.3.6.1.2.1.31.1.1.1.10.%s" % num_oid
                 elif oi == "Tu1":
                     num_oid = (' = '.join([x.prettyPrint() for x in varBind]).split("= ")[0].split(".")[6])
-                    in_isp2 = "1.3.6.1.2.1.31.1.1.1.6.%s" % num_oid
-                    out_isp2 = "1.3.6.1.2.1.31.1.1.1.10.%s" % num_oid
+                    tu1 = "1.3.6.1.2.1.2.2.1.8.%s" % num_oid
+                    # out_isp2 = "1.3.6.1.2.1.31.1.1.1.10.%s" % num_oid
                 else:
                     pass
-        await sql.sql_insert(
-            f"UPDATE status SET In_isp1 = '{in_isp1}',Out_isp1 = '{out_isp1}', "
-            f"In_isp2 = '{in_isp2}', Out_isp2 ='{out_isp2}' WHERE loopback = '{loopback}'")
+        await sql.sql_insert(f"UPDATE status SET Tu0 = '{tu0}', Tu1 = '{tu1}' WHERE loopback = '{loopback}'")
 
 
 async def snmp(loopback):
-    mib_all = await sql.sql_selectone(f"SELECT In_isp1, In_isp2 FROM status WHERE loopback = '{loopback}'")
+    mib_all = await sql.sql_selectone(f"SELECT Tu0, Tu1 FROM status WHERE loopback = '{loopback}'")
     d = []
+    print(loopback)
     for mib in mib_all:
         error_indication, error_status, error_index, var_binds = await snmp_v3(loopback, mib)
         if error_indication:
-            r = await sql.sql_selectone(f"SELECT In1_two, In2_two FROM status WHERE loopback = '{loopback}'")
-            d.append(r[0])
-            d.append(r[1])
+            # r = await sql.sql_selectone(f"SELECT In1_two, In2_two FROM status WHERE loopback = '{loopback}'")
+            d.append('0')
+            d.append('0')
             break
         elif error_status:
             print('%s at %s' % (error_status.prettyPrint(),
@@ -157,11 +155,12 @@ async def snmp(loopback):
                 #                print(' = '.join([x.prettyPrint() for x in varBind]))
                 m = (' = '.join([x.prettyPrint() for x in varBind]).split("= ")[1])
                 d.append(m)
-    # print(d)
-    request = f"UPDATE status SET In1_one = In1_two, In2_one = In2_two, In1_two = {d[0]}, In2_two = {d[1]} " \
-              f"WHERE loopback = '{loopback}'"
-    await sql.sql_insert(request)
-    await check_cisco(loopback)
+    print(d)
+    # request = f"UPDATE status SET In1_one = In1_two, In2_one = In2_two, In1_two = {d[0]}, In2_two = {d[1]} " \
+    #           f"WHERE loopback = '{loopback}'"
+    # await sql.sql_insert(request)
+    # await check_cisco(loopback)
+    await check_all(loopback, int(d[0]), int(d[1]))
 
 
 async def snmp_v3(loopback, mib):
@@ -199,7 +198,6 @@ async def check_cisco(loopback):
 async def check_all(loopback, status1, status2):
     status_t1, status_t2, kod = await sql.sql_selectone(
         f"SELECT status_1, status_2, kod FROM status WHERE loopback = '{loopback}'")
-
     if status1 == 0 and status2 == 0:
         if status_t1 == status1 and status_t2 == status2:
             pass
@@ -207,7 +205,6 @@ async def check_all(loopback, status1, status2):
             data = await request_name(loopback)
             text = f"{data[0]}\nКод: {data[1]}\n🔴 🔴 Филиал не доступен \nLoopback: {data[2]}\n{data[5]}\n" \
                    f"ISP_1: {data[3]}\n {data[6]}\nISP_2: {data[4]}"
-
             await sql.sql_insert(f"UPDATE status SET status_1 = 0, status_2 = 0 WHERE loopback = '{loopback}'")
             await sql.sql_insert(f"Update registrator SET down = 1 WHERE kod = '{kod}'")
             await send_mess(kod, text)
@@ -220,7 +217,6 @@ async def check_all(loopback, status1, status2):
                    f"Loopback: {data[2]}\n{data[6]}\nISP_2: {data[4]}"
             await sql.sql_insert(f"UPDATE status SET status_1 = 1, status_2 = 0 WHERE loopback = '{loopback}'")
             await send_mess(kod, text)
-
     elif status1 == 0 and status2 == 1:
         if status_t1 == status1 and status_t2 == status2:
             pass
@@ -230,7 +226,6 @@ async def check_all(loopback, status1, status2):
                    f"Loopback: {data[2]}\n{data[5]}\nISP_1: {data[3]}\n"
             await sql.sql_insert(f"UPDATE status SET status_1 = 0, status_2 = 1 WHERE loopback = '{loopback}'")
             await send_mess(kod, text)
-
     elif status1 == 1 and status2 == 1:
         if status_t1 == status1 and status_t2 == status2:
             pass
@@ -257,7 +252,6 @@ async def send_mess(kod, text, name=None, email=0):
             await asyncio.sleep(1)
             try:
                 await bot.send_message(chat_id=row, text=text, disable_notification=await notif())
-                print("sms")
                 if email == 1:
                     print("email")
                     # await send_email(kod, text)
@@ -265,8 +259,7 @@ async def send_mess(kod, text, name=None, email=0):
                 print(f"Ошибка отправки {row}")
             except ChatNotFound:
                 print(f"Юзер не найден {row}")
-            except BotBlocked:
-                print(f"Юзер заблокировал {row}")
+
     except TypeError:
         print("Никто не подписан")
 

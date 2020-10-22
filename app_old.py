@@ -1,17 +1,11 @@
-# from work.check_vs import start_snmp
-# from work.check_vs_new import start_snmp
 from work.zabbix_check import check
-from work.zabbix_check_vs import start_snmp, start_snmp_operstatus
+from work.zabbix_check_cisco import start_snmp, start_snmp_operstatus
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from loader import bot
-from work.check_scan import check_equipment
-from work.check_registrator import shed, start_check_registrator, start_check_registrator_cam
+from work.zabbix_check_registrator import shed, start_check_registrator, start_check_registrator_cam
 from loader import dp
 import asyncio
-from aiogram import executor
-import handlers
 import middlewares
-from work.zabbix import scanning_cisco
 
 middlewares.setup(dp)
 

@@ -1,12 +1,8 @@
 from work import sql
-from pysnmp.hlapi import *
 import asyncio
 import aiosnmp
-from loader import bot
-from work.check_vs import send_mess
-import time
+from old.check_vs import send_mess
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from sqlite3 import OperationalError
 from aiosnmp.exceptions import SnmpTimeoutError
 import logging
 

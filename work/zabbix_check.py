@@ -9,8 +9,9 @@ from pyzabbix import ZabbixAPI
 from sqlite3 import OperationalError
 from loader import bot
 import re
-from work.check_scan import check_equipment
+from work.zabbix_check_equipment import check_equipment
 import logging
+
 
 def find_location():
     return os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__))).replace('\\', '/') + '/'

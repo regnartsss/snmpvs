@@ -12,7 +12,6 @@ async def reg_menu():
 
 
 async def worksub(message, call):
-    # print("text")
     keyboard = InlineKeyboardMarkup()
     if message.text == "Подписаться на уведомления" or call.data.split("_")[0] == "menusub":
         rows = await sql.sql_select("SELECT id, name FROM region")
@@ -48,20 +47,15 @@ async def worksub(message, call):
 async def filialsub(user_id, reg):
         text = ""
         keyregion = InlineKeyboardMarkup()
-        # print("ddd")
         rows = await sql.sql_select(
             f"SELECT filial.name, filial.kod, status.status_1, status.status_2 FROM filial INNER JOIN status ON filial.loopback=status.loopback WHERE region = {reg} ORDER BY filial.name")
         for row in rows:
-            # print(row)
             (name, kod, status_1, status_2) = tuple(row)
             rows_2 = await sql.sql_selectone(f"SELECT count(kod) from sub Where kod = {kod} and user_id = {user_id}")
-            # print(rows_2)
             if rows_2[0] == 1:
                 smail = u'\U00002705'
-                # print(smail)
             else:
                 smail = ""
-            # print(status_1)
             if status_1 == 1 and status_2 == 1:
                 text = (smail + " " + name + " " + u'\U0001F535' + " " + u'\U0001F535')
             elif status_1 == 1 and status_2 == 0:
@@ -70,7 +64,6 @@ async def filialsub(user_id, reg):
                 text = (smail + " " + name + " " + u'\U0001F534' + " " + u'\U0001F535')
             elif status_1 == 0 and status_2 == 0:
                 text = (smail + " " + name + " " + u'\U0001F534' + " " + u'\U0001F534')
-            # print(text)
             keyregion.row(InlineKeyboardButton(text, callback_data=f"filialsub_{kod}_{reg}"))
         keyregion.row(InlineKeyboardButton(text="Назад", callback_data="menusub"))
         return keyregion

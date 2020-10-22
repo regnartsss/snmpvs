@@ -6,11 +6,11 @@ from work import sql
 from work.Ssh import ssh_console, Ssh_console, ssh_console_command, search_mac
 from work.admin import mess, AllMessage
 from work.keyboard import main_menu
-from work.Add_filial import NewFilial, Add_snmp
+# from work.Add_filial import NewFilial, Add_snmp
 from work.Statistics import info_filial, check_registrator, link, version_po
 from work.keyboard import keyboard_other, region, keyboard_back, keyboard_search, main_menu_user
 from work.Keyboard_menu import key_registrator, menu_region, menu_filials, menu_filial
-from work.sub import worksub, reg_menu
+from work.subscription import worksub, reg_menu
 
 
 @dp.message_handler(state=Ssh_console.command)
@@ -25,53 +25,53 @@ async def process_name(message: types.Message, state: FSMContext):
 
 data = {}
 
-
-@dp.message_handler(state=NewFilial.loopback)
-async def process_name(message: types.Message, state: FSMContext):
-    if message.text == "111":
-        await message.answer("Отмена", reply_markup=main_menu())
-        await state.finish()
-    else:
-        # ip = message.text.split(".")[1:3]
-        # print(ip)
-        request = f"SELECT count(kod) FROM filial WHERE loopback = '{message.text}' and sdwan = 1"
-        if (await sql.sql_selectone(request))[0] == 1:
-            await message.answer("Филиал уже добавлен", reply_markup=main_menu())
-            await state.finish()
-        else:
-            data['loopback'] = message.text
-            await NewFilial.next()
-            await message.answer(f"Loopback: {data['loopback']}\nВведите название филиала как в карточке 1С")
-
-
-@dp.message_handler(state=NewFilial.name)
-async def process_name(message: types.Message, state: FSMContext):
-    if message.text == "111":
-        await message.answer("Отмена", reply_markup=main_menu())
-        await state.finish()
-    else:
-        data['name'] = message.text
-        await NewFilial.next()
-        await message.answer(f"Loopback: {data['loopback']}\nФилиал: {data['name']}\nВыберите регион",
-                             reply_markup=await region())
-
-
-@dp.message_handler(state=NewFilial.region)
-async def process_name(message: types.Message, state: FSMContext):
-    if message.text == "111":
-        await message.answer("Отмена", reply_markup=main_menu())
-        await state.finish()
-    else:
-        data['region'] = message.text
-        await state.finish()
-        await message.answer(f"Идет добавление филиала\n"
-                             f"Loopback: {data['loopback']}\n"
-                             f"Филиал: {data['name']}\n"
-                             f"Регион: {data['region']}", reply_markup=main_menu())
-        kod = await Add_snmp(message=message, data=data).snmp_sysName()
-        status = await info_filial(kod)
-        await message.answer(status)
-
+#
+# @dp.message_handler(state=NewFilial.loopback)
+# async def process_name(message: types.Message, state: FSMContext):
+#     if message.text == "111":
+#         await message.answer("Отмена", reply_markup=main_menu())
+#         await state.finish()
+#     else:
+#         # ip = message.text.split(".")[1:3]
+#         # print(ip)
+#         request = f"SELECT count(kod) FROM filial WHERE loopback = '{message.text}' and sdwan = 1"
+#         if (await sql.sql_selectone(request))[0] == 1:
+#             await message.answer("Филиал уже добавлен", reply_markup=main_menu())
+#             await state.finish()
+#         else:
+#             data['loopback'] = message.text
+#             await NewFilial.next()
+#             await message.answer(f"Loopback: {data['loopback']}\nВведите название филиала как в карточке 1С")
+#
+#
+# @dp.message_handler(state=NewFilial.name)
+# async def process_name(message: types.Message, state: FSMContext):
+#     if message.text == "111":
+#         await message.answer("Отмена", reply_markup=main_menu())
+#         await state.finish()
+#     else:
+#         data['name'] = message.text
+#         await NewFilial.next()
+#         await message.answer(f"Loopback: {data['loopback']}\nФилиал: {data['name']}\nВыберите регион",
+#                              reply_markup=await region())
+#
+#
+# @dp.message_handler(state=NewFilial.region)
+# async def process_name(message: types.Message, state: FSMContext):
+#     if message.text == "111":
+#         await message.answer("Отмена", reply_markup=main_menu())
+#         await state.finish()
+#     else:
+#         data['region'] = message.text
+#         await state.finish()
+#         await message.answer(f"Идет добавление филиала\n"
+#                              f"Loopback: {data['loopback']}\n"
+#                              f"Филиал: {data['name']}\n"
+#                              f"Регион: {data['region']}", reply_markup=main_menu())
+#         kod = await Add_snmp(message=message, data=data).snmp_sysName()
+#         status = await info_filial(kod)
+#         await message.answer(status)
+#
 
 
 
@@ -86,12 +86,12 @@ async def market(call: types.CallbackQuery):
 async def work(message: types.Message):
     await message.answer("Разное", reply_markup=keyboard_other())
 
-
-@dp.message_handler(lambda c: c.from_user.id in admin_id, text="Добавить")
-async def work(message: types.Message):
-    await NewFilial.loopback.set()
-    await message.answer(text="Введите Loopback адрес или наберите 111 для отмены",
-                         reply_markup=keyboard_back())
+#
+# @dp.message_handler(lambda c: c.from_user.id in admin_id, text="Добавить")
+# async def work(message: types.Message):
+#     await NewFilial.loopback.set()
+#     await message.answer(text="Введите Loopback адрес или наберите 111 для отмены",
+#                          reply_markup=keyboard_back())
 
 
 @dp.message_handler(lambda c: c.from_user.id in admin_id, text="Назад")

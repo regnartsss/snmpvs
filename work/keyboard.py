@@ -24,7 +24,7 @@ def keyboard_search():
     keyboard.row("Поиск по названию")
     keyboard.row("Поиск по коду")
     keyboard.row("Поиск по серийнику")
-    keyboard.row("Поиск по ip")
+    keyboard.row("Поиск по ip адресу")
     keyboard.row("Назад")
     return keyboard
 

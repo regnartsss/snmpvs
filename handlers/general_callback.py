@@ -1,18 +1,16 @@
-from loader import dp, bot
+from loader import dp
 from aiogram import types
 from aiogram.utils.exceptions import MessageNotModified
 from work.Keyboard_menu import ssh
-from work.Ssh import ssh_t, ssh_console
+from work.Ssh import ssh_console
 from work.Statistics import info_registrator, info_filial
 from work.keyboard import cancel
 from work.Keyboard_menu import menu_filial, check_filial
-from work.sub import worksub
-from work.Add_filial import filial_check
-from work.check_vs import call_name
+from work.subscription import worksub
 from filters.loc import ssh_cb, lease_cb, console_ssh_cb, update_cb
 from work.Lease import lease
-from work.zabbix_check import vlan_cisco, update_vlan
-from work.check_scan import update_reg_cis
+from work.zabbix_check import update_vlan
+from work.zabbix_check_equipment import update_reg_cis
 
 
 @dp.callback_query_handler(ssh_cb.filter())

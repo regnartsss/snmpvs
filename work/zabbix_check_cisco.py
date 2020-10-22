@@ -4,9 +4,7 @@ from work import sql
 from loader import bot
 import asyncio
 import aiosnmp
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.exceptions import ChatNotFound
-from work.email_send import send_email
 from sqlite3 import OperationalError
 from aiosnmp.asn1 import Error
 import aioping

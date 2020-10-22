@@ -1,7 +1,6 @@
 from loader import dp, bot
 from aiogram import types
-from work.search import SearchFilial, search_kod_win, search_name_win, \
-    search_serial_win
+from work.search import SearchFilial, search_kod_win, search_name_win, search_serial_win, search_ip
 from aiogram.dispatcher import FSMContext
 from data.data import admin_id
 
@@ -26,7 +25,9 @@ async def work(message: types.Message):
 
 @dp.message_handler(lambda c: c.from_user.id in admin_id, text="Поиск по ip")
 async def work(message: types.Message):
-    await message.answer("Ожидайте обновления")
+    await message.answer("Введите айпи адрес")
+    await SearchFilial.Ip.set()
+
 
 
 @dp.message_handler(state=SearchFilial.Filial)
@@ -75,3 +76,18 @@ async def process_name(message: types.Message, state: FSMContext):
             print(n)
             await message.answer("Ничего не найдено")
             await state.finish()
+
+
+@dp.message_handler(state=SearchFilial.Ip)
+async def process_name(message: types.Message, state: FSMContext):
+    if message.text == "Нет" or message.text == "нет":
+        await state.finish()
+    else:
+        text = await search_ip(message.text)
+        if text is not False:
+            await message.answer(text=text)
+            await state.finish()
+        else:
+            await message.answer(text="Введите корректный айпи адрес")
+
+
