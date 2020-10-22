@@ -21,8 +21,7 @@ def main_menu():
 
 def keyboard_search():
     keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
-    keyboard.row("Поиск по названию")
-    keyboard.row("Поиск по коду")
+    keyboard.row("Поиск по названию", "Поиск по коду")
     keyboard.row("Поиск по серийнику")
     keyboard.row("Поиск по ip адресу")
     keyboard.row("Назад")
