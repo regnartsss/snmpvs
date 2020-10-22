@@ -153,7 +153,8 @@ async def work(message: types.Message):
         text = await search_mac(message.from_user.id, kod, text, message)
         await message.answer(text)
     else:
-        await message.answer("Повторите попытку")
+        pass
+        # await message.answer("Команда не распознана")
 
 # elif message.text == "Просканировать":
 #     await sql.sql_insert(f'DELETE FROM cisco')
