@@ -255,22 +255,26 @@ async def snmp(loopback, kod):
             for varBind in varBinds:
                 data = [x.prettyPrint() for x in varBind]
                 oid = '.'.join(data[0].split(".")[5:7])
-                In_isp1 = '.'.join(mib_all[0].split(".")[10:12]).strip()
-                In_isp2 = '.'.join(mib_all[1].split(".")[10:12]).strip()
-                Oper1 = '.'.join(mib_all[2].split(".")[10:12]).strip()
-                Oper2 = '.'.join(mib_all[3].split(".")[10:12]).strip()
-                status_oper1 = '.'.join(mib_all[4].split(".")[10:12]).strip()
+                try:
+                    In_isp1 = '.'.join(mib_all[0].split(".")[10:12]).strip()
+                    In_isp2 = '.'.join(mib_all[1].split(".")[10:12]).strip()
+                    Oper1 = '.'.join(mib_all[2].split(".")[10:12]).strip()
+                    Oper2 = '.'.join(mib_all[3].split(".")[10:12]).strip()
+                    status_oper1 = '.'.join(mib_all[4].split(".")[10:12]).strip()
 
-                if In_isp1 == oid:
-                    d.append(data[1])
-                if In_isp2 == oid:
-                    d.append(data[1])
-                if Oper1 == oid:
-                    op1 = data[1]
-                if Oper2 == oid:
-                    op2 = data[1]
-                if status_oper1 == oid:
-                    st_op2 = data[1]
+
+                    if In_isp1 == oid:
+                        d.append(data[1])
+                    if In_isp2 == oid:
+                        d.append(data[1])
+                    if Oper1 == oid:
+                        op1 = data[1]
+                    if Oper2 == oid:
+                        op2 = data[1]
+                    if status_oper1 == oid:
+                        st_op2 = data[1]
+                except AttributeError as n:
+                    print(n)
 
     try:
         request = f"UPDATE zb_st SET In1_one = In1_two, In2_one = In2_two, In1_two = {d[0]}, In2_two = {d[1]}, " \
