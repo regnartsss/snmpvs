@@ -88,6 +88,8 @@ async def check_snmp(ip):
         status1, status2 = await snmp_mikrotik(ip)
     except ValueError:
         status1, status2 = 0, 0
+    except TypeError:
+        status1, status2 = 0, 0
     if status1 == 1:
         status1 = 1
     elif status1 == 2:
