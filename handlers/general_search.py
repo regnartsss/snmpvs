@@ -23,7 +23,7 @@ async def work(message: types.Message):
     await SearchFilial.Serial.set()
 
 
-@dp.message_handler(lambda c: c.from_user.id in admin_id, text="Поиск по ip")
+@dp.message_handler(lambda c: c.from_user.id in admin_id, text="Поиск по ip адресу")
 async def work(message: types.Message):
     await message.answer("Введите айпи адрес")
     await SearchFilial.Ip.set()
