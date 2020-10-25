@@ -26,12 +26,11 @@ async def on_startup():
 
 
 if __name__ == '__main__':
-    asyncio.run(on_startup())
-    # try:
-    #     loop = asyncio.get_event_loop()
-    #
-    #     asyncio.ensure_future(on_startup())
-    #
-    #     loop.run_forever()
-    # except ValueError:
-    #     pass
+    try:
+        loop = asyncio.get_event_loop()
+
+        asyncio.ensure_future(on_startup())
+
+        loop.run_forever()
+    except ValueError:
+        pass
