@@ -26,6 +26,7 @@ async def on_startup():
 
 
 if __name__ == '__main__':
-        loop = asyncio.get_event_loop()
-        asyncio.ensure_future(on_startup())
-        loop.run_forever()
+    loop = asyncio.ProactorEventLoop()
+    asyncio.set_event_loop(loop)
+    asyncio.ensure_future(on_startup())
+    loop.run_forever()

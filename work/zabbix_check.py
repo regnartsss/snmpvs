@@ -239,6 +239,9 @@ async def cisco_ssh_serial(loopback):
 
 
 async def check_zabbix():
+    import urllib3
+    urllib3.disable_warnings()
+
     user = "podkopaev.k"
     password = "z15X3vdy"
     z = ZabbixAPI('https://zabbix.partner.ru/')
