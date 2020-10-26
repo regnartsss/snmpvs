@@ -22,7 +22,6 @@ def on_startup():
     # asyncio.set_event_loop(loop)
 
     loop = asyncio.get_event_loop()
-
     asyncio.ensure_future(start_snmp("ASC"))
     asyncio.ensure_future(zabb())
     asyncio.ensure_future(check())

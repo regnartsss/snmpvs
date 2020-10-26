@@ -29,6 +29,7 @@ async def sql_select(request):
     cursor = conn.cursor()
     cursor.execute(request)
     rows = cursor.fetchall()
+    conn.close()
     return rows
 
 
@@ -37,25 +38,5 @@ async def sql_selectone(request):
     cursor = conn.cursor()
     cursor.execute(request)
     rows = cursor.fetchone()
-    return rows
-
-def sql_select_no_await(request):
-    conn = sqlite3.connect(PATH+'sdwan.db')
-    cursor = conn.cursor()
-    cursor.execute(request)
-    rows = cursor.fetchall()
-    return rows
-
-def sql_selectone_no_await(request):
-    conn = sqlite3.connect(PATH+'sdwan.db')
-    cursor = conn.cursor()
-    cursor.execute(request)
-    rows = cursor.fetchone()
-    return rows
-
-def sql_insert_no_await(request):
-    conn = sqlite3.connect(PATH+'sdwan.db')
-    cursor = conn.cursor()
-    cursor.execute(request)
-    conn.commit()
     conn.close()
+    return rows
