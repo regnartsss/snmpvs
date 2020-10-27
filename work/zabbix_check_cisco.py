@@ -19,31 +19,31 @@ async def start_snmp(data):
         rows = await sql.sql_select(f"SELECT loopback, kod, sdwan FROM zabbix ORDER BY kod {data}")
         for loopback, kod, sdwan in rows:
             logging.info(f"snmp {loopback}")
+            request = f"SELECT count(loopback) FROM zb_st WHERE loopback = '{loopback}'"
+            count = (await sql.sql_selectone(request))[0]
             if sdwan == 1:
                 try:
-                    if (await sql.sql_selectone(f"SELECT count(loopback) FROM zb_st WHERE loopback = '{loopback}'"))[
-                        0] == 0:
+                    if count == 0:
                         await oid(loopback, kod)
                     else:
                         await snmp(loopback, kod)
                 except OperationalError:
                     await new_table_zb_st()
             elif sdwan == 0:
-                try:
-                    if (await sql.sql_selectone(f"SELECT count(loopback) FROM zb_st WHERE loopback = '{loopback}'"))[
-                        0] == 0:
-                        await oid_mikrotik(loopback, kod)
-                    else:
-                        await check_snmp(loopback)
-                except OperationalError:
-                    await new_table_zb_st()
+                pass
+                # try:
+                #     if count == 0:
+                #         await oid_mikrotik(loopback, kod)
+                #     else:
+                #         await check_snmp(loopback)
+                # except OperationalError:
+                #     await new_table_zb_st()
             else:
                 print("Ошибка")
 
 
 async def start_snmp_operstatus():
     i = 0
-    # await asyncio.sleep(60)
     while i < 2:
         rows = await sql.sql_select(f"SELECT loopback, kod, sdwan FROM zabbix WHERE sdwan = 1")
         for loopback, kod, sdwan in rows:
