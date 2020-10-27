@@ -70,9 +70,11 @@ async def test():
     z.login(user=user, password=password)
     print("Connected to Zabbix API Version %s" % z.api_version())
     data = {}
-    for h in z.host.get(severities=4):
-        for f in z.problem.get(hostids=h['hostid'], recept=True):
-            print(h['name'], f['name'], f['acknowledged'])
+    for h in z.host.get():
+        # print(h)
+        for f in z.problem.get(hostids=h['hostid'], severity = 4, recent=True):
+            print(f)
+            print(h['name'], f['name'], f['acknowledged'], f['suppressed'])
     #         try:
     #             data[h['name']].append(f['name'])
     #         except KeyError:

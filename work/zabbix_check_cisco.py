@@ -205,9 +205,11 @@ async def oid(loopback, kod, repeat=0):
 
 async def ping_cisco(loopback, kod):
     try:
-        delay = await aioping.ping(loopback) * 1000
-        print("Ping response in %s ms" % delay)
-        await oid(loopback, kod, 1)
+        return False
+        # delay = await aioping.ping(loopback) * 1000
+        # print("Ping response in %s ms" % delay)
+        # await oid(loopback, kod, 1)
+
     except TimeoutError:
         print("Timed out ", loopback)
         return False
@@ -215,9 +217,10 @@ async def ping_cisco(loopback, kod):
 
 async def ping_cisco_old(loopback, kod):
     try:
-        delay = await aioping.ping(loopback) * 1000
-        print("Ping response in %s ms" % delay)
-        await snmp(loopback, kod)
+        return False
+        # delay = await aioping.ping(loopback) * 1000
+        # print("Ping response in %s ms" % delay)
+        # await snmp(loopback, kod)
     except TimeoutError:
         # print("Timed out ", loopback)
         return False
