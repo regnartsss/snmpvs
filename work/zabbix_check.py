@@ -39,6 +39,8 @@ async def check():
         elif sdwan == 0:
             await hostname_mikrotik(loopback)
     await check_equipment()
+    print("end")
+    return
 
 
 async def hostname_cisco(loopback):

@@ -7,25 +7,25 @@ from pysnmp.hlapi import getCmd, SnmpEngine, UsmUserData, usmHMACSHAAuthProtocol
 
 
 async def check_equipment():
-        try:
-            rows = await sql_select("select loopback, zabbix.kod, zabbix.name, sdwan from zabbix except "
-                                    "select loopback, registrator.kod, zabbix.name, sdwan from registrator "
-                                    "left join zabbix on registrator.kod = zabbix.kod")
-        except OperationalError:
-            await table_registrator()
-            await check_equipment()
-            await table_cisco()
-            return
-        for loopback, kod, name, sdwan in rows:
-            if sdwan == 1:
-                await sql_insert(f"DELETE FROM registrator WHERE kod = {kod}")
-                await sql_insert(f"DELETE FROM cisco WHERE kod = {kod}")
-                await cisco_registrator(loopback)
-            elif sdwan == 0:
-                await sql_insert(f"DELETE FROM registrator WHERE kod = {kod}")
-                await sql_insert(f"DELETE FROM cisco WHERE kod = {kod}")
-                await mikrotik_cisco(loopback, kod)
-                await mikrotik_registrator(loopback, kod)
+    try:
+        rows = await sql_select("select loopback, zabbix.kod, zabbix.name, sdwan from zabbix except "
+                                "select loopback, registrator.kod, zabbix.name, sdwan from registrator "
+                                "left join zabbix on registrator.kod = zabbix.kod")
+    except OperationalError:
+        await table_registrator()
+        await check_equipment()
+        await table_cisco()
+        return
+    for loopback, kod, name, sdwan in rows:
+        if sdwan == 1:
+            await sql_insert(f"DELETE FROM registrator WHERE kod = {kod}")
+            await sql_insert(f"DELETE FROM cisco WHERE kod = {kod}")
+            await cisco_registrator(loopback)
+        elif sdwan == 0:
+            await sql_insert(f"DELETE FROM registrator WHERE kod = {kod}")
+            await sql_insert(f"DELETE FROM cisco WHERE kod = {kod}")
+            await mikrotik_cisco(loopback, kod)
+            await mikrotik_registrator(loopback, kod)
 
 
 async def cisco_registrator(loopback):
@@ -115,7 +115,6 @@ async def mikrotik_cisco(ip, kod):
                         with aiosnmp.Snmp(host=ip_old, port=161, community="read") as snmp:
                             for res in await snmp.get(".1.3.6.1.4.1.9.2.1.3.0"):
                                 name = res.value.decode('UTF-8')
-                                print(name)
                                 if kod is not None:
                                     request = f"INSERT INTO cisco (kod, ip, hostname) VALUES ({kod}, '{ip_old}','{name}')"
                                     await sql_insert(request)
@@ -161,6 +160,7 @@ async def update_reg_cis(kod):
         await sql_insert(f"DELETE FROM cisco WHERE kod = {kod}")
         await mikrotik_cisco(loopback, kod)
         await mikrotik_registrator(loopback, kod)
+
 
 async def table_registrator():
     request = """CREATE TABLE registrator (
