@@ -13,23 +13,26 @@ import logging
 
 async def start_snmp(data):
     await asyncio.sleep(10)
-    i = 0
-    while i < 2:
-        logging.info("start")
+    i, y, z = 0, 0, 0
+    while i < 200000000000:
+        logging.info(f"start {i}")
         rows = await sql.sql_select(f"SELECT loopback, kod, sdwan FROM zabbix ORDER BY kod {data}")
         for loopback, kod, sdwan in rows:
-            logging.info(f"snmp {loopback}")
+            # logging.info(f"snmp {loopback}")
             request = f"SELECT count(loopback) FROM zb_st WHERE loopback = '{loopback}'"
             count = (await sql.sql_selectone(request))[0]
             if sdwan == 1:
-                pass
-                # try:
-                #     if count == 0:
-                #         await oid(loopback, kod)
-                #     else:
-                #         await snmp(loopback, kod)
-                # except OperationalError:
-                #     await new_table_zb_st()
+                try:
+                    if count == 0:
+                        logging.info(f"oid {y} {loopback}")
+                        y += 1
+                        await oid(loopback, kod)
+                    else:
+                        logging.info(f"snmp {z} {loopback}")
+                        z += 1
+                        await snmp(loopback, kod)
+                except OperationalError:
+                    await new_table_zb_st()
             elif sdwan == 0:
                 try:
                     if count == 0:
@@ -40,7 +43,7 @@ async def start_snmp(data):
                     await new_table_zb_st()
             else:
                 print("Ошибка")
-
+        i += 1
 
 async def start_snmp_operstatus():
     i = 0
@@ -48,7 +51,7 @@ async def start_snmp_operstatus():
         rows = await sql.sql_select(f"SELECT loopback, kod, sdwan FROM zabbix WHERE sdwan = 1")
         for loopback, kod, sdwan in rows:
             if sdwan == 1:
-                logging.info(f"operstatus {loopback}")
+                # logging.info(f"operstatus {loopback}")
 
                 await snmp_operstatus(loopback)
             else:
