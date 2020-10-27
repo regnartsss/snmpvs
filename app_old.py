@@ -6,7 +6,7 @@ from work.zabbix_check_registrator import shed, start_check_registrator, start_c
 from loader import dp
 import asyncio
 import middlewares
-
+from work.test import test
 middlewares.setup(dp)
 
 
@@ -26,6 +26,7 @@ def on_startup():
     # asyncio.ensure_future(zabb())
     # asyncio.ensure_future(check())
     # asyncio.ensure_future(start_check_registrator())
+    # asyncio.ensure_future(test())
     loop.run_forever()
 
 

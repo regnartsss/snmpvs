@@ -22,22 +22,22 @@ async def start_snmp(data):
             request = f"SELECT count(loopback) FROM zb_st WHERE loopback = '{loopback}'"
             count = (await sql.sql_selectone(request))[0]
             if sdwan == 1:
-                try:
-                    if count == 0:
-                        await oid(loopback, kod)
-                    else:
-                        await snmp(loopback, kod)
-                except OperationalError:
-                    await new_table_zb_st()
-            elif sdwan == 0:
                 pass
                 # try:
                 #     if count == 0:
-                #         await oid_mikrotik(loopback, kod)
+                #         await oid(loopback, kod)
                 #     else:
-                #         await check_snmp(loopback)
+                #         await snmp(loopback, kod)
                 # except OperationalError:
                 #     await new_table_zb_st()
+            elif sdwan == 0:
+                try:
+                    if count == 0:
+                        await oid_mikrotik(loopback, kod)
+                    else:
+                        await check_snmp(loopback)
+                except OperationalError:
+                    await new_table_zb_st()
             else:
                 print("Ошибка")
 
