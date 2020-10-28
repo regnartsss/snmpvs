@@ -4,6 +4,7 @@ from sqlite3 import OperationalError
 from pyzabbix import ZabbixAPI
 import aioping
 import time
+from work.zabbix_check_cisco import send_mess
 #
 # async def scanning_cisco():
 #     request = f"SELECT ip, hostname FROM cisco"
@@ -104,36 +105,48 @@ async def test():
 
 
 async def check(error, done, name, loopback):
-    status_old = await sql_selectone(f"SELECT Provider1, Provider2 FROM zb_st_new WHERE loopback = '{loopback}'")
+    status_old = await sql_selectone(f"SELECT Provider1, Provider2, zabbix.kod FROM zb_st_new LEFT JOIN zabbix ON zb_st_new.loopback = zabbix.loopback WHERE zb_st_new.loopback = '{loopback}'")
     if status_old is None or status_old == []:
         await sql_insert(f"INSERT INTO zb_st_new (loopback, Provider1, Provider2) VALUES ('{loopback}', -1, -1)")
-        status_old = [-1, -1]
+        status_old = [-1, -1, 0]
 
     if "Provider 1 недоступен" in error or "(Tu0) недоступен" in error:
         if done == '0':
             if status_old[0] != 0:
+                await send_mess(status_old[2], f'{name} Основной провайдер не доступен')
                 print(f'{name} Основной провайдер не доступен')
                 await sql_insert(f"UPDATE zb_st_new SET Provider1 = 0 WHERE loopback = '{loopback}'")
         else:
             if status_old[0] != 1:
+                await send_mess(status_old[2], f'{name} Основной провайдер работает')
+
                 print(f'{name} Основной провайдер работает')
                 await sql_insert(f"UPDATE zb_st_new SET Provider1 = 1 WHERE loopback = '{loopback}'")
     elif 'Provider 2 недоступен' in error or "(Tu1) недоступен" in error:
         if done == '0':
             if status_old[1] != 0:
+
+                await send_mess(status_old[2], f'{name} Резервный провайдер не доступен')
+
                 print(f'{name} Резервный провайдер не доступен')
                 await sql_insert(f"UPDATE zb_st_new SET  Provider2 = 0 WHERE loopback = '{loopback}'")
         else:
             if status_old[1] != 1:
+                await send_mess(status_old[2], f'{name} Резервный провайдер работает')
+
                 print(f'{name} Резервный провайдер работает')
                 await sql_insert(f"UPDATE zb_st_new SET Provider2 = 1 WHERE loopback = '{loopback}'")
     elif "Филиал недоступен" in error or "no SNMP data" in error:
         if done == '0':
             if status_old[0] != 0 or status_old[1] != 0:
+                await send_mess(status_old[2], f'{name} Филиал не доступен')
+
                 print(f'{name} Филиал не доступен')
                 await sql_insert(f"UPDATE zb_st_new SET Provider1 = 0, Provider2 = 0 WHERE loopback = '{loopback}'")
         else:
             if status_old[0] != 1 or status_old[1] != 1:
+                await send_mess(status_old[2], f'{name} Филиал работает')
+
                 print(f'{name} Филиал работает')
                 await sql_insert(f"UPDATE zb_st_new SET Provider1 = 1, Provider2 = 1 WHERE loopback = '{loopback}'")
         # print("st 2 down")

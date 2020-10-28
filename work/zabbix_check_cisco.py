@@ -450,8 +450,8 @@ async def send_mess(kod, text, name=None, email=0):
             await asyncio.sleep(1)
             try:
 
-                await bot.send_message(chat_id=row, text=text, disable_notification=await notif())
-                # await bot.send_message(chat_id=765333440, text=text, disable_notification=await notif())
+                # await bot.send_message(chat_id=row, text=text, disable_notification=await notif())
+                await bot.send_message(chat_id=765333440, text=text, disable_notification=await notif())
                 print("sms")
                 if email == 1:
                     print("email")
