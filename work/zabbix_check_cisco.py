@@ -254,7 +254,7 @@ async def snmp(loopback, kod):
                     request = f"UPDATE zb_st SET In1_one = In1_two, In2_one = In2_two WHERE loopback = '{loopback}'"
                     await sql.sql_insert(request)
                     await check_cisco(loopback)
-                    continue
+                    break
             elif errorStatus:
                 print('%s at %s' % (errorStatus.prettyPrint(),
                                     errorIndex and varBinds[int(errorIndex) - 1][0] or '?'))
