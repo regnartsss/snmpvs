@@ -10,6 +10,7 @@ from aiosnmp.asn1 import Error
 import aioping
 import logging
 
+p = 0
 
 async def start_snmp(data):
     await asyncio.sleep(10)
@@ -24,11 +25,11 @@ async def start_snmp(data):
             if sdwan == 1:
                 try:
                     if count == 0:
-                        logging.info(f"oid {y} {loopback}")
+                        # logging.info(f"oid {y} {loopback}")
                         y += 1
                         await oid(loopback, kod)
                     else:
-                        logging.info(f"snmp {z} {loopback}")
+                        # logging.info(f"snmp {z} {loopback}")
                         z += 1
                         await snmp(loopback, kod)
                 except OperationalError:
@@ -204,25 +205,24 @@ async def oid(loopback, kod, repeat=0):
 
 
 async def ping_cisco(loopback, kod):
+    global p
+    logging.info(f"ping {p} {loopback}")
+    p += 1
     try:
-        return False
-        # delay = await aioping.ping(loopback) * 1000
-        # print("Ping response in %s ms" % delay)
-        # await oid(loopback, kod, 1)
-
+        await aioping.ping(loopback)
+        await oid(loopback, kod, 1)
     except TimeoutError:
-        print("Timed out ", loopback)
         return False
 
 
 async def ping_cisco_old(loopback, kod):
+    global p
+    logging.info(f"ping {p} {loopback}")
+    p += 1
     try:
-        return False
-        # delay = await aioping.ping(loopback) * 1000
-        # print("Ping response in %s ms" % delay)
-        # await snmp(loopback, kod)
+        await aioping.ping(loopback)
+        await snmp(loopback, kod)
     except TimeoutError:
-        # print("Timed out ", loopback)
         return False
 
 
