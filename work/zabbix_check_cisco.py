@@ -212,7 +212,7 @@ async def ping_cisco(loopback, kod):
         await aioping.ping(loopback)
         await oid(loopback, kod, 1)
     except TimeoutError:
-        return False
+        pass
 
 
 async def ping_cisco_old(loopback, kod):
@@ -231,67 +231,67 @@ async def snmp(loopback, kod):
         f"SELECT In_isp1, In_isp2, Oper_isp1, Oper_isp2, OperISP2 FROM zb_st WHERE loopback = '{loopback}'")
     if mib_all[0:2] == ('0', '0') or mib_all[0:2] == (None, None):
         logging.info(f"{loopback} oid не найден")
-        if await ping_cisco(loopback, kod) is False:
-            return
-    d, op1, op2, st_op2 = [], '2', '2', '2'
-    for errorIndication, errorStatus, \
-        errorIndex, varBinds in bulkCmd(
-        SnmpEngine(),
-        UsmUserData(userName='dvsnmp', authKey='55GjnJwtPfk', authProtocol=usmHMACSHAAuthProtocol),
-        UdpTransportTarget((str(loopback), 161)),
-        ContextData(),
-        0, 100,  # GETBULK specific: request up to 50 OIDs in a single response
-        ObjectType(ObjectIdentity('1.3.6.1.2.1.31.1.1.1.6')),
-        ObjectType(ObjectIdentity('1.3.6.1.2.1.2.2.1.8')),
-        lexicographicMode=False
-    ):
-        if errorIndication:
-            if await ping_cisco_old(loopback, kod) is False:
-                logging.info(f"{loopback} не доступен")
-                # r = await sql.sql_selectone(f"SELECT In1_two, In2_two FROM zb_st WHERE loopback = '{loopback}'")
-                # d.append(r[0])
-                # d.append(r[1])
-                request = f"UPDATE zb_st SET In1_one = In1_two, In2_one = In2_two WHERE loopback = '{loopback}'"
-                await sql.sql_insert(request)
-                await check_cisco(loopback)
-                return
-        elif errorStatus:
-            print('%s at %s' % (errorStatus.prettyPrint(),
-                                errorIndex and varBinds[int(errorIndex) - 1][0] or '?'))
-            break
-        else:
-            for varBind in varBinds:
-                data = [x.prettyPrint() for x in varBind]
-                oid = '.'.join(data[0].split(".")[5:7])
-                try:
-                    In_isp1 = '.'.join(mib_all[0].split(".")[10:12]).strip()
-                    In_isp2 = '.'.join(mib_all[1].split(".")[10:12]).strip()
-                    Oper1 = '.'.join(mib_all[2].split(".")[10:12]).strip()
-                    Oper2 = '.'.join(mib_all[3].split(".")[10:12]).strip()
-                    status_oper1 = '.'.join(mib_all[4].split(".")[10:12]).strip()
+        await ping_cisco(loopback, kod)
+    else:
+        d, op1, op2, st_op2 = [], '2', '2', '2'
+        for errorIndication, errorStatus, \
+            errorIndex, varBinds in bulkCmd(
+            SnmpEngine(),
+            UsmUserData(userName='dvsnmp', authKey='55GjnJwtPfk', authProtocol=usmHMACSHAAuthProtocol),
+            UdpTransportTarget((str(loopback), 161)),
+            ContextData(),
+            0, 100,  # GETBULK specific: request up to 50 OIDs in a single response
+            ObjectType(ObjectIdentity('1.3.6.1.2.1.31.1.1.1.6')),
+            ObjectType(ObjectIdentity('1.3.6.1.2.1.2.2.1.8')),
+            lexicographicMode=False
+        ):
+            if errorIndication:
+                if await ping_cisco_old(loopback, kod) is False:
+                    logging.info(f"{loopback} не доступен")
+                    # r = await sql.sql_selectone(f"SELECT In1_two, In2_two FROM zb_st WHERE loopback = '{loopback}'")
+                    # d.append(r[0])
+                    # d.append(r[1])
+                    request = f"UPDATE zb_st SET In1_one = In1_two, In2_one = In2_two WHERE loopback = '{loopback}'"
+                    await sql.sql_insert(request)
+                    await check_cisco(loopback)
+                    continue
+            elif errorStatus:
+                print('%s at %s' % (errorStatus.prettyPrint(),
+                                    errorIndex and varBinds[int(errorIndex) - 1][0] or '?'))
+                break
+            else:
+                for varBind in varBinds:
+                    data = [x.prettyPrint() for x in varBind]
+                    oid = '.'.join(data[0].split(".")[5:7])
+                    try:
+                        In_isp1 = '.'.join(mib_all[0].split(".")[10:12]).strip()
+                        In_isp2 = '.'.join(mib_all[1].split(".")[10:12]).strip()
+                        Oper1 = '.'.join(mib_all[2].split(".")[10:12]).strip()
+                        Oper2 = '.'.join(mib_all[3].split(".")[10:12]).strip()
+                        status_oper1 = '.'.join(mib_all[4].split(".")[10:12]).strip()
 
 
-                    if In_isp1 == oid:
-                        d.append(data[1])
-                    if In_isp2 == oid:
-                        d.append(data[1])
-                    if Oper1 == oid:
-                        op1 = data[1]
-                    if Oper2 == oid:
-                        op2 = data[1]
-                    if status_oper1 == oid:
-                        st_op2 = data[1]
-                except AttributeError as n:
-                    print(n)
+                        if In_isp1 == oid:
+                            d.append(data[1])
+                        if In_isp2 == oid:
+                            d.append(data[1])
+                        if Oper1 == oid:
+                            op1 = data[1]
+                        if Oper2 == oid:
+                            op2 = data[1]
+                        if status_oper1 == oid:
+                            st_op2 = data[1]
+                    except AttributeError as n:
+                        print(n)
 
-    try:
-        request = f"UPDATE zb_st SET In1_one = In1_two, In2_one = In2_two, In1_two = {d[0]}, In2_two = {d[1]}, " \
-                  f"Oper1 = {op1}, Oper2 = {op2}, status_operisp2 = {st_op2} WHERE loopback = '{loopback}'"
-        await sql.sql_insert(request)
-        await check_cisco(loopback)
-    except Exception as n:
-        print("Cis_errr", n)
-        pass
+        try:
+            request = f"UPDATE zb_st SET In1_one = In1_two, In2_one = In2_two, In1_two = {d[0]}, In2_two = {d[1]}, " \
+                      f"Oper1 = {op1}, Oper2 = {op2}, status_operisp2 = {st_op2} WHERE loopback = '{loopback}'"
+            await sql.sql_insert(request)
+            await check_cisco(loopback)
+        except Exception as n:
+            print("Cis_errr", n)
+            pass
     # if mib_all[0:4] == ('0', '0', '0', '0') or mib_all[0:4] == (None, None, None, None):
     #     # print("Нет oid, проверить", loopback, kod)
     #     if await ping_cisco(loopback, kod) is False:
