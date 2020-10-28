@@ -204,26 +204,26 @@ async def oid(loopback, kod, repeat=0):
                 f"In_isp2 = '{in_isp2}', Oper_isp2 ='{Oper_tu2}', OperISP2 = '{Oper_isp2}' WHERE loopback = '{loopback}'")
 
 
-async def ping_cisco(loopback, kod):
-    global p
-    logging.info(f"ping {p} {loopback}")
-    p += 1
-    try:
-        await aioping.ping(loopback)
-        await oid(loopback, kod, 1)
-    except TimeoutError:
-        pass
-
-
-async def ping_cisco_old(loopback, kod):
-    global p
-    logging.info(f"ping {p} {loopback}")
-    p += 1
-    try:
-        await aioping.ping(loopback)
-        await snmp(loopback, kod)
-    except TimeoutError:
-        return False
+# async def ping_cisco(loopback, kod):
+#     global p
+#     logging.info(f"ping {p} {loopback}")
+#     p += 1
+#     try:
+#         await aioping.ping(loopback)
+#         await oid(loopback, kod, 1)
+#     except TimeoutError:
+#         pass
+#
+#
+# async def ping_cisco_old(loopback, kod):
+#     global p
+#     logging.info(f"ping {p} {loopback}")
+#     p += 1
+#     try:
+#         await aioping.ping(loopback)
+#         await snmp(loopback, kod)
+#     except TimeoutError:
+#         return False
 
 
 async def snmp(loopback, kod):
@@ -231,7 +231,7 @@ async def snmp(loopback, kod):
         f"SELECT In_isp1, In_isp2, Oper_isp1, Oper_isp2, OperISP2 FROM zb_st WHERE loopback = '{loopback}'")
     if mib_all[0:2] == ('0', '0') or mib_all[0:2] == (None, None):
         logging.info(f"{loopback} oid не найден")
-        await ping_cisco(loopback, kod)
+        await oid(loopback, kod)
     else:
         d, op1, op2, st_op2 = [], '2', '2', '2'
         for errorIndication, errorStatus, \
@@ -246,15 +246,15 @@ async def snmp(loopback, kod):
             lexicographicMode=False
         ):
             if errorIndication:
-                if await ping_cisco_old(loopback, kod) is False:
-                    logging.info(f"{loopback} не доступен")
-                    # r = await sql.sql_selectone(f"SELECT In1_two, In2_two FROM zb_st WHERE loopback = '{loopback}'")
-                    # d.append(r[0])
-                    # d.append(r[1])
-                    request = f"UPDATE zb_st SET In1_one = In1_two, In2_one = In2_two WHERE loopback = '{loopback}'"
-                    await sql.sql_insert(request)
-                    await check_cisco(loopback)
-                    break
+                # if await ping_cisco_old(loopback, kod) is False:
+                #     logging.info(f"{loopback} не доступен")
+                    r = await sql.sql_selectone(f"SELECT In1_two, In2_two FROM zb_st WHERE loopback = '{loopback}'")
+                    d.append(r[0])
+                    d.append(r[1])
+                    # request = f"UPDATE zb_st SET In1_one = In1_two, In2_one = In2_two WHERE loopback = '{loopback}'"
+                    # await sql.sql_insert(request)
+                    # await check_cisco(loopback)
+                    # return
             elif errorStatus:
                 print('%s at %s' % (errorStatus.prettyPrint(),
                                     errorIndex and varBinds[int(errorIndex) - 1][0] or '?'))
@@ -262,24 +262,22 @@ async def snmp(loopback, kod):
             else:
                 for varBind in varBinds:
                     data = [x.prettyPrint() for x in varBind]
-                    oid = '.'.join(data[0].split(".")[5:7])
+                    oid_d = '.'.join(data[0].split(".")[5:7])
                     try:
                         In_isp1 = '.'.join(mib_all[0].split(".")[10:12]).strip()
                         In_isp2 = '.'.join(mib_all[1].split(".")[10:12]).strip()
                         Oper1 = '.'.join(mib_all[2].split(".")[10:12]).strip()
                         Oper2 = '.'.join(mib_all[3].split(".")[10:12]).strip()
                         status_oper1 = '.'.join(mib_all[4].split(".")[10:12]).strip()
-
-
-                        if In_isp1 == oid:
+                        if In_isp1 == oid_d:
                             d.append(data[1])
-                        if In_isp2 == oid:
+                        if In_isp2 == oid_d:
                             d.append(data[1])
-                        if Oper1 == oid:
+                        if Oper1 == oid_d:
                             op1 = data[1]
-                        if Oper2 == oid:
+                        if Oper2 == oid_d:
                             op2 = data[1]
-                        if status_oper1 == oid:
+                        if status_oper1 == oid_d:
                             st_op2 = data[1]
                     except AttributeError as n:
                         print(n)
