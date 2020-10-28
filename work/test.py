@@ -2,7 +2,7 @@ import paramiko
 from work.sql import sql_select, sql_insert, sql_selectone
 from sqlite3 import OperationalError
 from pyzabbix import ZabbixAPI
-
+import aioping
 #
 # async def scanning_cisco():
 #     request = f"SELECT ip, hostname FROM cisco"
@@ -59,22 +59,33 @@ from pyzabbix import ZabbixAPI
 #                                 f"UPDATE cisco_mac SET '{line.split()[3]}' = '{mac_old}' WHERE ip = '{ip}'")
 
 async def test():
-    import urllib3
-    urllib3.disable_warnings()
-    user = "podkopaev.k"
-    password = "z15X3vdy"
-    z = ZabbixAPI('https://zabbix.partner.ru/')
-    z.session.auth = (user, password)
-    z.session.verify = False
-    z.timeout = 5.1
-    z.login(user=user, password=password)
-    print("Connected to Zabbix API Version %s" % z.api_version())
-    data = {}
-    for h in z.host.get():
-        # print(h)
-        for f in z.problem.get(hostids=h['hostid'], severity = 4, recent=True):
-            print(f)
-            print(h['name'], f['name'], f['acknowledged'], f['suppressed'])
+    i = 0
+    while i < 1500:
+        print(i)
+        try:
+            await aioping.ping('10.0.111.9', timeout=1)
+        except TimeoutError:
+            pass
+        i += 1
+    # import urllib3
+    # urllib3.disable_warnings()
+    # user = "podkopaev.k"
+    # password = "z15X3vdy"
+    # z = ZabbixAPI('https://zabbix.partner.ru/')
+    # z.session.auth = (user, password)
+    # z.session.verify = False
+    # z.timeout = 5.1
+    # z.login(user=user, password=password)
+    # print("Connected to Zabbix API Version %s" % z.api_version())
+    # data = {}
+    # for h in z.host.get():
+    #     # print(h)
+    #     for f in z.problem.get(hostids=h['hostid'], severity=4, recent=True):
+    #         print(f)
+    #         print(h['name'], f['name'], f['acknowledged'], f['suppressed'])
+
+
+
     #         try:
     #             data[h['name']].append(f['name'])
     #         except KeyError:
