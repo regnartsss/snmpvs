@@ -141,7 +141,7 @@ async def start_check_registrator():
     while 0 < 1:
         rows = await sql.sql_select(f"SELECT ip FROM registrator")
         for row in rows:
-            logging.info(f"regi {row[0]}")
+            # logging.info(f"regi {row[0]}")
             data_r = await snmpregist(row[0])
             # await sql.sql_insert(f"UPDATE registrator SET ver_snmp = '{data_r[3]}' WHERE ip = '{row[0]}'")
             if data_r is False:
