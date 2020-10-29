@@ -232,7 +232,7 @@ async def snmp(loopback, kod):
         await oid(loopback, kod, 1)
 
     else:
-        d, op1, op2, st_op2 = [], '2', '2', '2'
+        d, op1, op2, st_op2 = [], '0', '0', '0'
         for errorIndication, errorStatus, \
             errorIndex, varBinds in bulkCmd(
             SnmpEngine(),
