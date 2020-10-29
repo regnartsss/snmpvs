@@ -76,11 +76,9 @@ async def test():
 
     while True:
         for h in z.host.get(with_monitored_triggers=True):
-            print(h)
-            for f in z.trigger.get(hostids=h['hostid']):
-            # for f in z.problem.get(hostids=h['hostid'], severities=[4, 5], recent=True):
-                print(f)
-            # print(f['name'], f['acknowledged'], f['suppressed'])
+            for f in z.problem.get(hostids=h['hostid'], severities=[4, 5], recent=True):
+                # print(f)
+                print(f['name'], f['acknowledged'], f['suppressed'], h['name'])
             #     await check(f['name'], f['r_eventid'], h['name'], h['host'])
         print("-----------------------")
         time.sleep(60)
@@ -181,3 +179,9 @@ async def check(error, done, name, loopback):
     else:
         print("не найден",loopback, name, error)
 
+
+import asyncio
+
+loop = asyncio.get_event_loop()
+asyncio.ensure_future(test())
+loop.run_forever()
