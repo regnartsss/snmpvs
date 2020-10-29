@@ -12,7 +12,7 @@ middlewares.setup(dp)
 
 async def zabb():
     scheduler = AsyncIOScheduler()
-    scheduler.add_job(check, 'interval', hours=24)
+    scheduler.add_job(check, 'interval', hours=4)
     scheduler.start()
 
 
