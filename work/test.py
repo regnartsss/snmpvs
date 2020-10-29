@@ -180,8 +180,8 @@ async def check(error, done, name, loopback):
         print("не найден",loopback, name, error)
 
 
-import asyncio
-
-loop = asyncio.get_event_loop()
-asyncio.ensure_future(test())
-loop.run_forever()
+# import asyncio
+#
+# loop = asyncio.get_event_loop()
+# asyncio.ensure_future(test())
+# loop.run_forever()
