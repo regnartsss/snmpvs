@@ -15,7 +15,7 @@ p = 0
 async def start_snmp(data):
     await asyncio.sleep(10)
     i, y, z = 0, 0, 0
-    while i < 200000000000:
+    while True:
         logging.info(f"start {i}")
         rows = await sql.sql_select(f"SELECT loopback, kod, sdwan FROM zabbix ORDER BY kod {data}")
         for loopback, kod, sdwan in rows:
@@ -178,15 +178,14 @@ async def oid(loopback, kod, repeat=0):
                        ObjectType(ObjectIdentity(f"{mib}.{i}"))
                        ))
             if error_indication:
-                return
+                # print(error_indication)
+                break
             elif error_status:
                 print('%s at %s' % (error_status.prettyPrint(),
                                     error_index and var_binds[int(error_index) - 1][0] or '?'))
             else:
                 for varBind in var_binds:
-
                     oi = (' = '.join([x.prettyPrint() for x in varBind]).split("= ")[1])
-                    #                print(oi)
                     if oi == "Tu0":
                         num_oid = (' = '.join([x.prettyPrint() for x in varBind]).split("= ")[0].split(".")[6])
                         in_isp1 = f"1.3.6.1.2.1.31.1.1.1.6.{num_oid.strip()}"
@@ -196,12 +195,11 @@ async def oid(loopback, kod, repeat=0):
                         in_isp2 = f"1.3.6.1.2.1.31.1.1.1.6.{num_oid.strip()}"
                         Oper_tu2 = f"1.3.6.1.2.1.2.2.1.8.{num_oid.strip()}"
                         Oper_isp2 = "1.3.6.1.2.1.2.2.1.8.2"
-
                     else:
                         pass
-            await sql.sql_insert(
-                f"UPDATE zb_st SET In_isp1 = '{in_isp1}', Oper_isp1 = '{Oper_tu1}', "
-                f"In_isp2 = '{in_isp2}', Oper_isp2 ='{Oper_tu2}', OperISP2 = '{Oper_isp2}' WHERE loopback = '{loopback}'")
+        await sql.sql_insert(
+        f"UPDATE zb_st SET In_isp1 = '{in_isp1}', Oper_isp1 = '{Oper_tu1}', "
+        f"In_isp2 = '{in_isp2}', Oper_isp2 ='{Oper_tu2}', OperISP2 = '{Oper_isp2}' WHERE loopback = '{loopback}'")
 
 
 # async def ping_cisco(loopback, kod):
@@ -231,7 +229,8 @@ async def snmp(loopback, kod):
         f"SELECT In_isp1, In_isp2, Oper_isp1, Oper_isp2, OperISP2 FROM zb_st WHERE loopback = '{loopback}'")
     if mib_all[0:2] == ('0', '0') or mib_all[0:2] == (None, None):
         logging.info(f"{loopback} oid не найден")
-        await oid(loopback, kod)
+        await oid(loopback, kod, 1)
+
     else:
         d, op1, op2, st_op2 = [], '2', '2', '2'
         for errorIndication, errorStatus, \
@@ -251,6 +250,7 @@ async def snmp(loopback, kod):
                     r = await sql.sql_selectone(f"SELECT In1_two, In2_two FROM zb_st WHERE loopback = '{loopback}'")
                     d.append(r[0])
                     d.append(r[1])
+                    break
                     # request = f"UPDATE zb_st SET In1_one = In1_two, In2_one = In2_two WHERE loopback = '{loopback}'"
                     # await sql.sql_insert(request)
                     # await check_cisco(loopback)
