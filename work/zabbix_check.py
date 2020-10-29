@@ -311,6 +311,7 @@ async def check_zabbix():
 
 async def update_vlan(kod):
     loopback = await sql_selectone(f"SELECT loopback FROM zabbix WHERE kod = {kod}")
+    await sql_insert(f"DELETE * FROM zb_st WHERE kod = {kod}")
     await vlan_cisco(loopback[0])
 
 
