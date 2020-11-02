@@ -115,12 +115,16 @@ async def snmp_mikrotik(ip):
             with aiosnmp.Snmp(host=ip, port=161, community="public") as s:
                 for res in await s.get(f"{mib}{mib_old}"):
                     status.append(res.value)
-        # except Error as n:
-        #     print(ip, n)
-        #     return await ping_mikrotik(ip)
-        # except aiosnmp.exceptions.SnmpTimeoutError as n:
-        #     print(ip, n)
-        #     return await ping_mikrotik(ip)
+        except Error as n:
+            print(ip, n)
+            # return await ping_mikrotik(ip)
+            # return [2, 2]
+            continue
+        except aiosnmp.exceptions.SnmpTimeoutError as n:
+            print(ip, n)
+            # return await ping_mikrotik(ip)
+            # return [2, 2]
+            continue
         except TimeoutError as n:
             print(ip, n)
             continue
