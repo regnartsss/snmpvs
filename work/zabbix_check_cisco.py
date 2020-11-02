@@ -7,7 +7,7 @@ import aiosnmp
 from aiogram.utils.exceptions import ChatNotFound
 from sqlite3 import OperationalError
 from aiosnmp.asn1 import Error
-import aioping
+# import aioping
 import logging
 
 p = 0
@@ -25,11 +25,11 @@ async def start_snmp(data):
             if sdwan == 1:
                 try:
                     if count == 0:
-                        # logging.info(f"oid {y} {loopback}")
+                        logging.info(f"oid {y} {loopback}")
                         y += 1
                         await oid(loopback, kod)
                     else:
-                        # logging.info(f"snmp {z} {loopback}")
+                        logging.info(f"snmp {z} {loopback}")
                         z += 1
                         await snmp(loopback, kod)
                 except OperationalError:
@@ -39,6 +39,7 @@ async def start_snmp(data):
                     if count == 0:
                         await oid_mikrotik(loopback, kod)
                     else:
+                        logging.info(f"snmp mikrotik {z} {loopback}")
                         await check_snmp(loopback)
                 except OperationalError:
                     await new_table_zb_st()
@@ -114,26 +115,26 @@ async def snmp_mikrotik(ip):
             with aiosnmp.Snmp(host=ip, port=161, community="public") as s:
                 for res in await s.get(f"{mib}{mib_old}"):
                     status.append(res.value)
-        except Error as n:
-            print(ip, n)
-            return await ping_mikrotik(ip)
-        except aiosnmp.exceptions.SnmpTimeoutError as n:
-            print(ip, n)
-            return await ping_mikrotik(ip)
+        # except Error as n:
+        #     print(ip, n)
+        #     return await ping_mikrotik(ip)
+        # except aiosnmp.exceptions.SnmpTimeoutError as n:
+        #     print(ip, n)
+        #     return await ping_mikrotik(ip)
         except TimeoutError as n:
             print(ip, n)
             continue
     return status
 
 
-async def ping_mikrotik(host):
-    try:
-        delay = await aioping.ping(host) * 1000
-        print("Ping response in %s ms" % delay)
-        await snmp_mikrotik(host)
-    except TimeoutError:
-        print("Timed out ", host)
-        return [2, 2]
+# async def ping_mikrotik(host):
+#     try:
+#         delay = await aioping.ping(host) * 1000
+#         print("Ping response in %s ms" % delay)
+#         await snmp_mikrotik(host)
+#     except TimeoutError:
+#         print("Timed out ", host)
+#         return [2, 2]
 
 
 async def new_table_zb_st():
