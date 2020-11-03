@@ -306,7 +306,7 @@ async def check_zabbix():
                     print(x['name'])
                     if name[0:3] == "див" or name == 'Восточная Сибирь':
                         await sql_insert(f"UPDATE zabbix SET region = {id}, region_mon = 999 WHERE loopback = '{x['host']}'")
-                    elif x['name'][0:3] == "Адм":
+                    elif x['name'][0:3] == "Адм" or x['name'][0:3] == "РРС":
                         await sql_insert(f"UPDATE zabbix SET region = 256, region_mon = 999 WHERE loopback = '{x['host']}'")
 
                     else:
