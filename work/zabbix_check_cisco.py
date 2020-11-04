@@ -16,7 +16,7 @@ async def start_snmp(data):
     await asyncio.sleep(10)
     i, y, z = 0, 0, 0
     while True:
-        logging.info(f"start {i}")
+        logging.info(f"start_cisco {i}")
         rows = await sql.sql_select(f"SELECT loopback, kod, sdwan FROM zabbix ORDER BY kod {data}")
         for loopback, kod, sdwan in rows:
             # logging.info(f"snmp {loopback}")
@@ -25,11 +25,11 @@ async def start_snmp(data):
             if sdwan == 1:
                 try:
                     if count == 0:
-                        logging.info(f"oid {y} {loopback}")
+                        # logging.info(f"oid {y} {loopback}")
                         y += 1
                         await oid(loopback, kod)
                     else:
-                        logging.info(f"snmp {z} {loopback}")
+                        # logging.info(f"snmp {z} {loopback}")
                         z += 1
                         await snmp(loopback, kod)
                 except OperationalError:
@@ -39,7 +39,7 @@ async def start_snmp(data):
                     if count == 0:
                         await oid_mikrotik(loopback, kod)
                     else:
-                        logging.info(f"snmp mikrotik {z} {loopback}")
+                        # logging.info(f"snmp mikrotik {z} {loopback}")
                         await check_snmp(loopback)
                 except OperationalError:
                     await new_table_zb_st()

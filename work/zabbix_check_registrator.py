@@ -138,7 +138,9 @@ async def start_check_registrator_cam():
 async def start_check_registrator():
     print("reg")
     await asyncio.sleep(20)
-    while 0 < 1:
+    i = 0
+    while True:
+        logging.info(f"start_cisco {i}")
         rows = await sql.sql_select(f"SELECT ip FROM registrator")
         for row in rows:
             logging.info(f"regi {row[0]}")
@@ -190,7 +192,7 @@ async def start_check_registrator():
                 #     await sql.sql_insert(f"Update registrator SET cam_down ='{cam_down}' WHERE ip = '{row[0]}'")
                 if script != script_old:
                     await sql.sql_insert(f"Update registrator SET script = '{data_r[2]}' WHERE ip = '{row[0]}'")
-
+        i += 1
 
 async def info_filial(ip, data):
     if data == 'cam_up':
