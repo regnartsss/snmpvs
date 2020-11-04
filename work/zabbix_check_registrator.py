@@ -296,6 +296,6 @@ async def info_registrator(ip):
     request = f"""UPDATE registrator 
 SET archive = '{row[0]}', disk = '{row[1]}', cam = '{cam}', 
 cam_down = '{cam_down}', script = '{row[3]}', firmware = '{row[4]}', uptime = '{row[5]}', down = 0 WHERE ip = '{ip}'"""
-    print(request)
+
     await sql.sql_insert(request)
 
