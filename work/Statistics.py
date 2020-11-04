@@ -1,4 +1,4 @@
-from work.sql import sql_selectone, sql_select
+from work.sql import sql_selectone, sql_select, sql_insert
 import aiosnmp
 from aiogram import types
 from loader import bot
@@ -137,8 +137,18 @@ async def info_snmp_registrator(ip, mib_all):
 
     # for row in rows:
 
-async def work():
-    pass
+async def work(kod):
+    work = (await sql_selectone(f"SELECT work FROM zabbix WHERE kod = {kod}"))[0]
+    print(work)
+    if work is None:
+        await sql_insert(f"UPDATE zabbix SET work = 1 WHERE kod = {kod}")
+        return False
+    elif work == 0:
+        await sql_insert(f"UPDATE zabbix SET work = 1 WHERE kod = {kod}")
+        return False
+    elif work == 1:
+        await sql_insert(f"UPDATE zabbix SET work = 0 WHERE kod = {kod}")
+        return True
 
 # def stat(kod)
 

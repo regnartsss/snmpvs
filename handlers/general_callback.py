@@ -47,8 +47,7 @@ async def market(call: types.CallbackQuery, callback_data: dict):
 
 @dp.callback_query_handler(update_cb.filter(data="close"))
 async def market(call: types.CallbackQuery, callback_data: dict):
-    print(callback_data)
-    data = work()
+    data = await work(callback_data['kod'])
     if data is False:
         await call.answer("Отключен")
     else:
