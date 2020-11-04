@@ -137,9 +137,12 @@ async def work(kod):
     work = (await sql_selectone(f"SELECT work FROM zabbix WHERE kod = {kod}"))[0]
     if work is None:
         await sql_insert(f"UPDATE zabbix SET work = 1 WHERE kod = {kod}")
+        await sql_insert(f"UPDATE zb_st SET  status_1 = 3, status_2 = 3 WHERE kod = {kod}")
         return False
     elif work == 0:
         await sql_insert(f"UPDATE zabbix SET work = 1 WHERE kod = {kod}")
+        await sql_insert(f"UPDATE zb_st SET  status_1 = 3, status_2 = 3 WHERE kod = {kod}")
+
         return False
     elif work == 1:
         await sql_insert(f"UPDATE zabbix SET work = 0 WHERE kod = {kod}")
