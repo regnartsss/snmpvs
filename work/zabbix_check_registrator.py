@@ -50,10 +50,13 @@ async def snmpregist(ip):
                     try:
                         status = res.value.decode('UTF-8')
                     except AttributeError:
+                        logging.info(f"reg {ip} NULL")
+
                         return "Null"
                     d.append(status)
             except aiosnmp.exceptions.SnmpTimeoutError:
-                print(f"timeout {ip}")
+                logging.info(f"timeout {ip}")
+                # print(f"timeout {ip}")
                 return False
     return d
 
@@ -140,10 +143,9 @@ async def start_check_registrator():
     await asyncio.sleep(20)
     i = 0
     while True:
-        logging.info(f"start_cisco {i}")
+        logging.info(f"start_reg {i}")
         rows = await sql.sql_select(f"SELECT ip FROM registrator")
         for row in rows:
-            logging.info(f"regi {row[0]}")
             data_r = await snmpregist(row[0])
             # await sql.sql_insert(f"UPDATE registrator SET ver_snmp = '{data_r[3]}' WHERE ip = '{row[0]}'")
             if data_r is False:
