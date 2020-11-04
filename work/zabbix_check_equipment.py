@@ -22,10 +22,12 @@ async def check_equipment():
             await sql_insert(f"DELETE FROM cisco WHERE kod = {kod}")
             await cisco_registrator(loopback)
         elif sdwan == 0:
-            await sql_insert(f"DELETE FROM registrator WHERE kod = {kod}")
-            await sql_insert(f"DELETE FROM cisco WHERE kod = {kod}")
-            await mikrotik_cisco(loopback, kod)
-            await mikrotik_registrator(loopback, kod)
+            try:
+                await sql_insert(f"DELETE FROM registrator WHERE kod = {kod}")
+                await sql_insert(f"DELETE FROM cisco WHERE kod = {kod}")
+            except OperationalError:
+                await mikrotik_cisco(loopback, kod)
+                await mikrotik_registrator(loopback, kod)
 
 
 async def cisco_registrator(loopback):

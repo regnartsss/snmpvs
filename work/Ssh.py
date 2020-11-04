@@ -72,8 +72,8 @@ async def ssh_console_command(message, state):
 
 
 async def console_command(message):
-    loopback = (await sql_selectone(f"SELECT loopback FROM users LEFT JOIN filial "
-                                    f"ON users.ssh_kod = filial.kod WHERE users.id = {message.chat.id}"))[0]
+    loopback = (await sql_selectone(f"SELECT loopback FROM users LEFT JOIN zabbix "
+                                    f"ON users.ssh_kod = zabbix.kod WHERE users.id = {message.chat.id}"))[0]
     command = message.text
     user = 'operator'
     secret = '71LtkJnrYjn'

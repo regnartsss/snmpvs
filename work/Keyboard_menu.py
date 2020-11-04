@@ -35,6 +35,7 @@ async def menu_filial(callback_data):
         keyboard.row(LAN, CAM, SC)
         keyboard.row(InlineKeyboardButton(text="ssh", callback_data=ssh_cb.new(kod=kod, region=region)))
         keyboard.row(InlineKeyboardButton(text="Обновить информацию", callback_data=update_cb.new(data="update", kod=kod, region=region)))
+        keyboard.row(InlineKeyboardButton(text="Отключить проверку", callback_data=update_cb.new(data="close", kod=kod, region=region)))
         keyboard.row(InlineKeyboardButton(text="Назад", callback_data=region_cb.new(num=region)))
         return keyboard
 

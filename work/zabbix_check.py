@@ -59,7 +59,6 @@ async def hostname_cisco(loopback):
         hostname = [x.prettyPrint() for x in varBind][1]
         hostname = hostname.split(".")[0]
         request = f"UPDATE zabbix SET kod = '{kod[0]}', hostname = '{hostname}' WHERE loopback = '{loopback}'"
-        print(request)
         await sql_insert(request)
         return hostname
 
@@ -346,6 +345,7 @@ async def new_table_zabbix():
     gateway_isp2 TEXT,
     serial       TEXT,
     sdwan        INT,
-    region_mon    INT
+    region_mon    INT,
+    work        INT
                                                   );"""
                      )

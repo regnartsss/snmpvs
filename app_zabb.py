@@ -17,18 +17,12 @@ async def zabb():
 
 
 def on_startup():
-    # bot.send_message(765333440, "Бот запущен")
-    # loop = asyncio.ProactorEventLoop()
-    # asyncio.set_event_loop(loop)
-
     loop = asyncio.get_event_loop()
-    # asyncio.ensure_future(start_snmp("ASC"))
-    # asyncio.ensure_future(zabb())
-    # asyncio.ensure_future(check())
+    asyncio.ensure_future(start_snmp("ASC"))
+    asyncio.ensure_future(zabb())
+    asyncio.ensure_future(check())
     asyncio.ensure_future(start_check_registrator())
-    # asyncio.ensure_future(test())
     loop.run_forever()
-
 
 if __name__ == '__main__':
     on_startup()

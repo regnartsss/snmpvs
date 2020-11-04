@@ -1,10 +1,7 @@
 from loader import dp
 from aiogram import types
 from aiogram.utils.exceptions import MessageNotModified
-from work.Keyboard_menu import ssh
-from work.Ssh import ssh_console
-from work.Statistics import info_registrator, info_filial
-from work.keyboard import cancel
+from work.Statistics import info_registrator, info_filial, work
 from work.Keyboard_menu import menu_filial, check_filial
 from work.subscription import worksub
 from filters.loc import ssh_cb, lease_cb, console_ssh_cb, update_cb
@@ -13,14 +10,7 @@ from work.zabbix_check import update_vlan
 from work.zabbix_check_equipment import update_reg_cis
 
 
-@dp.callback_query_handler(ssh_cb.filter())
-async def market(call: types.CallbackQuery, callback_data: dict):
-    await call.message.edit_reply_markup(reply_markup=await ssh(callback_data))
 
-
-@dp.callback_query_handler(console_ssh_cb.filter())
-async def market(call: types.CallbackQuery, callback_data: dict):
-    await call.message.answer(text=await ssh_console(callback_data, call.from_user.id), reply_markup=cancel())
 
 
 @dp.callback_query_handler(lease_cb.filter())
@@ -54,6 +44,15 @@ async def market(call: types.CallbackQuery, callback_data: dict):
     text = await info_filial(callback_data['kod'])
     await call.message.edit_text(text=text + "\n💥 Обновлено", reply_markup=await menu_filial(callback_data))
 
+
+@dp.callback_query_handler(update_cb.filter(data="close"))
+async def market(call: types.CallbackQuery, callback_data: dict):
+    print(callback_data)
+    data = work()
+    if data is False:
+        await call.answer("Отключен")
+    else:
+        await call.answer("Включен")
 
 
 @dp.callback_query_handler(lambda callback_query: True)

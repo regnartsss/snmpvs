@@ -13,10 +13,6 @@ from work.Keyboard_menu import key_registrator, menu_region, menu_filials, menu_
 from work.subscription import worksub, reg_menu
 
 
-@dp.message_handler(state=Ssh_console.command)
-async def process_name(message: types.Message, state: FSMContext):
-    text = await ssh_console_command(message, state)
-    await message.answer(text=text)
 
 
 @dp.message_handler(state=AllMessage.message)
