@@ -44,7 +44,7 @@ trassirmonitoring = ['1.3.6.1.4.1.3333.1.3', '1.3.6.1.4.1.3333.1.5', '1.3.6.1.4.
 async def snmpregist(ip):
     d = []
     for r in trassirmonitoring:
-        with aiosnmp.Snmp(host=ip, port=161, community="dssl", timeout=20, retries=3, max_repetitions=5, ) as snmp:
+        with aiosnmp.Snmp(host=ip, port=161, community="dssl", timeout=50, retries=3, max_repetitions=10, ) as snmp:
             try:
                 for res in await snmp.get(r):
                     try:
