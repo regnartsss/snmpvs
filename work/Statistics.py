@@ -146,6 +146,8 @@ async def work(kod):
         return False
     elif work == 1:
         await sql_insert(f"UPDATE zabbix SET work = 0 WHERE kod = {kod}")
+        await sql_insert(f"UPDATE zb_st SET  status_1 = 1, status_2 = 1 WHERE kod = {kod}")
+
         return True
 
 # def stat(kod)
