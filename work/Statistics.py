@@ -7,7 +7,6 @@ from loader import bot
 async def info_filial(kod):
     request = f"SELECT * FROM zabbix INNER JOIN zb_region ON zabbix.region = zb_region.id WHERE kod = {kod}"
     row = await sql_selectone(request)
-    print(row)
     text = f"""
 {await sdwan_mikrotik(row[17])}
 {row[2]}
@@ -76,7 +75,6 @@ async def version_po(message):
     text=""
     rows_old = await sql_select(f"SELECT ip, hostname, firmware FROM registrator")
     for row_old in rows_old:
-        print(row_old)
         text += f"{row_old[2]} {row_old[1]} {row_old[0]}\n"
     while len(text) > 4000:
         await message.answer(text=text[:4000])
@@ -92,7 +90,6 @@ async def check_registrator(message):
         for row in rows:
             rows_old = await sql_select(f"SELECT ip FROM registrator WHERE kod = {row[0]}")
             for row_old in rows_old:
-                print(row_old[0])
                 mib = [
                     # '1.3.6.1.4.1.3333.1.1',  # db
                     '1.3.6.1.4.1.3333.1.2',  # archive
@@ -135,11 +132,9 @@ async def info_snmp_registrator(ip, mib_all):
                     d.append(status)
         return d
 
-    # for row in rows:
 
 async def work(kod):
     work = (await sql_selectone(f"SELECT work FROM zabbix WHERE kod = {kod}"))[0]
-    print(work)
     if work is None:
         await sql_insert(f"UPDATE zabbix SET work = 1 WHERE kod = {kod}")
         return False
