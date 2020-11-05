@@ -14,7 +14,7 @@ async def menu_region():
 
 async def menu_filials(callback_data):
     region = callback_data["num"]
-    print("ddd")
+    # print("ddd")
     keyboard = InlineKeyboardMarkup(row_width=2)
     rows = await sql.sql_select(f"SELECT name, kod FROM zabbix WHERE region = {region} ORDER BY name")
     for name, kod in rows:

@@ -11,7 +11,7 @@ async def info_filial(kod):
 {await sdwan_mikrotik(row[17])}
 {row[2]}
 Код филиала: {kod}
-Регион: {await check_region(row[18])}
+Регион: {await check_region(row[3])}
 hostname: {row[4]}
 loopback: {row[1]}
 IP_LAN: {row[7]}
@@ -32,6 +32,7 @@ cisco: {await cisco(kod)}
 
 
 async def check_region(kod):
+    print(kod)
     return (await sql_selectone(f"SELECT name FROM zb_region WHERE id = {kod}"))[0]
 
 

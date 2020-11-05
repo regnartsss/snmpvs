@@ -55,7 +55,6 @@ async def snmpregist(ip):
                     d.append(status)
             except aiosnmp.exceptions.SnmpTimeoutError:
                 logging.info(f"timeout {ip}")
-                # print(f"timeout {ip}")
                 return False
     return d
 

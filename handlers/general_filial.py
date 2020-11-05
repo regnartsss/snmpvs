@@ -14,8 +14,8 @@ async def menu(message: types.Message):
 
 @dp.callback_query_handler(region_cb.filter())
 async def market(call: types.CallbackQuery, callback_data: dict):
-    print("ddd")
-    print(callback_data)
+    # print("ddd")
+    # print(callback_data)
     try:
         await call.message.edit_text(text="Выберите филиал", reply_markup=await menu_filials(callback_data))
     except MessageNotModified:
