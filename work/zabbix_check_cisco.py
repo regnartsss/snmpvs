@@ -116,17 +116,17 @@ async def snmp_mikrotik(ip):
                 for res in await s.get(f"{mib}{mib_old}"):
                     status.append(res.value)
         except Error as n:
-            print(ip, n)
+            logging.info(f"snmp_mikrotik_1 {ip} {n}")
             # return await ping_mikrotik(ip)
             # return [2, 2]
             continue
         except aiosnmp.exceptions.SnmpTimeoutError as n:
-            print(ip, n)
+            logging.info(f"snmp_mikrotik_2 {ip} {n}")
             # return await ping_mikrotik(ip)
             # return [2, 2]
             continue
         except TimeoutError as n:
-            print(ip, n)
+            logging.info(f"snmp_mikrotik_3 {ip} {n}")
             continue
     return status
 
@@ -457,9 +457,9 @@ async def send_mess(kod, text, name=None, email=0):
 
                 # await bot.send_message(chat_id=row, text=text, disable_notification=await notif())
                 await bot.send_message(chat_id=765333440, text=text, disable_notification=await notif())
-                print("sms")
-                if email == 1:
-                    print("email")
+                # print("sms")
+                # if email == 1:
+                    # print("email")
                     # await send_email(kod, text)
             except TypeError:
                 print(f"Ошибка отправки {row}")
