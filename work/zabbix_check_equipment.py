@@ -18,9 +18,11 @@ async def check_equipment():
         return
     for loopback, kod, name, sdwan in rows:
         if sdwan == 1:
-            await sql_insert(f"DELETE FROM registrator WHERE kod = {kod}")
-            await sql_insert(f"DELETE FROM cisco WHERE kod = {kod}")
-            await cisco_registrator(loopback)
+            try:
+                await sql_insert(f"DELETE FROM registrator WHERE kod = {kod}")
+                await sql_insert(f"DELETE FROM cisco WHERE kod = {kod}")
+            except OperationalError:
+                await cisco_registrator(loopback)
         elif sdwan == 0:
             try:
                 await sql_insert(f"DELETE FROM registrator WHERE kod = {kod}")
