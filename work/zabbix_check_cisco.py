@@ -124,7 +124,7 @@ async def snmp_mikrotik(ip):
             logging.info(f"snmp_mikrotik_2 {ip} {n}")
             # return await ping_mikrotik(ip)
             # return [2, 2]
-            continue
+            status.append(2)
         except TimeoutError as n:
             logging.info(f"snmp_mikrotik_3 {ip} {n}")
             continue
