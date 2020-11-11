@@ -285,9 +285,10 @@ async def check_zabbix():
                     text = f"Филиал {key}. Замена микротика {value_old} на циску {value}"
                     await bot.send_message(chat_id=765333440, text=text)
                     logging.info(f"DELETE FROM zabbix WHERE loopback = '{value_old}'")
-                    logging.info(f"DELETE FROM zb_st WHERE loopback = '{value_old}'")
                     await sql_insert(f"DELETE FROM zabbix WHERE loopback = '{value_old}'")
+                    logging.info(f"DELETE FROM zb_st WHERE loopback = '{value_old}'")
                     await sql_insert(f"DELETE FROM zb_st WHERE loopback = '{value_old}'")
+                    logging.info(f"INSERT INTO zabbix (loopback, name, sdwan) VALUES ('{value}', '{key}', 1)")
                     await sql_insert(f"INSERT INTO zabbix (loopback, name, sdwan) VALUES ('{value}', '{key}', 1)")
     try:
         await sql_insert("DELETE FROM zb_region")
