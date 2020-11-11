@@ -150,11 +150,14 @@ async def start_check_registrator():
                 request = f"""SELECT zabbix.name, registrator.hostname, zabbix.kod, down FROM zabbix LEFT JOIN registrator 
                 ON zabbix.kod = registrator.kod WHERE registrator.ip = '{row[0]}'
                     """
-                name, hostname, kod, down = await sql.sql_selectone(request)
-                if down == 0:
-                    await sql.sql_insert(f"Update registrator SET down = 1 WHERE ip = '{row[0]}'")
-                    text = f"{name} \nРегистратор {hostname}\nНе доступен\n{row[0]}"
-                    await send_mess(kod, text, email=1)
+                try:
+                    name, hostname, kod, down = await sql.sql_selectone(request)
+                    if down == 0:
+                        await sql.sql_insert(f"Update registrator SET down = 1 WHERE ip = '{row[0]}'")
+                        text = f"{name} \nРегистратор {hostname}\nНе доступен\n{row[0]}"
+                        await send_mess(kod, text, email=1)
+                except TypeError:
+                    logging.info(f"start_check_registrator {row[0]}")
             elif data_r == "Null":
                 print(f"Ошибка скрипта snmp {row}")
             else:
