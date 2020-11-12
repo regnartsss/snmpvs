@@ -454,7 +454,6 @@ async def send_mess(kod, text, name=None, email=0):
         for row in rows:
             await asyncio.sleep(1)
             try:
-
                 # await bot.send_message(chat_id=row, text=text, disable_notification=await notif())
                 await bot.send_message(chat_id=765333440, text=text, disable_notification=await notif())
                 # print("sms")
@@ -467,7 +466,7 @@ async def send_mess(kod, text, name=None, email=0):
                 print(f"Юзер не найден {row}")
 
     except TypeError:
-        print("Никто не подписан")
+        print("Никто не подписан ", kod)
 
 
 async def notif():
