@@ -9,6 +9,7 @@ from sqlite3 import OperationalError
 from aiosnmp.asn1 import Error
 # import aioping
 import logging
+from aiogram.utils.exceptions import NetworkError
 
 p = 0
 
@@ -455,8 +456,12 @@ async def send_mess(kod, text, name=None, email=0):
             await asyncio.sleep(1)
             try:
                 # await bot.send_message(chat_id=row, text=text, disable_notification=await notif())
-                await bot.send_message(chat_id=765333440, text=text, disable_notification=await notif())
-                # print("sms")
+                try:
+                    await bot.send_message(chat_id=765333440, text=text, disable_notification=await notif())
+                except NetworkError:
+                    logging.info(f"Ошибка подключения к серверу телеграм")
+
+            # print("sms")
                 # if email == 1:
                     # print("email")
                     # await send_email(kod, text)
