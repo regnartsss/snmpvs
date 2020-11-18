@@ -5,18 +5,19 @@ from ldap3 import Server, Connection, SUBTREE, ALL_ATTRIBUTES
 import json
 import os
 from data import data
-
+from work.sql import sql_select_no
 
 def find_location():
     return os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__))).replace('\\', '/') + '/'
-global dat
+# global dat
 
 PATH = find_location()
 
-def open_dat():
-    global dat
-    with open(PATH + 'dat.json', 'rb') as f:
-         dat = json.load(f)
+# def open_dat():
+#     global dat
+#     with open(PATH + 'dat.json', 'rb') as f:
+#          dat = json.load(f)
+dat = ['kra', 'abk', 'uln', 'irk', 'ykt', 'cht']
 
 def AD():
     AD_USER = 'podkopaev.k@partner.ru'
@@ -36,24 +37,30 @@ def AD():
 
 #Создать контейнер
 #   print(conn.add('OU=newscript,OU=_Computers,OU=02. Восточная Сибирь,OU=1. Розничная Сеть (ДНС),OU=DNS Users,DC=partner,DC=ru', 'organizationalUnit'))
-
-
+    rows = sql_select_no(f"SELECT kod FROM zabbix")
     for entry in g:
         name = entry['attributes']['name']
-        name_old = name.split("-")[0]
-        name_old_3 = name[0:3]
+        for row in rows:
+            if str(row) in name:
+                print(name)
+
+        for d in dat:
+            if d in name.lower()[0:3]:
+                print(name)
+        # name_old = name.split("-")[0]
+        # name_old_3 = name[0:3]
         # print(name_old_3)
-        for i in dat:
-            if name_old == i:
-                print("Найден ПК %s\n" % name)
-                conn.modify_dn('CN=%s,CN=Computers,DC=partner,DC=ru'%name, 'CN=%s'%name,
-                               new_superior='OU=newscript,OU=_Computers,OU=02. Восточная Сибирь,OU=1. Розничная Сеть (ДНС),OU=DNS Users,DC=partner,DC=ru')
-        for x in range(len(data.pref)):
-            if name_old_3 == data.pref[x]:
-                print("Найден ПК %s\n" % name)
-                conn.modify_dn('CN=%s,CN=Computers,DC=partner,DC=ru'%name, 'CN=%s'%name,
-                new_superior = 'OU=newscript,OU=_Computers,OU=02. Восточная Сибирь,OU=1. Розничная Сеть (ДНС),OU=DNS Users,DC=partner,DC=ru')
+        # for i in dat:
+        #     if name_old == i:
+        #         print("Найден ПК %s\n" % name)
+        #         # conn.modify_dn('CN=%s,CN=Computers,DC=partner,DC=ru'%name, 'CN=%s'%name,
+        #         #                new_superior='OU=newscript,OU=_Computers,OU=02. Восточная Сибирь,OU=1. Розничная Сеть (ДНС),OU=DNS Users,DC=partner,DC=ru')
+        # for x in range(len(data.pref)):
+        #     if name_old_3 == data.pref[x]:
+        #         print("Найден ПК %s\n" % name)
+        #         # conn.modify_dn('CN=%s,CN=Computers,DC=partner,DC=ru'%name, 'CN=%s'%name,
+        #         # new_superior = 'OU=newscript,OU=_Computers,OU=02. Восточная Сибирь,OU=1. Розничная Сеть (ДНС),OU=DNS Users,DC=partner,DC=ru')
 
 
 # open_dat()
-# AD()
+AD()

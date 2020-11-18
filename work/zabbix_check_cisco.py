@@ -129,6 +129,9 @@ async def snmp_mikrotik(ip):
         except TimeoutError as n:
             logging.info(f"snmp_mikrotik_3 {ip} {n}")
             continue
+        except Exception as n:
+            logging.info(f"snmp_mikrotik_4 {ip} {n}")
+            continue
     return status
 
 

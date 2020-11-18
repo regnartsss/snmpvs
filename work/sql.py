@@ -32,6 +32,13 @@ async def sql_select(request):
     conn.close()
     return rows
 
+def sql_select_no(request):
+    conn = sqlite3.connect(PATH+'sdwan.db')
+    cursor = conn.cursor()
+    cursor.execute(request)
+    rows = cursor.fetchall()
+    conn.close()
+    return rows
 
 async def sql_selectone(request):
     conn = sqlite3.connect(PATH+'sdwan.db')
