@@ -161,40 +161,47 @@ async def start_check_registrator():
             elif data_r == "Null":
                 print(f"Ошибка скрипта snmp {row}")
             else:
-                disk = data_r[0]
-                script = data_r[2]
-                select = await sql.sql_selectone(f"SELECT disk, cam_down, kod, cam, down, script FROM registrator WHERE ip = '{row[0]}'")
-                disk_old, cam_down_old, kod, cam, down, script_old = select
-                if down is None:
-                    await info_registrator(row[0])
-                    continue
-                elif down == 1:
-                    text = "Регистратор работает\n"
-                    try:
-                        text += await info_filial(row[0], 'up')
-                    except Exception as n:
-                        print(f"ERROR = Регистратор работает {n}")
-                    await send_mess(kod, text, email=1)
-                    await sql.sql_insert(f"Update registrator SET down = 0 WHERE ip = '{row[0]}'")
-
-                if disk_old != disk:
-                    text = "Ошибка диска\n"
-                    text += await info_filial(row[0], 'disk')
-                    await send_mess(kod, text, email=1)
-                    await sql.sql_insert(f"Update registrator SET disk = '{data_r[0]}' WHERE ip = '{row[0]}'")
-
-                # if cam_down != cam_down_old:
-                #     if cam_down == cam:
-                #         text = await info_filial(row[0], 'cam_up')
-                #         text += "Камеры работают"
-                #         await send_mess(kod, text)
-                #     else:
-                #         text = await info_filial(row[0], 'cam_down')
-                #         text += "Камера не работает"
-                #         await send_mess(kod, text)
-                #     await sql.sql_insert(f"Update registrator SET cam_down ='{cam_down}' WHERE ip = '{row[0]}'")
-                if script != script_old:
-                    await sql.sql_insert(f"Update registrator SET script = '{data_r[2]}' WHERE ip = '{row[0]}'")
+                try:
+                    disk = data_r[0]
+                    script = data_r[2]
+                    cam_work, cam_all = data_r[1].split(" / ")
+                    select = await sql.sql_selectone(f"SELECT disk, cam_down, kod, cam, down, script FROM registrator WHERE ip = '{row[0]}'")
+                    disk_old, cam_down_old, kod, cam, down, script_old = select
+                    if down is None:
+                        await info_registrator(row[0])
+                        continue
+                    elif down == 1:
+                        text = "Регистратор работает\n"
+                        try:
+                            text += await info_filial(row[0], 'up')
+                        except Exception as n:
+                            print(f"ERROR = Регистратор работает {n}")
+                        await send_mess(kod, text, email=1)
+                        await sql.sql_insert(f"Update registrator SET down = 0 WHERE ip = '{row[0]}'")
+                    if disk_old != disk:
+                        text = "Ошибка диска\n"
+                        text += await info_filial(row[0], 'disk')
+                        await send_mess(kod, text, email=1)
+                        await sql.sql_insert(f"Update registrator SET disk = '{data_r[0]}' WHERE ip = '{row[0]}'")
+                    if cam_all != cam:
+                        # print("Камеры")
+                        await sql.sql_insert(f"Update registrator SET cam ='{cam}' WHERE ip = '{row[0]}'")
+                    # if cam_work != cam_down_old:
+                    #      if cam_work == cam:
+                    #         text = await info_filial(row[0], 'cam_up')
+                    #         text += "Камеры работают"
+                    #         # await send_mess(kod, text)
+                    #         # print(text)
+                    #      else:
+                    #         text = await info_filial(row[0], 'cam_down')
+                    #         text += "Камера не работает"
+                    #         # await send_mess(kod, text)
+                    #         # print(text)
+                    await sql.sql_insert(f"Update registrator SET cam_down ='{cam_work}' WHERE ip = '{row[0]}'")
+                    if script != script_old:
+                        await sql.sql_insert(f"Update registrator SET script = '{data_r[2]}' WHERE ip = '{row[0]}'")
+                except TypeError:
+                    print("Ошибка регистратора")
         i += 1
 
 async def info_filial(ip, data):

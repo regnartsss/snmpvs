@@ -305,7 +305,7 @@ async def check_zabbix():
                 await sql_insert(f"INSERT INTO zb_region (id, id_monitor, name) VALUES ({id}, {id}, '{name}')")
             for x in z.host.get(groupids=h['groupid']):
                 if x['host'][0:2] == '10':
-                    print(x['name'])
+                    # print(x['name'])
                     if name[0:3] == "див" or name == 'Восточная Сибирь':
                         await sql_insert(f"UPDATE zabbix SET region = {id}, region_mon = 999 WHERE loopback = '{x['host']}'")
                     elif x['name'][0:3] == "Адм" or x['name'][0:3] == "РРС":
