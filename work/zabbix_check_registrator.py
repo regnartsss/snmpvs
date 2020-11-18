@@ -143,6 +143,7 @@ async def start_check_registrator():
         logging.info(f"start_reg {i}")
         rows = await sql.sql_select(f"SELECT ip FROM registrator")
         for row in rows:
+            print(row)
             data_r = await snmpregist(row[0])
             # await sql.sql_insert(f"UPDATE registrator SET ver_snmp = '{data_r[3]}' WHERE ip = '{row[0]}'")
             if data_r is False:
@@ -164,6 +165,7 @@ async def start_check_registrator():
                     disk = data_r[0]
                     script = data_r[2]
                     cam_work, cam_all = data_r[1].split(" / ")
+                    print(cam_work, cam_all)
                     select = await sql.sql_selectone(f"SELECT disk, cam_down, kod, cam, down, script FROM registrator WHERE ip = '{row[0]}'")
                     disk_old, cam_down_old, kod, cam, down, script_old = select
                     if down is None:
@@ -184,7 +186,7 @@ async def start_check_registrator():
                         await sql.sql_insert(f"Update registrator SET disk = '{data_r[0]}' WHERE ip = '{row[0]}'")
                     if cam_all != cam:
                         # print("Камеры")
-                        await sql.sql_insert(f"Update registrator SET cam ='{cam}' WHERE ip = '{row[0]}'")
+                        await sql.sql_insert(f"Update registrator SET cam ='{cam_all}' WHERE ip = '{row[0]}'")
                     # if cam_work != cam_down_old:
                     #      if cam_work == cam:
                     #         text = await info_filial(row[0], 'cam_up')
