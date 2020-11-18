@@ -44,7 +44,7 @@ trassirmonitoring = ['1.3.6.1.4.1.3333.1.3', '1.3.6.1.4.1.3333.1.5', '1.3.6.1.4.
 async def snmpregist(ip):
     d = []
     for r in trassirmonitoring:
-        with aiosnmp.Snmp(host=ip, port=161, community="dssl", timeout=50, retries=3, max_repetitions=10, ) as snmp:
+        with aiosnmp.Snmp(host=ip, port=161, community="dssl") as snmp:
             try:
                 for res in await snmp.get(r):
                     try:
@@ -62,8 +62,7 @@ async def snmpregist(ip):
 async def info_snmp_registrator(ip, mib_all):
         d = []
         for r in mib_all:
-            with aiosnmp.Snmp(host=ip, port=161, community="dssl", timeout=10, retries=3,
-                              max_repetitions=5, ) as snmp:
+            with aiosnmp.Snmp(host=ip, port=161, community="dssl") as snmp:
                 for res in await snmp.get(r):
                     try:
                         status = res.value.decode('UTF-8')
@@ -75,7 +74,7 @@ async def info_snmp_registrator(ip, mib_all):
 
 async def cam_snmp(ip):
     d = []
-    with aiosnmp.Snmp(host=ip, port=161, community="dssl", timeout=5, retries=3, max_repetitions=2, ) as snmp:
+    with aiosnmp.Snmp(host=ip, port=161, community="dssl") as snmp:
         try:
             for res in await snmp.get('1.3.6.1.4.1.3333.1.5'):
                 status = res.value.decode('UTF-8')
