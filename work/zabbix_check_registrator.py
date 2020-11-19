@@ -1,7 +1,7 @@
 from work import sql
 import asyncio
 import aiosnmp
-from old.check_vs import send_mess
+from work.zabbix_check_cisco import send_mess
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from aiosnmp.exceptions import SnmpTimeoutError
 import logging

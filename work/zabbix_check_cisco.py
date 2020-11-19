@@ -9,7 +9,7 @@ from sqlite3 import OperationalError
 from aiosnmp.asn1 import Error
 # import aioping
 import logging
-from aiogram.utils.exceptions import NetworkError
+from aiogram.utils.exceptions import NetworkError, BotBlocked
 
 p = 0
 
@@ -463,15 +463,12 @@ async def send_mess(kod, text, name=None, email=0):
                     await bot.send_message(chat_id=765333440, text=text, disable_notification=await notif())
                 except NetworkError:
                     logging.info(f"Ошибка подключения к серверу телеграм")
-
-            # print("sms")
-                # if email == 1:
-                    # print("email")
-                    # await send_email(kod, text)
             except TypeError:
                 print(f"Ошибка отправки {row}")
             except ChatNotFound:
                 print(f"Юзер не найден {row}")
+            except BotBlocked:
+                print(f"Юзер заблокировал {row}")
 
     except TypeError:
         print("Никто не подписан ", kod)
