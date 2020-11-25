@@ -11,6 +11,7 @@ from loader import bot
 import re
 from work.zabbix_check_equipment import check_equipment
 import logging
+from data.data import admin_id
 
 
 def find_location():
@@ -283,7 +284,11 @@ async def check_zabbix():
             if key == key_old:
                 if value != value_old:
                     text = f"Филиал {key}. Замена микротика {value_old} на циску {value}"
-                    await bot.send_message(chat_id=765333440, text=text)
+                    for user_id in admin_id:
+                        try:
+                            await bot.send_message(chat_id=user_id, text=text)
+                        except Exception as b:
+                            logging.info(f"Exception '{b}'")
                     logging.info(f"DELETE FROM zabbix WHERE loopback = '{value_old}'")
                     await sql_insert(f"DELETE FROM zabbix WHERE loopback = '{value_old}'")
                     logging.info(f"DELETE FROM zb_st WHERE loopback = '{value_old}'")
