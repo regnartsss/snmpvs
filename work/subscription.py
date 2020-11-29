@@ -14,7 +14,7 @@ async def reg_menu():
 async def worksub(message, call):
     keyboard = InlineKeyboardMarkup()
     if message.text == "Подписаться на уведомления" or call.data.split("_")[0] == "menusub":
-        rows = await sql.sql_select("SELECT id, name FROM region")
+        rows = await sql.sql_select("SELECT id, name FROM zb_region ORDER BY name")
         for row in rows:
             keyboard.row(InlineKeyboardButton(text=f"{row[1]}", callback_data=f"regionsub_{row[0]}"))
         return keyboard
@@ -23,8 +23,6 @@ async def worksub(message, call):
         user_id = call.message.chat.id
         data = await filialsub(user_id, reg)
         await call.message.edit_text(text="Нажмите для подписки", reply_markup=data)
-
-
     elif call.data.split("_")[0] == "filialsub":
         reg = call.data.split('_')[2]
         kod = call.data.split('_')[1]
@@ -48,7 +46,7 @@ async def filialsub(user_id, reg):
         text = ""
         keyregion = InlineKeyboardMarkup()
         rows = await sql.sql_select(
-            f"SELECT filial.name, filial.kod, status.status_1, status.status_2 FROM filial INNER JOIN status ON filial.loopback=status.loopback WHERE region = {reg} ORDER BY filial.name")
+            f"SELECT zabbix.name, zabbix.kod, zb_st.status_1, zb_st.status_2 FROM zabbix INNER JOIN zb_st ON zabbix.loopback=zb_st.loopback WHERE region = {reg} ORDER BY zabbix.name")
         for row in rows:
             (name, kod, status_1, status_2) = tuple(row)
             rows_2 = await sql.sql_selectone(f"SELECT count(kod) from sub Where kod = {kod} and user_id = {user_id}")

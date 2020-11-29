@@ -19,8 +19,10 @@ async def menu_filials(callback_data):
     rows = await sql.sql_select(f"SELECT name, kod FROM zabbix WHERE region = {region} ORDER BY name")
     for name, kod in rows:
         if kod is not None:
+            # keyboard.insert(
+            #     InlineKeyboardButton(text=f"{kod} {name}", callback_data=filials_cb.new(region=region, kod=kod)))
             keyboard.insert(
-                InlineKeyboardButton(text=f"{kod} {name}", callback_data=filials_cb.new(region=region, kod=kod)))
+                InlineKeyboardButton(text=f"{name}", callback_data=filials_cb.new(region=region, kod=kod)))
     keyboard.add(InlineKeyboardButton(text="Назад", callback_data="menu"))
     return keyboard
 
