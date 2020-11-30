@@ -21,8 +21,6 @@ async def search_name_win(message):
 
 
 async def search_kod_win(message):
-    print(f"SELECT * FROM data_full, zabbix WHERE kod = {message.text}")
-    # try:
     rows = await sql.sql_selectone(f"SELECT * FROM data_full WHERE kod = {message.text}")
     if rows is None:
         row = await sql.sql_selectone(f"SELECT kod, name, loopback FROM zabbix WHERE kod = {message.text}")
@@ -34,7 +32,6 @@ async def search_kod_win(message):
     else:
         text = f"{rows[1]} {rows[0]}\n"
         return text
-
 
 
 async def search_serial_win(message):
