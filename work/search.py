@@ -12,7 +12,10 @@ class SearchFilial(StatesGroup):
 
 
 async def search_name_win(message):
-    rows = await sql.sql_select(f"SELECT * FROM data_full WHERE data_full.name_reg LIKE '%{message.text}%'")
+    print(message.text)
+    name = message.text
+    print(f"SELECT * FROM data_full WHERE data_full.name_reg LIKE '%{name.lower()}%'")
+    rows = await sql.sql_select(f"SELECT * FROM data_full WHERE data_full.name_reg LIKE '%{name.lower()}%'")
     text = ""
     for row in rows:
         text += f"{row[1]} {row[0]}\n"

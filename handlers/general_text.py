@@ -12,9 +12,6 @@ from work.keyboard import keyboard_other, region, keyboard_back, keyboard_search
 from work.Keyboard_menu import key_registrator, menu_region, menu_filials, menu_filial
 from work.subscription import worksub, reg_menu
 
-
-
-
 @dp.message_handler(state=AllMessage.message)
 async def process_name(message: types.Message, state: FSMContext):
     await mess(message, state)
@@ -143,6 +140,7 @@ async def work(message: types.Message):
 
 @dp.message_handler(content_types=types.ContentTypes.ANY)
 async def work(message: types.Message):
+    print("test")
     if message.text[:1] == "/":
         text = message.text[1:]
         kod = (await sql.sql_selectone(f"SELECT ssh_kod FROM users WHERE id = {message.from_user.id}"))[0]
