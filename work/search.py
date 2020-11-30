@@ -12,9 +12,7 @@ class SearchFilial(StatesGroup):
 
 
 async def search_name_win(message):
-    print(message.text)
     name = message.text
-    print(f"SELECT * FROM data_full WHERE data_full.name_reg LIKE '%{name.lower()}%'")
     rows = await sql.sql_select(f"SELECT * FROM data_full WHERE data_full.name_reg LIKE '%{name.lower()}%'")
     text = ""
     for row in rows:
@@ -23,13 +21,20 @@ async def search_name_win(message):
 
 
 async def search_kod_win(message):
-    try:
-        row = await sql.sql_selectone(f"SELECT * FROM data_full WHERE kod = {message.text}")
-        text = f"{row[1]} {row[0]}\n"
+    print(f"SELECT * FROM data_full, zabbix WHERE kod = {message.text}")
+    # try:
+    rows = await sql.sql_selectone(f"SELECT * FROM data_full WHERE kod = {message.text}")
+    if rows is None:
+        row = await sql.sql_selectone(f"SELECT kod, name, loopback FROM zabbix WHERE kod = {message.text}")
+        if row is not None:
+            text = f"{row[1]} {row[0]} {row[2]}\n"
+            return text
+        else:
+            return "Ничего не найдено"
+    else:
+        text = f"{rows[1]} {rows[0]}\n"
         return text
-    except Exception as n:
-        print(n)
-        return "Ничего не найдено"
+
 
 
 async def search_serial_win(message):
