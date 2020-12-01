@@ -1,6 +1,6 @@
 from work.sql import sql_select, sql_insert
 import asyncssh
-from sqlite3 import OperationalError
+from sqlite3 import OperationalError, IntegrityError
 from loader import bot
 
 async def counter():
@@ -22,20 +22,25 @@ async def counter():
                                 lease = line.split()[3]
                                 temp = line.split()[4]
                                 try:
-                                    await sql_insert(f"INSERT INTO bd_counter (name, kod, ip, lease, temp, mac) VALUES ('{row[1]}',{row[2]},'{ip}','{lease}','{temp}','{mac}')")
+                                    await sql_insert(f"INSERT or REPLACE INTO bd_counter (name, kod, ip, lease, temp, mac) VALUES ('{row[1]}',{row[2]},'{ip}','{lease}','{temp}','{mac}')")
                                 except OperationalError:
                                     await create_bd_counter()
                                     await sql_insert(f"INSERT INTO bd_counter (name, kod, ip, lease, temp, mac) VALUES ('{row[1]}',{row[2]},'{ip}','{lease}','{temp}','{mac}')")
-                            elif line.split()[1].split(".")[0] == '7C2F':
+
+                                    # print(f"UPDATE bd_counter SET ip = '{ip}', lease = '{lease}', temp = '{temp}' WHERE mac = '{mac}'")
+                                    # await sql_insert(f"UPDATE bd_counter SET ip = '{ip}', lease = '{lease}', temp = '{temp}' WHERE mac = '{mac}'")
+                                    # print("ff")
+                            if line.split()[1].split(".")[0] == '7c2f' or line.split()[1].split(".")[0] == '0c11':
                                 ip = line.split()[0]
                                 mac = line.split()[1]
                                 lease = line.split()[3]
                                 temp = line.split()[4]
                                 try:
-                                    await sql_insert(f"INSERT INTO bd_phone (name, kod, ip, lease, temp, mac) VALUES ('{row[1]}',{row[2]},'{ip}','{lease}','{temp}','{mac}')")
+                                    await sql_insert(f"INSERT or REPLACE INTO bd_phone VALUES ('{row[1]}',{row[2]},'{ip}','{lease}','{temp}','{mac}')")
                                 except OperationalError:
-                                    await create_bd_counter()
+                                    await create_bd_phone()
                                     await sql_insert(f"INSERT INTO bd_phone (name, kod, ip, lease, temp, mac) VALUES ('{row[1]}',{row[2]},'{ip}','{lease}','{temp}','{mac}')")
+
 
             except TimeoutError:
                 print("timeout", row[0])
@@ -70,7 +75,7 @@ async def create_bd_counter():
     ip    TEXT,
     lease TEXT,
     temp TEXT,
-    mac   TEXT
+    mac   TEXT PRIMARY KEY
 );
 """
     await sql_insert(request)
@@ -83,7 +88,7 @@ async def create_bd_phone():
     ip    TEXT,
     lease TEXT,
     temp TEXT,
-    mac   TEXT
+    mac   TEXT PRIMARY KEY
 );
 """
     await sql_insert(request)

@@ -136,7 +136,11 @@ async def work(message: types.Message):
 
 @dp.message_handler(text="456")
 async def work(message: types.Message):
-    await message.answer(await counter_mess())
+    await message.answer(await counter_mess(message.from_user.id))
+
+@dp.message_handler(text="789")
+async def work(message: types.Message):
+    await message.answer(await pgone_mess(message.from_user.id))
 
 @dp.message_handler(text="Инструкции")
 async def work(message: types.Message):
