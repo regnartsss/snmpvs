@@ -135,11 +135,13 @@ async def work(message: types.Message):
 async def work(message: types.Message):
     await counter()
 
-@dp.message_handler(text="456")
+
+@dp.message_handler(text="Счетчик")
 async def work(message: types.Message):
     await message.answer(await counter_mess(message.from_user.id))
 
-@dp.message_handler(text="789")
+
+@dp.message_handler(text="Телефон")
 async def work(message: types.Message):
     await message.answer(await phone_mess(message.from_user.id))
 
