@@ -11,6 +11,7 @@ from work.Statistics import info_filial, check_registrator, link, version_po
 from work.keyboard import keyboard_other, region, keyboard_back, keyboard_search, main_menu_user
 from work.Keyboard_menu import key_registrator, menu_region, menu_filials, menu_filial
 from work.subscription import worksub, reg_menu
+from work.counter_check import counter, counter_mess
 
 @dp.message_handler(state=AllMessage.message)
 async def process_name(message: types.Message, state: FSMContext):
@@ -114,8 +115,6 @@ async def work(message: types.Message):
 
 
 
-
-
 @dp.message_handler(lambda c: c.from_user.id in admin_id, text="Регистраторы")
 async def work(message: types.Message):
     await message.answer("Регистраторы", reply_markup=await key_registrator())
@@ -130,6 +129,14 @@ async def work(message: types.Message):
 async def work(message: types.Message):
     await message.answer(await check_registrator(message))
 
+
+@dp.message_handler(text="123")
+async def work(message: types.Message):
+    await counter()
+
+@dp.message_handler(text="456")
+async def work(message: types.Message):
+    await message.answer(await counter_mess())
 
 @dp.message_handler(text="Инструкции")
 async def work(message: types.Message):
