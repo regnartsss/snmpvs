@@ -57,7 +57,7 @@ async def counter_mess(user_id):
     print(len(text))
     return text
 
-async def counter_phone(user_id):
+async def phone_mess(user_id):
     rows = await sql_select("SELECT name, ip FROM bd_phone")
     text = ""
     for row in rows:
