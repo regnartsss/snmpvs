@@ -47,7 +47,7 @@ async def counter():
 
 
 async def counter_mess(user_id):
-    rows = await sql_select("SELECT name, ip FROM bd_counter")
+    rows = await sql_select("SELECT name, ip FROM bd_counter ORDER BY name")
     text = ""
     for row in rows:
         text += f"{row[0]} {row[1]} \n"
@@ -58,7 +58,7 @@ async def counter_mess(user_id):
     return text
 
 async def phone_mess(user_id):
-    rows = await sql_select("SELECT name, ip FROM bd_phone")
+    rows = await sql_select("SELECT name, ip FROM bd_phone ORDER BY name")
     text = ""
     for row in rows:
         text += f"{row[0]} {row[1]} \n"

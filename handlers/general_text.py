@@ -13,6 +13,7 @@ from work.Keyboard_menu import key_registrator, menu_region, menu_filials, menu_
 from work.subscription import worksub, reg_menu
 from work.counter_check import counter, counter_mess, phone_mess
 
+
 @dp.message_handler(state=AllMessage.message)
 async def process_name(message: types.Message, state: FSMContext):
     await mess(message, state)
