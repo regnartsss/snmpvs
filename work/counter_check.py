@@ -52,6 +52,17 @@ async def counter_mess(user_id):
     print(len(text))
     return text
 
+async def counter_phone(user_id):
+    rows = await sql_select("SELECT name, ip FROM bd_phone")
+    text = ""
+    for row in rows:
+        text += f"{row[0]} {row[1]} \n"
+        if len(text) > 4000:
+            await bot.send_message(user_id, text)
+            text = ""
+    print(len(text))
+    return text
+
 async def create_bd_counter():
     request = """CREATE TABLE bd_counter (
     name  TEXT,
