@@ -121,6 +121,12 @@ async def work(message: types.Message):
     await message.answer("Регистраторы", reply_markup=await key_registrator())
 
 
+@dp.message_handler(lambda c: c.from_user.id in admin_id, text="Регистраторы")
+async def work(message: types.Message):
+    await message.answer("Регистраторы", reply_markup=await key_registrator())
+    await message.answer("null", reply_markup=main_menu())
+
+
 @dp.message_handler(text="Подписаться на уведомления")
 async def work(message: types.Message):
     await message.answer("Выберите регион", reply_markup=await worksub(message, call=""))
