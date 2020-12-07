@@ -56,6 +56,7 @@ async def cisco_registrator(loopback):
             break
         else:
             for varBind in varBinds:
+                print(' = '.join([x.prettyPrint() for x in varBind]).split("= "))
                 #                    print(' = '.join([x.prettyPrint() for x in varBind]))
                 ip = ' = '.join([x.prettyPrint() for x in varBind]).split("= ")[1]
                 #                    print(ip.split(".")[3])
@@ -179,7 +180,8 @@ async def table_registrator():
     firmware TEXT,
     script   TEXT,
     down     INT,
-    ver_snmp TEXT
+    ver_snmp TEXT,
+    mac TEXT
 );"""
     await sql_insert(request)
 
