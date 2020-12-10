@@ -209,8 +209,9 @@ async def start_check_registrator():
                     await sql.sql_insert(f"Update registrator SET cam_down ='{cam_work}' WHERE ip = '{row[0]}'")
                     if script != script_old:
                         await sql.sql_insert(f"Update registrator SET script = '{data_r[2]}' WHERE ip = '{row[0]}'")
-                except TypeError:
-                    print("Ошибка регистратора")
+                except Exception as n:
+                    logging.info(f"ERROR_zabbix_check_registrator {n}")
+
         i += 1
 
 async def info_filial(ip, data):
