@@ -452,7 +452,7 @@ async def request_name(loopback):
         f"SELECT name, kod, loopback, ISP1, ISP2, isp1_name, isp2_name FROM zabbix WHERE loopback = '{loopback}'")
 
 
-async def send_mess(kod, text, data, email=0):
+async def send_mess(kod, text, data=1, email=0):
     if data == 0:
         await bot.send_message(chat_id='@sdwan_log', text=text, disable_notification=True)
     rows = await sql.sql_selectone(f"SELECT user_id FROM sub WHERE kod = {kod}")
