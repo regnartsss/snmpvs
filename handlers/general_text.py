@@ -3,7 +3,7 @@ from loader import dp, bot
 from data.data import admin_id
 from aiogram.dispatcher import FSMContext
 from work import sql
-from work.Ssh import ssh_console, Ssh_console, ssh_console_command, search_mac
+from work.Ssh import ssh_console, Ssh_console, search_mac
 from work.admin import mess, AllMessage
 from work.keyboard import main_menu
 # from work.Add_filial import NewFilial, Add_snmp
@@ -13,6 +13,7 @@ from work.Keyboard_menu import key_registrator, menu_region, menu_filials, menu_
 from work.subscription import worksub, reg_menu
 from work.counter_check import counter, mess
 from work.ldap_old import AD
+
 
 @dp.message_handler(state=AllMessage.message)
 async def process_name(message: types.Message, state: FSMContext):

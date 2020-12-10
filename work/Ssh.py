@@ -52,10 +52,9 @@ async def kod_loopback(call):
 
 
 async def ssh_console(callback_data, user_id):
-    kod = callback_data["kod"]
+    # kod = callback_data["kod"]
     # user_id = call.message.chat.id
-    await Ssh_console.command.set()
-    await sql_insert(f"UPDATE users SET ssh_kod = {kod} WHERE id = {user_id}")
+    # await sql_insert(f"UPDATE users SET ssh_kod = {kod} WHERE id = {user_id}")
     text = "Введите команду SSH для отправки на циску или 444 для отмены\n" \
            "vlan 100 - ping vrf 100 'ip addreess'\nvlan 200 - ping vrf 200 'ip addreess'\n" \
            "vlan 400 - ping vrf 100 'ip addreess'\nvlan 500 - ping vrf 6 'ip addreess'\n" \
@@ -63,25 +62,17 @@ async def ssh_console(callback_data, user_id):
     return text
 
 
-async def ssh_console_command(message, state):
-    if message.text == "🚫 Отмена":
-        await message.answer("🚫 Отмена", reply_markup=main_menu())
-        await state.finish()
-    else:
-        return await console_command(message)
 
-
-async def console_command(message):
-    loopback = (await sql_selectone(f"SELECT loopback FROM users LEFT JOIN zabbix "
-                                    f"ON users.ssh_kod = zabbix.kod WHERE users.id = {message.chat.id}"))[0]
-    command = message.text
+async def console_command(kod, command, user_id):
+    loopback = (await sql_selectone(f"SELECT loopback FROM zabbix WHERE kod = {kod}"))[0]
+    # command = message.text
     user = 'operator'
     secret = '71LtkJnrYjn'
     async with asyncssh.connect(loopback, username=user, password=secret, known_hosts=None) as conn:
         result = await conn.run(command, check=True)
         text = result.stdout
         while len(text) > 4000:
-            await bot.send_message(chat_id=message.chat.id, text=text[:4000])
+            await bot.send_message(chat_id=user_id, text=text[:4000])
             text = text[4000:]
         return text
 

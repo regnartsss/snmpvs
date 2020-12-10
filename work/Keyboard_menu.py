@@ -1,8 +1,8 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from work import sql
 from work.Statistics import info_filial
-from filters.loc import send_lease_cb, region_cb, filials_cb, ssh_cb, lease_cb, console_ssh_cb, update_cb, region_registr_cb
-
+from filters.loc import send_lease_cb, region_cb, filials_cb, ssh_cb, lease_cb, console_ssh_cb, update_cb, region_registr_cb, console_input_cb
+from work.sql import sql_selectone
 
 async def menu_region():
     keyboard = InlineKeyboardMarkup()
@@ -53,11 +53,14 @@ async def check_filial(callback_data):
 
 
 async def ssh(callback_data):
-    print(callback_data)
-    region = callback_data["region"]
     kod = callback_data["kod"]
+    try:
+        region = callback_data["region"]
+    except KeyError:
+        region = (await sql_selectone(f"SELECT region FROM zabbix WHERE kod = {kod}"))[0]
     keyboard = InlineKeyboardMarkup()
-    keyboard.row(InlineKeyboardButton(text="ssh_console", callback_data=console_ssh_cb.new(kod=kod)))
+    # keyboard.row(InlineKeyboardButton(text="ssh_console", callback_data=console_ssh_cb.new(kod=kod)))
+    keyboard.row(InlineKeyboardButton(text="sh ip int br", callback_data=console_input_cb.new(kod=kod, command="sh ip int br")))
     # keyboard.row(InlineKeyboardButton(text="traceroute vrf 100 10.10.33.5", callback_data=f"ssh_trac_{call.data.split('_')[2]}"))
     keyboard.row(InlineKeyboardButton(text="Назад", callback_data=filials_cb.new(region=region, kod=kod)))
     return keyboard
