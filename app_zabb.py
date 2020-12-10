@@ -8,11 +8,14 @@ import asyncio
 import middlewares
 from work.test import test
 middlewares.setup(dp)
+from work.ldap_old import AD
 
 
 async def zabb():
     scheduler = AsyncIOScheduler()
     scheduler.add_job(check, 'interval', hours=4)
+    scheduler.add_job(AD, 'interval', hours=4)
+
     scheduler.start()
 
 
@@ -20,6 +23,8 @@ def on_startup():
     loop = asyncio.get_event_loop()
     asyncio.ensure_future(start_snmp("ASC"))
     asyncio.ensure_future(zabb())
+    asyncio.ensure_future(AD())
+
     asyncio.ensure_future(check())
     asyncio.ensure_future(start_check_registrator())
     loop.run_forever()
