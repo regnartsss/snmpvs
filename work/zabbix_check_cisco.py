@@ -413,7 +413,7 @@ async def check_all(loopback, status1, status2):
 
             await sql.sql_insert(f"UPDATE zb_st SET status_1 = 0, status_2 = 0 WHERE loopback = '{loopback}'")
             await sql.sql_insert(f"Update registrator SET down = 1 WHERE kod = '{kod}'")
-            await send_mess(kod, text)
+            await send_mess(kod, text, 0)
     elif status1 == 1 and status2 == 0:
         if status_t1 == status1 and status_t2 == status2:
             pass
@@ -422,7 +422,7 @@ async def check_all(loopback, status1, status2):
             text = f"{data[0]}\nКод: {data[1]}\n🟢 🔴 Резервный провайдер не работает \n" \
                    f"Loopback: {data[2]}\n{data[6]}\nISP_2: {data[4]}"
             await sql.sql_insert(f"UPDATE zb_st SET status_1 = 1, status_2 = 0 WHERE loopback = '{loopback}'")
-            await send_mess(kod, text)
+            await send_mess(kod, text, 0)
 
     elif status1 == 0 and status2 == 1:
         if status_t1 == status1 and status_t2 == status2:
@@ -432,7 +432,7 @@ async def check_all(loopback, status1, status2):
             text = f"{data[0]}\nКод: {data[1]}\n🔴 🟢 Основной провайдер не работает\n\n" \
                    f"Loopback: {data[2]}\n{data[5]}\nISP_1: {data[3]}\n"
             await sql.sql_insert(f"UPDATE zb_st SET status_1 = 0, status_2 = 1 WHERE loopback = '{loopback}'")
-            await send_mess(kod, text)
+            await send_mess(kod, text, 0)
 
     elif status1 == 1 and status2 == 1:
         if status_t1 == status1 and status_t2 == status2:
@@ -441,7 +441,7 @@ async def check_all(loopback, status1, status2):
             data = await request_name(loopback)
             text = f"{data[0]}\nКод: {data[1]}\n🟢 🟢 Филиал работает"
             await sql.sql_insert(f"UPDATE zb_st SET status_1 = 1, status_2 = 1 WHERE loopback = '{loopback}'")
-            await send_mess(kod, text)
+            await send_mess(kod, text, 0)
     else:
         pass
 
@@ -452,8 +452,9 @@ async def request_name(loopback):
         f"SELECT name, kod, loopback, ISP1, ISP2, isp1_name, isp2_name FROM zabbix WHERE loopback = '{loopback}'")
 
 
-async def send_mess(kod, text, name=None, email=0):
-    await bot.send_message(chat_id='@sdwan_log', text=text, disable_notification=True)
+async def send_mess(kod, text, data, email=0):
+    if data == 0:
+        await bot.send_message(chat_id='@sdwan_log', text=text, disable_notification=True)
     rows = await sql.sql_selectone(f"SELECT user_id FROM sub WHERE kod = {kod}")
     try:
         for row in rows:
