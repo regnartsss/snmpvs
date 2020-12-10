@@ -453,14 +453,14 @@ async def request_name(loopback):
 
 
 async def send_mess(kod, text, name=None, email=0):
+    await bot.send_message(chat_id='@sdwan_log', text=text, disable_notification=True)
     rows = await sql.sql_selectone(f"SELECT user_id FROM sub WHERE kod = {kod}")
     try:
         for row in rows:
             await asyncio.sleep(1)
             try:
-                # await bot.send_message(chat_id=row, text=text, disable_notification=await notif())
                 try:
-                    await bot.send_message(chat_id=765333440, text=text, disable_notification=await notif())
+                    await bot.send_message(chat_id=row, text=text, disable_notification=await notif())
                 except NetworkError:
                     logging.info(f"Ошибка подключения к серверу телеграм")
             except TypeError:
@@ -469,7 +469,6 @@ async def send_mess(kod, text, name=None, email=0):
                 print(f"Юзер не найден {row}")
             except BotBlocked:
                 print(f"Юзер заблокировал {row}")
-
     except TypeError:
         print("Никто не подписан ", kod)
 

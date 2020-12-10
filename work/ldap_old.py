@@ -10,7 +10,7 @@ from work.sql import sql_select_no, sql_selectone_no, sql_selectone, sql_select
 import socket
 from loader import bot
 from work.search import search_ip
-
+from work.zabbix_check_cisco import notif
 
 def find_location():
     return os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__))).replace('\\', '/') + '/'
@@ -53,7 +53,6 @@ async def AD():
                 result = re.findall(r'\w{3}\d', name)
                 if result:
                     await move_group(name, conn)
-    await bot.send_message(chat_id=765333440, text="Закончено")
 
 
 async def move_group(name, conn):
@@ -64,7 +63,7 @@ async def move_group(name, conn):
         if filial != "Ничего не нашел":
             superior, text = await find_group(filial)
             text = f"{name} перенесен в группу {text}"
-            await bot.send_message(chat_id=765333440, text=text)
+            await bot.send_message(chat_id=765333440, text=text, reply_markup=await notif())
             if conn.modify_dn(f'CN={name},CN=Computers,DC=partner,DC=ru', f'CN={name}', new_superior=superior) is False:
                 print("Филиала нет")
                 if conn.add(superior, 'organizationalUnit') is False:
@@ -80,7 +79,7 @@ async def move_group(name, conn):
                     conn.modify_dn(f'CN={name},CN=Computers,DC=partner,DC=ru', f'CN={name}', new_superior=superior)
     except dns.resolver.NXDOMAIN:
         text = f"{name} не найден филиал, переместите руками"
-        await bot.send_message(chat_id=765333440, text=text)
+        await bot.send_message(chat_id=765333440, text=text, reply_markup=await notif())
 
 
 async def find_group(filial):
