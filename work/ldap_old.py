@@ -6,7 +6,7 @@ import json
 import os
 from data import data
 from work.sql import sql_select_no, sql_selectone_no, sql_selectone, sql_select
-import ipaddr, ipaddress
+# import ipaddr, ipaddress
 import socket
 from loader import bot
 from work.search import search_ip
