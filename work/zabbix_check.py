@@ -12,7 +12,7 @@ import re
 from work.zabbix_check_equipment import check_equipment
 import logging
 from data.data import admin_id
-
+from aiogram.utils.exceptions import ChatNotFound
 
 def find_location():
     return os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__))).replace('\\', '/') + '/'
@@ -287,6 +287,8 @@ async def check_zabbix():
                     for user_id in admin_id:
                         try:
                             await bot.send_message(chat_id=user_id, text=text)
+                        except ChatNotFound:
+                            logging.info(f"Чат не найден '{user_id}'")
                         except Exception as b:
                             logging.info(f"Exception '{b}'")
                     logging.info(f"DELETE FROM zabbix WHERE loopback = '{value_old}'")

@@ -47,3 +47,11 @@ async def sql_selectone(request):
     rows = cursor.fetchone()
     conn.close()
     return rows
+
+def sql_selectone_no(request):
+    conn = sqlite3.connect(PATH+'sdwan.db')
+    cursor = conn.cursor()
+    cursor.execute(request)
+    rows = cursor.fetchone()
+    conn.close()
+    return rows

@@ -6,11 +6,13 @@ from work.Keyboard_menu import key_registrator, menu_region, menu_filials, menu_
 from work.sql import sql_insert
 from work.Statistics import info_filial, check_registrator, link, version_po
 from work.Statistics import info_registrator, info_filial
+from work.keyboard import main_menu
 
 
 @dp.message_handler(text="Филиалы")
 async def menu(message: types.Message):
-    await message.answer("Выберите регион111", reply_markup=await menu_region())
+    await message.answer("null", reply_markup=main_menu())
+    await message.answer("Выберите регион", reply_markup=await menu_region())
 
 
 @dp.callback_query_handler(region_cb.filter())
