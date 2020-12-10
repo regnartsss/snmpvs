@@ -48,7 +48,7 @@ async def cisco_registrator(loopback):
                               ObjectType(ObjectIdentity('IP-MIB', 'ipNetToMediaNetAddress')),
                               lexicographicMode=False):
         if errorIndication:
-            print(errorIndication)
+            print("zabbix",errorIndication)
             break
         elif errorStatus:
             print('%s at %s' % (errorStatus.prettyPrint(),
