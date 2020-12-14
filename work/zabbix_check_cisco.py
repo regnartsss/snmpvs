@@ -227,7 +227,7 @@ async def ping_cisco_old(loopback, kod):
     logging.info(f"ping {p} {loopback}")
     p += 1
     try:
-        await aioping.ping(loopback, 10)
+        await aioping.ping(loopback, 100)
         await snmp(loopback, kod)
     except TimeoutError:
         return False
