@@ -83,6 +83,7 @@ async def move_group(name, conn):
 
 
 async def find_group(filial):
+    print(filial)
     request = f"SELECT zabbix.kod, zb_region.name FROM zabbix LEFT JOIN zb_region ON zabbix.region = zb_region.id WHERE zabbix.name = '{filial}'"
     rows = await sql_selectone(request)
     region = str(rows[1])
