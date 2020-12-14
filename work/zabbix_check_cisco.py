@@ -7,7 +7,7 @@ import aiosnmp
 from aiogram.utils.exceptions import ChatNotFound
 from sqlite3 import OperationalError
 from aiosnmp.asn1 import Error
-# import aioping
+import aioping
 import logging
 from aiogram.utils.exceptions import NetworkError, BotBlocked
 
@@ -222,15 +222,17 @@ async def oid(loopback, kod, repeat=0):
 #         pass
 #
 #
-# async def ping_cisco_old(loopback, kod):
-#     global p
-#     logging.info(f"ping {p} {loopback}")
-#     p += 1
-#     try:
-#         await aioping.ping(loopback)
-#         await snmp(loopback, kod)
-#     except TimeoutError:
-#         return False
+async def ping_cisco_old(loopback, kod):
+    global p
+    logging.info(f"ping {p} {loopback}")
+    p += 1
+    try:
+        await aioping.ping(loopback, 10)
+        await snmp(loopback, kod)
+    except TimeoutError:
+        return False
+
+
 
 
 async def snmp(loopback, kod):
@@ -254,16 +256,13 @@ async def snmp(loopback, kod):
             lexicographicMode=False
         ):
             if errorIndication:
-                # if await ping_cisco_old(loopback, kod) is False:
+                if await ping_cisco_old(loopback, kod) is False:
                 #     logging.info(f"{loopback} не доступен")
                     r = await sql.sql_selectone(f"SELECT In1_two, In2_two FROM zb_st WHERE loopback = '{loopback}'")
                     d.append(r[0])
                     d.append(r[1])
                     break
-                    # request = f"UPDATE zb_st SET In1_one = In1_two, In2_one = In2_two WHERE loopback = '{loopback}'"
-                    # await sql.sql_insert(request)
-                    # await check_cisco(loopback)
-                    # return
+
             elif errorStatus:
                 print('%s at %s' % (errorStatus.prettyPrint(),
                                     errorIndex and varBinds[int(errorIndex) - 1][0] or '?'))
