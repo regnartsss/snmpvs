@@ -60,7 +60,7 @@ async def move_group(name, conn):
         answer = dns.resolver.query(name, raise_on_no_answer=False)
         an = str(answer.rrset).split()[4]
         filial = await search_ip(an)
-        if filial != "Ничего не нашел":
+        if filial != "Ничего не нашел по ip":
             superior, text = await find_group(filial)
             text = f"{name} перенесен в группу {text}"
             await bot.send_message(chat_id=765333440, text=text, reply_markup=await notif())
@@ -83,7 +83,6 @@ async def move_group(name, conn):
 
 
 async def find_group(filial):
-    print(filial)
     request = f"SELECT zabbix.kod, zb_region.name FROM zabbix LEFT JOIN zb_region ON zabbix.region = zb_region.id WHERE zabbix.name = '{filial}'"
     rows = await sql_selectone(request)
     region = str(rows[1])
