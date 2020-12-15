@@ -255,6 +255,7 @@ async def snmp(loopback, kod, repeat=0):
         ):
             if errorIndication:
                 if repeat == 0:
+                    await asyncio.sleep(5)
                     await snmp(loopback, kod, 1)
                 # if await ping_cisco_old(loopback, kod) is False:
                 #     logging.info(f"{loopback} не доступен")
