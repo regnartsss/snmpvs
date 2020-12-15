@@ -29,8 +29,8 @@ AD_SEARCH_COMPUTERS = 'OU=_Computers,OU=02. Восточная Сибирь,OU=1
 async def AD():
     AD_USER = 'podkopaev.k@partner.ru'
     AD_PASSWORD = 'z15X3vdy'
-    # AD_SEARCH_TREE = 'OU=autogroup,OU=_Computers,OU=02. Восточная Сибирь,OU=1. Розничная Сеть (ДНС),OU=DNS Users,DC=partner,DC=ru'
-    AD_SEARCH_TREE = 'CN=Computers,DC=partner,DC=ru'
+    AD_SEARCH_TREE = 'OU=autogroup,OU=_Computers,OU=02. Восточная Сибирь,OU=1. Розничная Сеть (ДНС),OU=DNS Users,DC=partner,DC=ru'
+    # AD_SEARCH_TREE = 'CN=Computers,DC=partner,DC=ru'
     # server = "partner.ru"
     # AD_SEARCH_TREE =
     # соединяюсь с сервером. всё ОК
@@ -66,7 +66,7 @@ async def move_group(name, conn, dn):
         if filial != "Ничего не нашел по ip":
             superior, text = await find_group(filial)
             text = f"{name} перенесен в группу {text}"
-            await bot.send_message(chat_id=765333440, text=text, reply_markup=await notif())
+            await bot.send_message(chat_id=765333440, text=text, disable_notification=await notif())
             conn.modify_dn(str(dn), relative_dn=f'CN={name}', new_superior=superior)
             if conn.result['result'] == 80:
                 print("Создать филиал")
@@ -83,12 +83,11 @@ async def move_group(name, conn, dn):
                 conn.add(dn=cn_group, attributes=attrs)
                 print(conn.result)
                 conn.modify_dn(str(dn), relative_dn=f'CN={name}', new_superior=superior)
-            else:
-                print("Филиал есть")
+
 
     except dns.resolver.NXDOMAIN:
         text = f"{name} не найден филиал, переместите руками"
-        await bot.send_message(chat_id=765333440, text=text, reply_markup=await notif())
+        await bot.send_message(chat_id=765333440, text=text, disable_notification=await notif())
 
 
 async def find_group(filial):
