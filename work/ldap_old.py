@@ -48,7 +48,6 @@ async def AD():
         # if 'vs' in name[:2].lower():
         result = re.findall(r'^vs\d', name.lower())
         if result:
-            print(name)
             await move_group(name, conn, dn)
         for d in dat:
             if d in name.lower()[0:3]:
