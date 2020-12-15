@@ -30,7 +30,7 @@ async def AD():
     AD_USER = 'podkopaev.k@partner.ru'
     AD_PASSWORD = 'z15X3vdy'
     # AD_SEARCH_TREE = 'OU=autogroup,OU=_Computers,OU=02. Восточная Сибирь,OU=1. Розничная Сеть (ДНС),OU=DNS Users,DC=partner,DC=ru'
-    # AD_SEARCH_TREE = 'CN=Computers,DC=partner,DC=ru'
+    AD_SEARCH_TREE = 'CN=Computers,DC=partner,DC=ru'
     # server = "partner.ru"
     # AD_SEARCH_TREE =
     # соединяюсь с сервером. всё ОК
@@ -38,14 +38,13 @@ async def AD():
     conn = Connection(server, user=AD_USER, password=AD_PASSWORD)
     conn.bind()
     print('Connection Bind Complete!')
-    # conn.search(AD_SEARCH_TREE, search_filter='(objectCategory=computer)', search_scope=SUBTREE, paged_size=1000,
-    #             attributes=ALL_ATTRIBUTES)
-    conn.search(AD_SEARCH_AUTOGROUP, search_filter='(objectCategory=computer)', search_scope=SUBTREE, attributes=ALL_ATTRIBUTES)
+    conn.search(AD_SEARCH_TREE, search_filter='(objectCategory=computer)', search_scope=SUBTREE, paged_size=1000,
+                attributes=ALL_ATTRIBUTES)
+    # conn.search(AD_SEARCH_AUTOGROUP, search_filter='(objectCategory=computer)', search_scope=SUBTREE, attributes=ALL_ATTRIBUTES)
     rows = await sql_select(f"SELECT kod FROM zabbix")
     for entry in conn.entries:
         dn = entry['distinguishedName']
         name = str(entry['name'])
-        print(name)
         for row in rows:
             if str(row[0]) in name and 'vs' == name[:2].lower():
                 await move_group(name, conn, dn)
