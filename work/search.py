@@ -71,14 +71,13 @@ async def search_ip(host):
             return row
         else:
             ip = '.'.join(host.split(".")[0:3])
-            rows = await sql.sql_select(f"SELECT vlan100, vlan200, vlan300, vlan400, vlan500, name FROM zabbix WHERE sdwan = 1")
+            rows = await sql.sql_select(f"SELECT loopback, vlan100, vlan200, vlan300, vlan400, vlan500, name FROM zabbix")
             for row in rows:
                 for r in row:
                     ip_search = str(r).split(".")[0:3]
                     ip_search = '.'.join(ip_search)
-                    # print(ip_search)
                     if ip == ip_search:
-                        return row[5]
+                        return row[6]
             return "Ничего не нашел по ip"
     except socket.error:
         return False

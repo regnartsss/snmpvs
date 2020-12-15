@@ -256,7 +256,7 @@ async def snmp(loopback, kod):
             lexicographicMode=False
         ):
             if errorIndication:
-                if await ping_cisco_old(loopback, kod) is False:
+                # if await ping_cisco_old(loopback, kod) is False:
                 #     logging.info(f"{loopback} не доступен")
                     r = await sql.sql_selectone(f"SELECT In1_two, In2_two FROM zb_st WHERE loopback = '{loopback}'")
                     d.append(r[0])
