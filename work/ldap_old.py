@@ -38,21 +38,25 @@ async def AD():
     conn = Connection(server, user=AD_USER, password=AD_PASSWORD)
     conn.bind()
     print('Connection Bind Complete!')
-    conn.search(AD_SEARCH_TREE, search_filter='(objectCategory=computer)', search_scope=SUBTREE, paged_size=1000,
-                attributes=ALL_ATTRIBUTES)
+    result = conn.extend.standard.paged_search(AD_SEARCH_TREE, search_filter='(objectCategory=computer)', search_scope=SUBTREE, attributes=ALL_ATTRIBUTES)
+
     # conn.search(AD_SEARCH_AUTOGROUP, search_filter='(objectCategory=computer)', search_scope=SUBTREE, attributes=ALL_ATTRIBUTES)
     rows = await sql_select(f"SELECT kod FROM zabbix")
-    for entry in conn.entries:
-        dn = entry['distinguishedName']
-        name = str(entry['name'])
-        for row in rows:
-            if str(row[0]) in name and 'vs' == name[:2].lower():
-                await move_group(name, conn, dn)
+    for entry in result:
+        dn = entry['attributes']['distinguishedName']
+        name = str(entry['attributes']['name'])
+        # if 'vs' in name[:2].lower():
+        result = re.findall(r'^vs\d', name.lower())
+        if result:
+            print(name)
+            await move_group(name, conn, dn)
         for d in dat:
             if d in name.lower()[0:3]:
                 result = re.findall(r'\w{3}\d', name)
                 if result:
                     await move_group(name, conn, dn)
+
+
 
 
 async def move_group(name, conn, dn):
@@ -82,33 +86,10 @@ async def move_group(name, conn, dn):
                 conn.modify_dn(str(dn), relative_dn=f'CN={name}', new_superior=superior)
             else:
                 print("Филиал есть")
-            #
 
-                # cn_group, attrs = create_group(filial)
-                # print(cn_group, attrs)
-            # if conn.modify_dn(f'CN={name},CN=Computers,DC=partner,DC=ru', f'CN={name}', new_superior=superior) is False:
-            #     print("Филиала нет")
-            #     print(superior)
-            #     if conn.add(superior, 'organizationalUnit') is False:
-            #         print("Региона нет")
-            #         # region = ','.join(superior.split(",")[1:])
-            #         # print(region)
-            #         # if conn.add(region, 'organizationalUnit') is False:
-            #         #     print("Регион не создан")
-            #         # else:
-            #         #     conn.add(superior, 'organizationalUnit')
-            #         #     conn.modify_dn(f'CN={name},CN=Computers,DC=partner,DC=ru', f'CN={name}', new_superior=superior)
-                    #     dn, attrs = create_group(filial)
-                    #     conn.add(dn=superior, attributes=attrs)
-            #
-            #     else:
-            #         conn.modify_dn(f'CN={name},CN=Computers,DC=partner,DC=ru', f'CN={name}', new_superior=superior)
-            #         dn, attrs = create_group(filial)
-            #         conn.add(dn=superior, attributes=attrs)
     except dns.resolver.NXDOMAIN:
-        pass
-        # text = f"{name} не найден филиал, переместите руками"
-        # await bot.send_message(chat_id=765333440, text=text, reply_markup=await notif())
+        text = f"{name} не найден филиал, переместите руками"
+        await bot.send_message(chat_id=765333440, text=text, reply_markup=await notif())
 
 
 async def find_group(filial):
