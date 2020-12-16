@@ -30,7 +30,7 @@ async def start_snmp(data):
                         y += 1
                         await oid(loopback, kod)
                     else:
-                        # logging.info(f"snmp {z} {loopback}")
+                        logging.info(f"snmp {z} {loopback}")
                         z += 1
                         await snmp(loopback, kod)
                 except OperationalError:
@@ -222,18 +222,20 @@ async def oid(loopback, kod, repeat=0):
 #         pass
 #
 #
-async def ping_cisco_old(loopback, kod):
-    global p
-    logging.info(f"ping {p} {loopback}")
-    p += 1
-    try:
-        await aioping.ping(loopback, 100)
-        await snmp(loopback, kod)
-    except TimeoutError:
-        return False
+# async def ping_cisco_old(loopback, kod):
+#     global p
+#     logging.info(f"ping {p} {loopback}")
+#     p += 1
+#     try:
+#         await aioping.ping(loopback, 100)
+#         await snmp(loopback, kod)
+#     except TimeoutError:
+#         return False
 
 
 async def snmp(loopback, kod, repeat=0):
+    logging.info(f"snmp {loopback} {repeat}")
+
     mib_all = await sql.sql_selectone(
         f"SELECT In_isp1, In_isp2, Oper_isp1, Oper_isp2, OperISP2 FROM zb_st WHERE loopback = '{loopback}'")
     if mib_all[0:2] == ('0', '0') or mib_all[0:2] == (None, None):
@@ -254,16 +256,17 @@ async def snmp(loopback, kod, repeat=0):
             lexicographicMode=False
         ):
             if errorIndication:
-                if repeat == 0:
-                    await asyncio.sleep(5)
-                    await snmp(loopback, kod, 1)
-                # if await ping_cisco_old(loopback, kod) is False:
-                #     logging.info(f"{loopback} не доступен")
-                else:
+                # print(repeat)
+                # if repeat == 0:
+                #     await snmp(loopback, kod, 1)
+                # # if await ping_cisco_old(loopback, kod) is False:
+                # #     logging.info(f"{loopback} не доступен")
+                # elif repeat == 1:
+                #     print("столп")
                     r = await sql.sql_selectone(f"SELECT In1_two, In2_two FROM zb_st WHERE loopback = '{loopback}'")
                     d.append(r[0])
                     d.append(r[1])
-                    break
+                    return
 
             elif errorStatus:
                 print('%s at %s' % (errorStatus.prettyPrint(),
