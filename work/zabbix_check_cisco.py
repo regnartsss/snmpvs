@@ -266,7 +266,7 @@ async def snmp(loopback, kod, repeat):
                     r = await sql.sql_selectone(f"SELECT In1_two, In2_two FROM zb_st WHERE loopback = '{loopback}'")
                     d.append(r[0])
                     d.append(r[1])
-                    return
+                    break
 
             elif errorStatus:
                 print('%s at %s' % (errorStatus.prettyPrint(),
@@ -466,9 +466,7 @@ async def check_all(loopback, status1, status2):
             pass
         else:
             data = await request_name(loopback)
-
             text = f"{data[0]}\nКод: {data[1]}\n🟢 🟢 Филиал работает\nUptime: "
-
             uptime = await snmp_v3(loopback, '1.3.6.1.2.1.1.3.0')
             text += uptime
             await sql.sql_insert(f"UPDATE zb_st SET status_1 = 1, status_2 = 1, uptime = '{uptime}' WHERE loopback = '{loopback}'")
