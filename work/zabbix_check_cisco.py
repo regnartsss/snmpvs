@@ -30,9 +30,10 @@ async def start_snmp(data):
                         y += 1
                         await oid(loopback, kod)
                     else:
-                        logging.info(f"snmp {z} {loopback}")
+                        # logging.info(f"snmp {z} {loopback}")
                         z += 1
-                        await snmp(loopback, kod)
+                        await snmp(loopback, kod, 0)
+
                 except OperationalError:
                     await new_table_zb_st()
             elif sdwan == 0:
@@ -233,9 +234,8 @@ async def oid(loopback, kod, repeat=0):
 #         return False
 
 
-async def snmp(loopback, kod, repeat=0):
-    logging.info(f"snmp {loopback} {repeat}")
-
+async def snmp(loopback, kod, repeat):
+    # logging.info(f"snmp {loopback} {repeat}")
     mib_all = await sql.sql_selectone(
         f"SELECT In_isp1, In_isp2, Oper_isp1, Oper_isp2, OperISP2 FROM zb_st WHERE loopback = '{loopback}'")
     if mib_all[0:2] == ('0', '0') or mib_all[0:2] == (None, None):
@@ -373,6 +373,7 @@ async def snmp_operstatus(loopback):
 
 
 async def snmp_v3(loopback, mib):
+    '1.3.6.1.2.1.1.3.0'
     logging.info("snmp_v3_start")
     error_indication, error_status, error_index, var_binds = next(
         getCmd(SnmpEngine(),
@@ -381,7 +382,26 @@ async def snmp_v3(loopback, mib):
                ContextData(),
                ObjectType(ObjectIdentity(mib)))
     )
-    return error_indication, error_status, error_index, var_binds
+    if error_indication:
+        print(error_indication)
+    elif error_status:
+        print("error")
+        print('%s at %s' % (error_status.prettyPrint(),
+                            error_index and var_binds[int(error_index) - 1][0] or '?'))
+    else:
+        for varBind in var_binds:
+            m = (' = '.join([x.prettyPrint() for x in varBind]).split("= ")[1])
+            seconds = int(m[:-2])
+            return await format_seconds_to_hhmmss(seconds)
+
+async def format_seconds_to_hhmmss(seconds):
+    day = seconds // (60 * 60 * 24)
+    seconds %= (60 * 60 * 24)
+    hours = seconds // (60 * 60)
+    seconds %= (60 * 60)
+    minutes = seconds // 60
+    seconds %= 60
+    return "%02id %02ih %02im %02is" % (day, hours, minutes, seconds)
 
 
 async def check_cisco(loopback):
@@ -424,7 +444,8 @@ async def check_all(loopback, status1, status2):
         else:
             data = await request_name(loopback)
             text = f"{data[0]}\nКод: {data[1]}\n🟢 🔴 Резервный провайдер не работает \n" \
-                   f"Loopback: {data[2]}\n{data[6]}\nISP_2: {data[4]}"
+                   f"Loopback: {data[2]}\n{data[6]}\nISP_2: {data[4]}\nUptime: "
+            text += await snmp_v3(loopback, '1.3.6.1.2.1.1.3.0')
             await sql.sql_insert(f"UPDATE zb_st SET status_1 = 1, status_2 = 0 WHERE loopback = '{loopback}'")
             await send_mess(kod, text, 0)
 
@@ -434,7 +455,8 @@ async def check_all(loopback, status1, status2):
         else:
             data = await request_name(loopback)
             text = f"{data[0]}\nКод: {data[1]}\n🔴 🟢 Основной провайдер не работает\n\n" \
-                   f"Loopback: {data[2]}\n{data[5]}\nISP_1: {data[3]}\n"
+                   f"Loopback: {data[2]}\n{data[5]}\nISP_1: {data[3]}\nUptime: "
+            text += await snmp_v3(loopback, '1.3.6.1.2.1.1.3.0')
             await sql.sql_insert(f"UPDATE zb_st SET status_1 = 0, status_2 = 1 WHERE loopback = '{loopback}'")
             await send_mess(kod, text, 0)
 
@@ -443,7 +465,9 @@ async def check_all(loopback, status1, status2):
             pass
         else:
             data = await request_name(loopback)
-            text = f"{data[0]}\nКод: {data[1]}\n🟢 🟢 Филиал работает"
+
+            text = f"{data[0]}\nКод: {data[1]}\n🟢 🟢 Филиал работает\nUptime: "
+            text += await snmp_v3(loopback, '1.3.6.1.2.1.1.3.0')
             await sql.sql_insert(f"UPDATE zb_st SET status_1 = 1, status_2 = 1 WHERE loopback = '{loopback}'")
             await send_mess(kod, text, 0)
     else:
@@ -457,8 +481,8 @@ async def request_name(loopback):
 
 
 async def send_mess(kod, text, data=1, email=0):
-    if data == 0:
-        await bot.send_message(chat_id='@sdwan_log', text=text, disable_notification=True)
+    # if data == 0:
+    #     await bot.send_message(chat_id='@sdwan_log', text=text, disable_notification=True)
     rows = await sql.sql_selectone(f"SELECT user_id FROM sub WHERE kod = {kod}")
     try:
         for row in rows:
