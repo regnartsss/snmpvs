@@ -29,8 +29,8 @@ AD_SEARCH_COMPUTERS = 'OU=_Computers,OU=02. Восточная Сибирь,OU=1
 async def AD():
     AD_USER = 'podkopaev.k@partner.ru'
     AD_PASSWORD = 'z15X3vdy'
-    # AD_SEARCH_TREE = 'OU=autogroup,OU=_Computers,OU=02. Восточная Сибирь,OU=1. Розничная Сеть (ДНС),OU=DNS Users,DC=partner,DC=ru'
-    AD_SEARCH_TREE = 'CN=Computers,DC=partner,DC=ru'
+    AD_SEARCH_TREE = 'OU=autogroup,OU=_Computers,OU=02. Восточная Сибирь,OU=1. Розничная Сеть (ДНС),OU=DNS Users,DC=partner,DC=ru'
+    # AD_SEARCH_TREE = 'CN=Computers,DC=partner,DC=ru'
     # server = "partner.ru"
     # AD_SEARCH_TREE =
     # соединяюсь с сервером. всё ОК

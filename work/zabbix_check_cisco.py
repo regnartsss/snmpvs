@@ -447,7 +447,7 @@ async def check_all(loopback, status1, status2):
             text = f"{data[0]}\nКод: {data[1]}\n🟢 🔴 Резервный провайдер не работает \n" \
                    f"Loopback: {data[2]}\n{data[6]}\nISP_2: {data[4]}\nUptime: "
             uptime = await snmp_v3(loopback, '1.3.6.1.2.1.1.3.0')
-            text += uptime
+            text +=  str(uptime)
             await sql.sql_insert(f"UPDATE zb_st SET status_1 = 1, status_2 = 0, uptime = '{uptime}' WHERE loopback = '{loopback}'")
             await send_mess(kod, text, 0)
     elif status1 == 0 and status2 == 1:
@@ -458,7 +458,7 @@ async def check_all(loopback, status1, status2):
             text = f"{data[0]}\nКод: {data[1]}\n🔴 🟢 Основной провайдер не работает\n\n" \
                    f"Loopback: {data[2]}\n{data[5]}\nISP_1: {data[3]}\nUptime: "
             uptime = await snmp_v3(loopback, '1.3.6.1.2.1.1.3.0')
-            text += uptime
+            text += str(uptime)
             await sql.sql_insert(f"UPDATE zb_st SET status_1 = 0, status_2 = 1, uptime = '{uptime}' WHERE loopback = '{loopback}'")
             await send_mess(kod, text, 0)
     elif status1 == 1 and status2 == 1:
@@ -468,7 +468,7 @@ async def check_all(loopback, status1, status2):
             data = await request_name(loopback)
             text = f"{data[0]}\nКод: {data[1]}\n🟢 🟢 Филиал работает\nUptime: "
             uptime = await snmp_v3(loopback, '1.3.6.1.2.1.1.3.0')
-            text += uptime
+            text +=  str(uptime)
             await sql.sql_insert(f"UPDATE zb_st SET status_1 = 1, status_2 = 1, uptime = '{uptime}' WHERE loopback = '{loopback}'")
             await send_mess(kod, text, 0)
     else:
