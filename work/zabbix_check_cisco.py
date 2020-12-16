@@ -394,6 +394,7 @@ async def snmp_v3(loopback, mib):
             seconds = int(m[:-2])
             return await format_seconds_to_hhmmss(seconds)
 
+
 async def format_seconds_to_hhmmss(seconds):
     day = seconds // (60 * 60 * 24)
     seconds %= (60 * 60 * 24)
@@ -445,10 +446,10 @@ async def check_all(loopback, status1, status2):
             data = await request_name(loopback)
             text = f"{data[0]}\nКод: {data[1]}\n🟢 🔴 Резервный провайдер не работает \n" \
                    f"Loopback: {data[2]}\n{data[6]}\nISP_2: {data[4]}\nUptime: "
-            text += await snmp_v3(loopback, '1.3.6.1.2.1.1.3.0')
-            await sql.sql_insert(f"UPDATE zb_st SET status_1 = 1, status_2 = 0 WHERE loopback = '{loopback}'")
+            uptime = await snmp_v3(loopback, '1.3.6.1.2.1.1.3.0')
+            text += uptime
+            await sql.sql_insert(f"UPDATE zb_st SET status_1 = 1, status_2 = 0, uptime = '{uptime}' WHERE loopback = '{loopback}'")
             await send_mess(kod, text, 0)
-
     elif status1 == 0 and status2 == 1:
         if status_t1 == status1 and status_t2 == status2:
             pass
@@ -456,10 +457,10 @@ async def check_all(loopback, status1, status2):
             data = await request_name(loopback)
             text = f"{data[0]}\nКод: {data[1]}\n🔴 🟢 Основной провайдер не работает\n\n" \
                    f"Loopback: {data[2]}\n{data[5]}\nISP_1: {data[3]}\nUptime: "
-            text += await snmp_v3(loopback, '1.3.6.1.2.1.1.3.0')
-            await sql.sql_insert(f"UPDATE zb_st SET status_1 = 0, status_2 = 1 WHERE loopback = '{loopback}'")
+            uptime = await snmp_v3(loopback, '1.3.6.1.2.1.1.3.0')
+            text += uptime
+            await sql.sql_insert(f"UPDATE zb_st SET status_1 = 0, status_2 = 1, uptime = '{uptime}' WHERE loopback = '{loopback}'")
             await send_mess(kod, text, 0)
-
     elif status1 == 1 and status2 == 1:
         if status_t1 == status1 and status_t2 == status2:
             pass
@@ -467,8 +468,10 @@ async def check_all(loopback, status1, status2):
             data = await request_name(loopback)
 
             text = f"{data[0]}\nКод: {data[1]}\n🟢 🟢 Филиал работает\nUptime: "
-            text += await snmp_v3(loopback, '1.3.6.1.2.1.1.3.0')
-            await sql.sql_insert(f"UPDATE zb_st SET status_1 = 1, status_2 = 1 WHERE loopback = '{loopback}'")
+
+            uptime = await snmp_v3(loopback, '1.3.6.1.2.1.1.3.0')
+            text += uptime
+            await sql.sql_insert(f"UPDATE zb_st SET status_1 = 1, status_2 = 1, uptime = '{uptime}' WHERE loopback = '{loopback}'")
             await send_mess(kod, text, 0)
     else:
         pass
@@ -481,8 +484,8 @@ async def request_name(loopback):
 
 
 async def send_mess(kod, text, data=1, email=0):
-    if data == 0:
-        await bot.send_message(chat_id='@sdwan_log', text=text, disable_notification=True)
+    # if data == 0:
+    #     await bot.send_message(chat_id='@sdwan_log', text=text, disable_notification=True)
     rows = await sql.sql_selectone(f"SELECT user_id FROM sub WHERE kod = {kod}")
     try:
         for row in rows:
@@ -513,75 +516,3 @@ async def notif():
     else:
         # print("Со звуком")
         return None
-
-#
-# def data_monitor():
-#     return datetime.today().strftime("%H:%M:%S %d/%m/%Y")
-
-#
-# async def monitoring():
-#     keyboard = InlineKeyboardMarkup()
-#     i = 1
-#     tab = []
-#     column = []
-#     request = f"SELECT filial.kod, status_1, status_2, ISP1, ISP2 FROM status " \
-#               f"INNER JOIN filial ON status.kod = filial.kod ORDER BY status.kod"
-#     rows = await sql.sql_select(request)
-#     l = len(rows)
-#     num,n = 0,0
-#     while num < l:
-#         num += 4
-#         column.append(num)
-#     for row in rows:
-#         ch1 = "🔵"
-#         ch2 = "🔵"
-#         if row[1] == 1:
-#             ch1 = "🔵"
-#         elif row[1] == 0:
-#             ch1 = "🔴"
-#         if row[2] == 1:
-#             ch2 = "🔵"
-#         elif row[2] == 0:
-#             ch2 = "🔴"
-#         if row[3] == "unassigned":
-#             ch1 = "⚪"
-#         if row[4] == "unassigned":
-#             ch2 = "⚪"
-#         tab.append(InlineKeyboardButton(text=f"{ch1}{ch2}{row[0]} ", callback_data=f"sub_{row[0]}"))
-#         if i in column:
-#             keyboard.row(*tab)
-#             tab = []
-#             n += 1
-#         if i == 100:
-#             await edit_mess(keyboard, 1)
-#             keyboard = InlineKeyboardMarkup()
-#         i += 1
-#     keyboard.row(*tab)
-#     await edit_mess(keyboard, 2)
-#
-#
-#
-# async def edit_mess(keyboard, q):
-#     chat = "@test_moni"
-#     # chat = "@sdwan_monitoring"
-#     text = "<---------------->\n Время проверки %s" % data_monitor()
-#     try:
-#         message_id = (await sql.sql_selectone(f"SELECT username FROM users WHERE id = 123456789 and first_name = 'mess_{q}'"))[0]
-#         print(message_id)
-#         await bot.edit_message_text(chat_id=chat, message_id=message_id, text=text, reply_markup=keyboard)
-#     except Exception as n:
-#         print(n)
-#         id = await bot.send_message(chat_id=chat, text=text, reply_markup=keyboard)
-#         await sql.sql_insert(f"UPDATE users SET username = {id.message_id} WHERE id = 123456789 and first_name = 'mess_{q}'")
-
-# loop = asyncio.get_event_loop()
-# loop.run_until_complete(monitoring())
-
-
-# async def call_name(call):
-#     kod = call.data.split("_")[1]
-#     name = (await sql.sql_selectone(f"SELECT name FROM filial WHERE kod = {kod}"))[0]
-#     try:
-#         await bot.answer_callback_query(callback_query_id=call.id, text=f"{name}")
-#     except Exception as n:
-#         print(f"cal{n}")

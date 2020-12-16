@@ -71,3 +71,14 @@ async def create_bd(data):
 );
 """
     await sql_insert(request)
+
+
+async def mess_uptime(user_id):
+    rows = await sql_select(f"SELECT name, uptime FROM zb_st LEFT JOIN zabbix ON zb_st.kod = zabbix.kod ORDER BY uptime")
+    text = ""
+    for row in rows:
+        text += f"{row[0]} {row[1]} \n"
+        if len(text) > 4000:
+            await bot.send_message(user_id, text)
+            text = ""
+    return text
