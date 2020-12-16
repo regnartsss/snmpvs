@@ -327,6 +327,8 @@ async def update_vlan(kod):
     # print(f"DELETE FROM zb_st WHERE kod = {kod}")
     await sql_insert(f"DELETE FROM zb_st WHERE kod = {kod}")
     await vlan_cisco(loopback[0])
+    await isp_name_cisco(loopback[0])
+
 
 
 
