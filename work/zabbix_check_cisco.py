@@ -236,7 +236,6 @@ async def oid(loopback, kod, repeat=0):
 
 async def snmp(loopback, kod, repeat):
     # logging.info(f"snmp {loopback} {repeat}")
-    print(loopback)
     mib_all = await sql.sql_selectone(
         f"SELECT In_isp1, In_isp2, Oper_isp1, Oper_isp2, OperISP2 FROM zb_st WHERE loopback = '{loopback}'")
     if mib_all[0:2] == ('0', '0') or mib_all[0:2] == (None, None):
@@ -257,7 +256,6 @@ async def snmp(loopback, kod, repeat):
             lexicographicMode=False
         ):
             if errorIndication:
-                print(repeat)
                 if repeat == 0:
                     print('repeat')
                     repeat = 1
