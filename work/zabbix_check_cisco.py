@@ -10,7 +10,7 @@ from aiosnmp.asn1 import Error
 import aioping
 import logging
 from aiogram.utils.exceptions import NetworkError, BotBlocked
-
+from data.config import channel_mess
 p = 0
 
 async def start_snmp(data):
@@ -236,6 +236,7 @@ async def oid(loopback, kod, repeat=0):
 
 async def snmp(loopback, kod, repeat):
     # logging.info(f"snmp {loopback} {repeat}")
+    print(loopback)
     mib_all = await sql.sql_selectone(
         f"SELECT In_isp1, In_isp2, Oper_isp1, Oper_isp2, OperISP2 FROM zb_st WHERE loopback = '{loopback}'")
     if mib_all[0:2] == ('0', '0') or mib_all[0:2] == (None, None):
@@ -256,13 +257,16 @@ async def snmp(loopback, kod, repeat):
             lexicographicMode=False
         ):
             if errorIndication:
-                # print(repeat)
-                # if repeat == 0:
-                #     await snmp(loopback, kod, 1)
+                print(repeat)
+                if repeat == 0:
+                    print('repeat')
+                    repeat = 1
+                    await snmp(loopback, kod, 1)
                 # # if await ping_cisco_old(loopback, kod) is False:
                 # #     logging.info(f"{loopback} не доступен")
                 # elif repeat == 1:
                 #     print("столп")
+                else:
                     r = await sql.sql_selectone(f"SELECT In1_two, In2_two FROM zb_st WHERE loopback = '{loopback}'")
                     d.append(r[0])
                     d.append(r[1])
@@ -482,25 +486,26 @@ async def request_name(loopback):
 
 
 async def send_mess(kod, text, data=1, email=0):
-    if data == 0:
-        await bot.send_message(chat_id='@sdwan_log', text=text, disable_notification=True)
-    rows = await sql.sql_selectone(f"SELECT user_id FROM sub WHERE kod = {kod}")
-    try:
-        for row in rows:
-            await asyncio.sleep(1)
-            try:
+    if channel_mess == 0:
+        if data == 0:
+            await bot.send_message(chat_id='@sdwan_log', text=text, disable_notification=True)
+        rows = await sql.sql_selectone(f"SELECT user_id FROM sub WHERE kod = {kod}")
+        try:
+            for row in rows:
+                await asyncio.sleep(1)
                 try:
-                    await bot.send_message(chat_id=row, text=text, disable_notification=await notif())
-                except NetworkError:
-                    logging.info(f"Ошибка подключения к серверу телеграм")
-            except TypeError:
-                print(f"Ошибка отправки {row}")
-            except ChatNotFound:
-                print(f"Юзер не найден {row}")
-            except BotBlocked:
-                print(f"Юзер заблокировал {row}")
-    except TypeError:
-        print("Никто не подписан ", kod)
+                    try:
+                        await bot.send_message(chat_id=row, text=text, disable_notification=await notif())
+                    except NetworkError:
+                        logging.info(f"Ошибка подключения к серверу телеграм")
+                except TypeError:
+                    print(f"Ошибка отправки {row}")
+                except ChatNotFound:
+                    print(f"Юзер не найден {row}")
+                except BotBlocked:
+                    print(f"Юзер заблокировал {row}")
+        except TypeError:
+            print("Никто не подписан ", kod)
 
 
 async def notif():

@@ -1,6 +1,6 @@
 import logging
 from aiogram import Bot, Dispatcher, types
-from data.config import API_TOKEN, PROXY_URL
+from data.config import API_TOKEN
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 
 # PROXY_AUTH = aiohttp.BasicAuth(login='SsBNpW', password='oTUn9X')

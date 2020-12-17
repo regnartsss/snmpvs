@@ -12,7 +12,7 @@ from work.keyboard import keyboard_other, region, keyboard_back, keyboard_search
 from work.Keyboard_menu import key_registrator, menu_region, menu_filials, menu_filial
 from work.subscription import worksub, reg_menu
 from work.counter_check import counter, mess, mess_uptime
-from work.ldap_old import AD
+from work.ldap_group import AD
 
 
 @dp.message_handler(state=AllMessage.message)
