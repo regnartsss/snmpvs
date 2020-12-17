@@ -24,10 +24,10 @@ async def zabb():
 def on_startup():
     loop = asyncio.get_event_loop()
     asyncio.ensure_future(start_snmp("ASC"))
-    # asyncio.ensure_future(zabb())
-    # asyncio.ensure_future(ad())
-    # asyncio.ensure_future(check())
-    # asyncio.ensure_future(start_check_registrator())
+    asyncio.ensure_future(zabb())
+    asyncio.ensure_future(ad())
+    asyncio.ensure_future(check())
+    asyncio.ensure_future(start_check_registrator())
 
     loop.run_forever()
 
