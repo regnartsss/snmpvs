@@ -256,6 +256,7 @@ async def snmp(loopback, kod, repeat):
             lexicographicMode=False
         ):
             if errorIndication:
+                print(repeat)
                 if repeat == 0:
                     print('repeat')
                     repeat = 1
