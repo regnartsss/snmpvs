@@ -36,7 +36,7 @@ async def search_user():
                 for g in gro:
                     g = g.split(",")[0][3:]
                     if le == l:
-                        text = f"👶 {name} в группе филиала не состоит \n{cn.split(',')[0][3:]}\n"
+                        text = f"👶 {name}\n"
                         # print("Пользователь в группе не состоит", cn)
                         for g in gro:
                             result = re.findall(r'Auto_', g)
