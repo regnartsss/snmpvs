@@ -23,7 +23,8 @@ async def ad():
     # rows = await sql_select(f"SELECT kod FROM zabbix")
     for entry in result:
         dn = entry['attributes']['distinguishedName']
-        name = str(entry['attributes']['name'])
+        # name = str(entry['attributes']['name'])
+        name = str(entry['attributes']['dNSHostName'])
         result = re.findall(r'^vs\d', name.lower())
         if result:
             await move_group(name, conn, dn)
@@ -37,6 +38,7 @@ async def ad():
 async def move_group(name, conn, dn):
     try:
         answer = dns.resolver.query(name, raise_on_no_answer=False)
+        print(answer.rrset)
         an = str(answer.rrset).split()[4]
         filial = await search_ip(an)
         if filial != "Ничего не нашел по ip":
