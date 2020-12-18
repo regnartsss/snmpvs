@@ -81,8 +81,8 @@ def create_group(department, superion):
 
 
 async def send_message_ldap(text):
-    if channel_mess == 0:
-        await bot.send_message(chat_id='@sdwan_log', text=text, disable_notification=True)
+    # if channel_mess == 0:
+    #     await bot.send_message(chat_id='@sdwan_log', text=text, disable_notification=True)
     print(text)
     # for admin in admin_id:
     #     try:
