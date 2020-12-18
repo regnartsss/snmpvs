@@ -22,7 +22,7 @@ async def start_snmp(data):
         logging.info(f"start_cisco {i}")
         rows = await sql.sql_select(f"SELECT loopback, kod, sdwan FROM zabbix WHERE work is Null or work = 0 ORDER BY kod {data}")
         for loopback, kod, sdwan in rows:
-            logging.info(f"snmp {loopback}")
+            # logging.info(f"snmp {loopback}")
             await asyncio.sleep(1)
             request = f"SELECT count(loopback) FROM zb_st WHERE loopback = '{loopback}'"
             count = (await sql.sql_selectone(request))[0]
