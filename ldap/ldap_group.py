@@ -8,6 +8,7 @@ from work.search import search_ip
 from work.zabbix_check_cisco import notif
 import dns.resolver
 import re
+from data.config import channel_mess
 
 dat = ['kra', 'abk', 'uln', 'irk', 'ykt', 'cht']
 
@@ -80,6 +81,8 @@ def create_group(department, superion):
 
 
 async def send_message_ldap(text):
+    if channel_mess == 0:
+            await bot.send_message(chat_id='@sdwan_log', text=text, disable_notification=True)
     for admin in admin_id:
         try:
             await bot.send_message(chat_id=admin, text=text, disable_notification=await notif())

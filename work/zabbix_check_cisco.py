@@ -13,6 +13,7 @@ from aiogram.utils.exceptions import NetworkError, BotBlocked
 from data.config import channel_mess
 p = 0
 
+
 async def start_snmp(data):
     await asyncio.sleep(10)
     i, y, z = 0, 0, 0
@@ -256,10 +257,11 @@ async def snmp(loopback, kod, repeat):
             lexicographicMode=False
         ):
             if errorIndication:
-                print(repeat)
+                # print(repeat)
                 if repeat == 0:
-                    print('repeat')
+                    # print('repeat')
                     repeat = 1
+                    await asyncio.sleep(5)
                     await snmp(loopback, kod, 1)
                 # # if await ping_cisco_old(loopback, kod) is False:
                 # #     logging.info(f"{loopback} не доступен")
