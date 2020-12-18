@@ -20,7 +20,6 @@ def search_user():
     groups = conn.extend.standard.paged_search(AD_SEARCH_TREE, search_filter=filt, search_scope=SUBTREE,
                                                attributes=ALL_ATTRIBUTES)
     groups = list(groups)
-    print(groups)
     for t in g:
         department_user = t['attributes']['department']
         member = t['attributes']['distinguishedName']
@@ -36,7 +35,6 @@ def search_user():
                     g = g.split(",")[0][3:]
                     if le == l:
                         text = f"Пользователь в группе не состоит {g}\n"
-                        print("Пользователь в группе не состоит", cn)
                         for g in gro:
                             result = re.findall(r'Auto_', g)
                             if result:
@@ -44,7 +42,6 @@ def search_user():
                                 conn.modify(g, {'member': [(MODIFY_DELETE, member)]})
                             text += f"Добавлен в группу {cn.split(',')[0]}"
                             conn.modify(cn, {'member': [(MODIFY_ADD, member)]})
-                            print(text)
                             # await send_message_ldap(text)
                         break
                     elif g == gr:

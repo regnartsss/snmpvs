@@ -13,6 +13,7 @@ filt = "(&(objectCategory=person)(objectClass=user)(!(userAccountControl:1.2.840
 
 
 async def search_user():
+    print('search_user')
     filt = "(&(objectCategory=person)(objectClass=user)(!(userAccountControl:1.2.840.113556.1.4.803:=2))(title=*правляющ*))"
     g = conn.extend.standard.paged_search(AD_SEARCH_TREE, search_filter=filt, search_scope=SUBTREE,
                                           attributes=ALL_ATTRIBUTES)
@@ -37,7 +38,6 @@ async def search_user():
                     g = g.split(",")[0][3:]
                     if le == l:
                         text = f"👶 {name}\n"
-                        # print("Пользователь в группе не состоит", cn)
                         for g in gro:
                             result = re.findall(r'Auto_', g)
                             if result:

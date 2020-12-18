@@ -82,15 +82,16 @@ def create_group(department, superion):
 
 async def send_message_ldap(text):
     if channel_mess == 0:
-            await bot.send_message(chat_id='@sdwan_log', text=text, disable_notification=True)
-    for admin in admin_id:
-        try:
-            await bot.send_message(chat_id=admin, text=text, disable_notification=await notif())
-        except NetworkError:
-            logging.info(f"Ошибка подключения к серверу телеграм")
-        except TypeError:
-            logging.info(f"Ошибка отправки {admin}")
-        except ChatNotFound:
-            logging.info(f"Юзер не найден {admin}")
-        except BotBlocked:
-            logging.info(f"Юзер заблокировал {admin}")
+        await bot.send_message(chat_id='@sdwan_log', text=text, disable_notification=True)
+    print(text)
+    # for admin in admin_id:
+    #     try:
+    #         await bot.send_message(chat_id=admin, text=text, disable_notification=await notif())
+    #     except NetworkError:
+    #         logging.info(f"Ошибка подключения к серверу телеграм")
+    #     except TypeError:
+    #         logging.info(f"Ошибка отправки {admin}")
+    #     except ChatNotFound:
+    #         logging.info(f"Юзер не найден {admin}")
+    #     except BotBlocked:
+    #         logging.info(f"Юзер заблокировал {admin}")
