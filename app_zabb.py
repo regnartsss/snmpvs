@@ -15,17 +15,28 @@ middlewares.setup(dp)
 async def zabb():
     await bot.send_message(chat_id=765333440, text="Бот запущен")
     scheduler = AsyncIOScheduler()
+    # scheduler.add_job(ad, trigger='cron', minute=00, jitter=100)
+    # scheduler.add_job(ad, trigger='cron', minute=59, jitter=100)
+    # scheduler.add_job(ad, trigger='cron', minute=1, jitter=100)
+    # scheduler.add_job(ad, trigger='cron', minute=2, jitter=100)
+    # scheduler.add_job(ad, trigger='cron', minute=3, jitter=100)
+
+    # scheduler.add_job(ad, trigger='cron', hour=15, minute=45)
+
     # scheduler.add_job(check, 'interval', hours=4)
     # scheduler.add_job(ad, 'interval', hours=4)
     # scheduler.add_job(search_user, 'interval', hours=24)
-    scheduler.add_job(search_user, 'cron', hour='13', minute='31')
-    scheduler.add_job(check, 'cron', hour='10', minute='00')
-    scheduler.add_job(check, 'cron', hour='15', minute='00')
-    scheduler.add_job(check, 'cron', hour='18', minute='20')
-    scheduler.add_job(ad, 'cron', hour='9', minute='00')
-    scheduler.add_job(ad, 'cron', hour='13', minute='32')
-    scheduler.add_job(ad, 'cron', hour='16', minute='00')
-    scheduler.add_job(ad, 'cron', hour='18', minute='00')
+    scheduler.add_job(check, 'cron', hour='10', minute='00', jitter=100)
+    # scheduler.add_job(check, 'cron', hour='15', minute='00')
+    scheduler.add_job(check, 'cron', hour='18', minute='00', jitter=100)
+    scheduler.add_job(ad, 'cron', hour='10', minute='00', jitter=100)
+    scheduler.add_job(ad, 'cron', hour='14', minute='00', jitter=100)
+    scheduler.add_job(ad, 'cron', hour='18', minute='00', jitter=100)
+    scheduler.add_job(search_user, 'cron', hour='10', minute='10', jitter=100)
+    scheduler.add_job(search_user, 'cron', hour='16', minute='00', jitter=100)
+    scheduler.add_job(search_user, 'cron', hour='16', minute='30', jitter=100)
+
+
     scheduler.start()
 
 
@@ -37,7 +48,6 @@ def on_startup():
     # asyncio.ensure_future(check())
     # asyncio.ensure_future(search_user())
     asyncio.ensure_future(start_check_registrator())
-
     loop.run_forever()
 
 

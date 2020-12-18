@@ -18,7 +18,7 @@ async def search_user():
     g = conn.extend.standard.paged_search(AD_SEARCH_TREE, search_filter=filt, search_scope=SUBTREE,
                                           attributes=ALL_ATTRIBUTES)
 
-    filt = f"(&(objectCategory=group)(CN=*Auto_*))"
+    filt = f"(&(objectCategory=group)(CN=_*))"
     groups = conn.extend.standard.paged_search(AD_SEARCH_TREE, search_filter=filt, search_scope=SUBTREE,
                                                attributes=ALL_ATTRIBUTES)
     groups = list(groups)
@@ -27,7 +27,7 @@ async def search_user():
         member = t['attributes']['distinguishedName']
         gro = t['attributes']['memberof']
         name= t['attributes']['displayName']
-        gr = f'Auto_Администратор компьютера {department_user}'
+        gr = f'_Администратор компьютера {department_user}'
         l = 1
         le = len(gro)
         for group in groups:
@@ -39,7 +39,7 @@ async def search_user():
                     if le == l:
                         text = f"👶 {name}\n"
                         for g in gro:
-                            result = re.findall(r'Auto_', g)
+                            result = re.findall(r'_', g)
                             if result:
                                 text += f"❌ Удален из группы {g.split(',')[0][3:]}\n"
                                 conn.modify(g, {'member': [(MODIFY_DELETE, member)]})

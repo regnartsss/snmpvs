@@ -14,6 +14,7 @@ dat = ['kra', 'abk', 'uln', 'irk', 'ykt', 'cht']
 
 
 async def ad():
+    print("ad")
     server = Server(AD_SERVER)
     conn = Connection(server, user=AD_USER, password=AD_PASSWORD)
     conn.bind()
@@ -71,12 +72,12 @@ async def find_group(filial):
 
 
 def create_group(department, superion):
-    dn = f'CN=Auto_Администратор компьютера {department},{superion}'
+    dn = f'CN=_Администратор компьютера {department},{superion}'
     attrs = {}
     attrs['objectclass'] = ['top', 'Group']
-    attrs['cn'] = f'Auto_Администратор компьютера {department}'
+    attrs['cn'] = f'_Администратор компьютера {department}'
     attrs['groupType'] = '-2147483644'
-    attrs['sAMAccountName'] = f'Auto_Администратор компьютера {department}'
+    attrs['sAMAccountName'] = f'_Администратор компьютера {department}'
     return dn, attrs
 
 
