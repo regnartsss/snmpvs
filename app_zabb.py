@@ -18,6 +18,7 @@ async def zabb():
     # scheduler.add_job(check, 'interval', hours=4)
     # scheduler.add_job(ad, 'interval', hours=4)
     # scheduler.add_job(search_user, 'interval', hours=24)
+    scheduler.add_job(search_user, 'cron', hour='12', minute='00')
     scheduler.add_job(check, 'cron', hour='10', minute='00')
     scheduler.add_job(check, 'cron', hour='15', minute='00')
     scheduler.add_job(check, 'cron', hour='18', minute='20')
@@ -25,7 +26,6 @@ async def zabb():
     scheduler.add_job(ad, 'cron', hour='12', minute='00')
     scheduler.add_job(ad, 'cron', hour='16', minute='00')
     scheduler.add_job(ad, 'cron', hour='18', minute='00')
-    scheduler.add_job(search_user, 'cron', hour='10', minute='30')
     scheduler.start()
 
 
