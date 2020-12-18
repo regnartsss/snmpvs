@@ -25,16 +25,17 @@ async def zabb():
     scheduler.add_job(ad, 'cron', hour='12', minute='00')
     scheduler.add_job(ad, 'cron', hour='16', minute='00')
     scheduler.add_job(ad, 'cron', hour='18', minute='00')
-    scheduler.add_job(search_user, 'cron', hour='9', minute='10')
+    scheduler.add_job(search_user, 'cron', hour='10', minute='00')
     scheduler.start()
 
 
 def on_startup():
     loop = asyncio.get_event_loop()
-    asyncio.ensure_future(start_snmp("ASC"))
     asyncio.ensure_future(zabb())
-    asyncio.ensure_future(ad())
-    asyncio.ensure_future(check())
+    asyncio.ensure_future(start_snmp("ASC"))
+    # asyncio.ensure_future(ad())
+    # asyncio.ensure_future(check())
+    # asyncio.ensure_future(search_user())
     asyncio.ensure_future(start_check_registrator())
 
     loop.run_forever()
