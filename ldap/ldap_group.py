@@ -23,8 +23,10 @@ async def ad():
     # rows = await sql_select(f"SELECT kod FROM zabbix")
     for entry in result:
         dn = entry['attributes']['distinguishedName']
-        # name = str(entry['attributes']['name'])
-        name = str(entry['attributes']['dNSHostName'])
+        try:
+            name = str(entry['attributes']['dNSHostName'])
+        except KeyError:
+            name = str(entry['attributes']['name'])
         result = re.findall(r'^vs\d', name.lower())
         if result:
             await move_group(name, conn, dn)

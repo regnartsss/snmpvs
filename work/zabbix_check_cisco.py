@@ -491,7 +491,10 @@ async def request_name(loopback):
 async def send_mess(kod, text, data=1, email=0):
     if channel_mess == 0:
         if data == 0:
-            await bot.send_message(chat_id='@sdwan_log', text=text, disable_notification=True)
+            try:
+                await bot.send_message(chat_id='@sdwan_log', text=text, disable_notification=True)
+            except NetworkError:
+                logging.info(f"Ошибка подключения к серверу телеграм")
         rows = await sql.sql_selectone(f"SELECT user_id FROM sub WHERE kod = {kod}")
         try:
             for row in rows:
