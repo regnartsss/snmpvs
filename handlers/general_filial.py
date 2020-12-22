@@ -28,7 +28,7 @@ async def market(call: types.CallbackQuery, callback_data: dict):
     kod = callback_data["kod"]
     text = await info_filial(kod)
     keyboard = await menu_filial(callback_data)
-    await sql_insert(f"UPDATE users SET ssh_kod = {kod} WHERE user_id = {call.from_user.id}")
+    await sql_insert(f"UPDATE users SET ssh_kod = {kod} WHERE id = {call.from_user.id}")
 
     await call.message.edit_text(text=text, reply_markup=keyboard)
 
