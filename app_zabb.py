@@ -26,6 +26,8 @@ async def zabb():
     scheduler.add_job(ad, 'cron', hour='18', minute='00', jitter=100)
     scheduler.add_job(search_user, 'cron', hour='10', minute='10', jitter=100)
     scheduler.add_job(search_user, 'cron', hour='17', minute='00', jitter=100)
+    scheduler.add_job(search_user, 'cron', hour='10', minute='30', jitter=100)
+
     scheduler.start()
 
 

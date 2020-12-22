@@ -3,7 +3,7 @@ from work.sql import sql_select_no, sql_selectone_no
 import re
 from data.config import AD_USER, AD_PASSWORD, AD_SERVER, admin_id
 from ldap.ldap_group import send_message_ldap
-
+import asyncio
 AD_SEARCH_TREE = 'OU=02. Восточная Сибирь,OU=1. Розничная Сеть (ДНС),OU=DNS Users,DC=partner,DC=ru'
 
 server = Server(AD_SERVER)
@@ -17,8 +17,8 @@ async def search_user():
     filt = "(&(objectCategory=person)(objectClass=user)(!(userAccountControl:1.2.840.113556.1.4.803:=2))(title=*правляющ*))"
     g = conn.extend.standard.paged_search(AD_SEARCH_TREE, search_filter=filt, search_scope=SUBTREE,
                                           attributes=ALL_ATTRIBUTES)
-
-    filt = f"(&(objectCategory=group)(CN=_Администратор*))"
+    await asyncio.sleep(2)
+    filt = f"(&(objectCategory=group)(CN=ААдминистратор*))"
     groups = conn.extend.standard.paged_search(AD_SEARCH_TREE, search_filter=filt, search_scope=SUBTREE,
                                                attributes=ALL_ATTRIBUTES)
     groups = list(groups)
@@ -39,7 +39,7 @@ async def search_user():
                     if le == l:
                         text = f"👶 {name}\n"
                         for g in gro:
-                            result = re.findall(r'_Администратор', g)
+                            result = re.findall(r'ААдминистратор', g)
                             if result:
                                 text += f"❌ Удален из группы {g.split(',')[0][3:]}\n"
                                 conn.modify(g, {'member': [(MODIFY_DELETE, member)]})

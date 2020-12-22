@@ -76,12 +76,12 @@ async def find_group(filial):
 
 
 def create_group(department, superion):
-    dn = f'CN=_Администратор компьютера {department},{superion}'
+    dn = f'CN=ААдминистратор компьютера {department},{superion}'
     attrs = {}
     attrs['objectclass'] = ['top', 'Group']
-    attrs['cn'] = f'_Администратор компьютера {department}'
+    attrs['cn'] = f'ААдминистратор компьютера {department}'
     attrs['groupType'] = '-2147483644'
-    attrs['sAMAccountName'] = f'_Администратор компьютера {department}'
+    attrs['sAMAccountName'] = f'ААдминистратор компьютера {department}'
     return dn, attrs
 
 
