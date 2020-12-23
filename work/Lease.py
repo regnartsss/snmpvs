@@ -41,7 +41,7 @@ async def lease(callback_data):
                             data = "%s/%s/%s %s" % (t[3], t[2], t[4], t[5])
                 except IndexError:
                     data = ""
-                text_all += "%s /%s %s\n" % (ip, mac, data)
+                text_all += "%s %s %s\n" % (ip, mac, data)
     if text_all == "":
         return "Нет адресов"
     else:
@@ -103,7 +103,7 @@ async def search_mac(kod, vlan, text_all):
                         # print(text_list)
                         text_all = ''
                         for text in text_list:
-                            mac = text.split()[1][1:]
+                            mac = text.split()[1]
                             mac_old = ''.join(line.split()[1].split("."))
                             if mac_old == mac:
                                 text += f" {ip} {line.split()[3]}"
