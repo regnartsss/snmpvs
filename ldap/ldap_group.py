@@ -71,7 +71,7 @@ async def find_group(filial):
     rows = await sql_selectone(request)
     region = str(rows[1])
     region = region.replace('"', '')
-    superior = f'OU={rows[0]} {filial},OU={region},OU=Филиалы,OU=_Computers,OU=02. Восточная Сибирь,OU=1. Розничная Сеть (ДНС),OU=DNS Users,DC=partner,DC=ru'
+    superior = f'OU={rows[0]} {filial},OU={region},OU=_Computers,OU=02. Восточная Сибирь,OU=1. Розничная Сеть (ДНС),OU=DNS Users,DC=partner,DC=ru'
     text = f"{region}/{rows[0]} {filial}"
     return superior, text
 
