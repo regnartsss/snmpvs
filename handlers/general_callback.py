@@ -11,11 +11,9 @@ from work.zabbix_check_equipment import update_reg_cis
 
 
 
-
-
 @dp.callback_query_handler(lease_cb.filter())
 async def market(call: types.CallbackQuery, callback_data: dict):
-    await call.answer("Ожидайте...", cache_time=10)
+    await call.answer("Ожидайте...", cache_time=20)
     text = await lease(callback_data)
     keyboard = await menu_filial(callback_data)
     try:
