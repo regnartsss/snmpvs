@@ -36,12 +36,13 @@ async def lease(callback_data):
                         if t[6] == "PM":
                             ss = int(t[5].split(":")[0]) + 12
                             ss = "%s:%s" % (ss, t[5].split(":")[1])
-                            data = "%s/%s/%s %s" % (t[3], t[2], t[4], ss)
+                            data = "_%s/%s/%s %s_" % (t[3], t[2], t[4], ss)
                         else:
-                            data = "%s/%s/%s %s" % (t[3], t[2], t[4], t[5])
+                            data = "_%s/%s/%s %s_" % (t[3], t[2], t[4], t[5])
                 except IndexError:
                     data = ""
-                text_all += "%s %s %s\n" % (ip, mac, data)
+                print(ip, mac, data)
+                text_all += f"{ip} {mac} {data}\n"
     if text_all == "":
         return "Нет адресов"
     else:
@@ -84,7 +85,6 @@ async def search_mac(kod, vlan, text_all):
         # except paramiko.ssh_exception.NoValidConnectionsError:
         #     print(f"Нет подключения к циско {ip} {row[1]}")
         #     continue
-        print(temp)
         try:
             client.connect(hostname=ip, username=user, password=passwors, port=22)
         except paramiko.ssh_exception.NoValidConnectionsError:
@@ -93,24 +93,31 @@ async def search_mac(kod, vlan, text_all):
         stdin, stdout, stderr = client.exec_command(command_one)
         text = stdout.read().decode("utf-8").split("\r\n")
         for line in text:
-
             try:
-                if str(line.split()[0]) == str(vlan[4:7]):
-                    if str(line.split()[3]) not in temp:
-                        # print(line)
-                        # print(text_all.split("\n"))
-                        text_list = text_all.split("\n")
-                        # print(text_list)
-                        text_all = ''
-                        for text in text_list:
-                            mac = text.split()[1]
-                            mac_old = ''.join(line.split()[1].split("."))
-                            if mac_old == mac:
-                                text += f" {ip} {line.split()[3]}"
-                            text_all += text + '\n'
-
-                            # mac.append()
+                vl = str(line.split()[0])
+                vl_old = str(vlan[4:7])
             except IndexError:
-                pass
+                continue
+            if vl == vl_old:
+                if str(line.split()[3]) not in temp:
+                    text_list = text_all.split("\n")
+                    text_all = ''
+                    for text in text_list:
+                        try:
+                            ip_text = text.split()[0]
+                        except IndexError:
+                            continue
+                        mac = text.split()[1]
+                        try:
+                            data = text.split()[2]
+                            time = text.split()[3]
+                        except IndexError:
+                            data, time = '', ''
+                        port = line.split()[3]
+                        mac_old = ''.join(line.split()[1].split("."))
+                        if mac_old == mac:
+                            text = f"{ip_text} {mac} *{ip} {port}* {data} {time}\n"
+                        text_all += f"{text} \n"
+    print(text_all)
     return text_all
 

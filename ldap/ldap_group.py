@@ -24,9 +24,10 @@ async def ad():
     for entry in result:
         dn = entry['attributes']['distinguishedName']
         try:
-            name = str(entry['attributes']['dNSHostName'])
+            namedns = str(entry['attributes']['dNSHostName'])
         except KeyError:
-            name = str(entry['attributes']['name'])
+            namedns = str(entry['attributes']['name'])
+        name = str(entry['attributes']['name'])
         result = re.findall(r'^vs\d', name.lower())
         if result:
             await move_group(name, conn, dn)
@@ -34,12 +35,12 @@ async def ad():
             if d in name.lower()[0:3]:
                 result = re.findall(r'\w{3}\d', name)
                 if result:
-                    await move_group(name, conn, dn)
+                    await move_group(name, conn, dn, namedns)
 
 
-async def move_group(name, conn, dn):
+async def move_group(name, conn, dn, namedns):
     try:
-        answer = dns.resolver.query(name, raise_on_no_answer=False)
+        answer = dns.resolver.query(namedns, raise_on_no_answer=False)
         print(answer.rrset)
         an = str(answer.rrset).split()[4]
         filial = await search_ip(an)

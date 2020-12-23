@@ -17,7 +17,7 @@ async def market(call: types.CallbackQuery, callback_data: dict):
     text = await lease(callback_data)
     keyboard = await menu_filial(callback_data)
     try:
-        await call.message.edit_text(text=text, reply_markup=keyboard)
+        await call.message.edit_text(text=text, reply_markup=keyboard,parse_mode='Markdown')
     except MessageNotModified:
         pass
 
