@@ -30,7 +30,7 @@ async def ad():
         name = str(entry['attributes']['name'])
         result = re.findall(r'^vs\d', name.lower())
         if result:
-            await move_group(name, conn, dn)
+            await move_group(name, conn, dn, namedns)
         for d in dat:
             if d in name.lower()[0:3]:
                 result = re.findall(r'\w{3}\d', name)
@@ -41,7 +41,7 @@ async def ad():
 async def move_group(name, conn, dn, namedns):
     try:
         answer = dns.resolver.query(namedns, raise_on_no_answer=False)
-        print(answer.rrset)
+        # print(answer.rrset)
         an = str(answer.rrset).split()[4]
         filial = await search_ip(an)
         if filial != "Ничего не нашел по ip":
@@ -71,25 +71,26 @@ async def find_group(filial):
     rows = await sql_selectone(request)
     region = str(rows[1])
     region = region.replace('"', '')
-    superior = f'OU={rows[0]} {filial},OU={region},OU=_Computers,OU=02. Восточная Сибирь,OU=1. Розничная Сеть (ДНС),OU=DNS Users,DC=partner,DC=ru'
+    superior = f'OU={rows[0]} {filial},OU={region},OU=Филиалы,OU=_Computers,OU=02. Восточная Сибирь,OU=1. Розничная Сеть (ДНС),OU=DNS Users,DC=partner,DC=ru'
     text = f"{region}/{rows[0]} {filial}"
     return superior, text
 
 
 def create_group(department, superion):
-    dn = f'CN=ААдминистратор компьютера {department},{superion}'
+    dn = f'CN=Администраторы компьютеров _{department},{superion}'
     attrs = {}
     attrs['objectclass'] = ['top', 'Group']
-    attrs['cn'] = f'ААдминистратор компьютера {department}'
+    attrs['cn'] = f'Администраторы компьютеров _{department}'
     attrs['groupType'] = '-2147483644'
-    attrs['sAMAccountName'] = f'ААдминистратор компьютера {department}'
+    attrs['sAMAccountName'] = f'Администраторы компьютеров _{department}'
     return dn, attrs
 
 
 async def send_message_ldap(text):
     if channel_mess == 0:
         await bot.send_message(chat_id='@sdwan_log', text=text, disable_notification=True)
-    # print(text)
+    else:
+        print(text)
     # for admin in admin_id:
     #     try:
     #         await bot.send_message(chat_id=admin, text=text, disable_notification=await notif())
