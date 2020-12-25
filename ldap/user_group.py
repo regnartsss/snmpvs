@@ -21,6 +21,7 @@ async def search_user():
     filt = f"(&(objectCategory=group)(CN=Администраторы компьютеров _*))"
     groups = conn.extend.standard.paged_search(AD_SEARCH_TREE, search_filter=filt, search_scope=SUBTREE,
                                                attributes=ALL_ATTRIBUTES)
+    await asyncio.sleep(2)
     groups = list(groups)
     for t in g:
         department_user = t['attributes']['department']
