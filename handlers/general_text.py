@@ -13,6 +13,8 @@ from work.Keyboard_menu import key_registrator, menu_region, menu_filials, menu_
 from work.subscription import worksub, reg_menu
 from work.counter_check import counter, mess, mess_uptime
 from ldap.ldap_group import ad
+from ldap.user_group import search_user
+
 
 
 @dp.message_handler(state=AllMessage.message)
@@ -80,9 +82,11 @@ async def work(message: types.Message):
 async def work(message: types.Message):
     await counter()
 
+
 @dp.message_handler(text="456")
 async def work(message: types.Message):
     await ad()
+    await search_user()
 
 
 @dp.message_handler(text="Счетчик")
