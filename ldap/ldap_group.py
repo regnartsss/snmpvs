@@ -30,12 +30,15 @@ async def ad():
         name = str(entry['attributes']['name'])
         result = re.findall(r'^vs\d', name.lower())
         if result:
-            print(result)
+            print(name)
             await move_group(name, conn, dn, namedns)
         for d in dat:
             if d in name.lower()[0:3]:
+
                 result = re.findall(r'\w{3}\d', name)
                 if result:
+                    print(name)
+
                     await move_group(name, conn, dn, namedns)
 
 
@@ -44,7 +47,9 @@ async def move_group(name, conn, dn, namedns):
         answer = dns.resolver.query(namedns, raise_on_no_answer=False)
         # print(answer.rrset)
         an = str(answer.rrset).split()[4]
+        print(an)
         filial = await search_ip(an)
+        print(filial)
         if filial != "Ничего не нашел по ip":
             superior, text = await find_group(filial)
             text = f"{name} перенесен в группу {text}"
@@ -62,6 +67,9 @@ async def move_group(name, conn, dn, namedns):
                 cn_group, attrs = create_group(filial, superior)
                 conn.add(dn=cn_group, attributes=attrs)
                 conn.modify_dn(str(dn), relative_dn=f'CN={name}', new_superior=superior)
+        else:
+            text = f"{name} не найден филиал, переместите руками"
+            await send_message_ldap(text)
     except dns.resolver.NXDOMAIN:
         text = f"{name} не найден филиал, переместите руками"
         await send_message_ldap(text)
