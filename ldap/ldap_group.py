@@ -30,6 +30,7 @@ async def ad():
         name = str(entry['attributes']['name'])
         result = re.findall(r'^vs\d', name.lower())
         if result:
+            print(result)
             await move_group(name, conn, dn, namedns)
         for d in dat:
             if d in name.lower()[0:3]:
