@@ -14,7 +14,7 @@ from work.subscription import worksub, reg_menu
 from work.counter_check import counter, mess, mess_uptime
 from ldap.ldap_group import ad
 from ldap.user_group import search_user
-
+import asyncio
 
 
 @dp.message_handler(state=AllMessage.message)
@@ -86,6 +86,7 @@ async def work(message: types.Message):
 @dp.message_handler(text="456")
 async def work(message: types.Message):
     await ad()
+    await asyncio.sleep(5)
     await search_user()
 
 
