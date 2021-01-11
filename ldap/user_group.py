@@ -17,11 +17,12 @@ async def search_user():
     filt = "(&(objectCategory=person)(objectClass=user)(!(userAccountControl:1.2.840.113556.1.4.803:=2))(title=*правляющ*))"
     g = conn.extend.standard.paged_search(AD_SEARCH_TREE, search_filter=filt, search_scope=SUBTREE,
                                           attributes=ALL_ATTRIBUTES)
-    await asyncio.sleep(5)
+    conn.extend()
+    # await asyncio.sleep(5)
     filt = f"(&(objectCategory=group)(CN=Администраторы компьютеров _*))"
     groups = conn.extend.standard.paged_search(AD_SEARCH_TREE, search_filter=filt, search_scope=SUBTREE,
                                                attributes=ALL_ATTRIBUTES)
-    await asyncio.sleep(5)
+    # await asyncio.sleep(5)
     groups = list(groups)
     for t in g:
         department_user = t['attributes']['department']
