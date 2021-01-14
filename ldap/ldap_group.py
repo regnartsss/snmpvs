@@ -32,14 +32,14 @@ async def ad():
         if result:
 
             await move_group(name, conn, dn, namedns)
-        result = re.findall(r'^\d{4}', name.lower())
-        if result:
-
-            await move_group(name, conn, dn, namedns)
-        result = re.findall(r'^\d{3}', name.lower())
-        if result:
-
-            await move_group(name, conn, dn, namedns)
+        # result = re.findall(r'^\d{4}', name.lower())
+        # if result:
+        #
+        #     await move_group(name, conn, dn, namedns)
+        # result = re.findall(r'^\d{3}', name.lower())
+        # if result:
+        #
+        #     await move_group(name, conn, dn, namedns)
         for d in dat:
             if d in name.lower()[0:3]:
                 result = re.findall(r'\w{3}\d', name)
