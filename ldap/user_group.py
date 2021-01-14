@@ -6,22 +6,23 @@ from ldap.ldap_group import send_message_ldap
 import asyncio
 AD_SEARCH_TREE = 'OU=02. Восточная Сибирь,OU=1. Розничная Сеть (ДНС),OU=DNS Users,DC=partner,DC=ru'
 
-server = Server(AD_SERVER)
-conn = Connection(server, user=AD_USER, password=AD_PASSWORD)
-conn.bind()
-filt = "(&(objectCategory=person)(objectClass=user)(!(userAccountControl:1.2.840.113556.1.4.803:=2))(title=*правляющ*))"
-
-
 async def search_user():
     print('search_user')
+    server = Server(AD_SERVER)
+    conn = Connection(server, user=AD_USER, password=AD_PASSWORD)
+    conn.bind()
+    print('Connection Bind Complete!')
     filt = "(&(objectCategory=person)(objectClass=user)(!(userAccountControl:1.2.840.113556.1.4.803:=2))(title=*правляющ*))"
     g = conn.extend.standard.paged_search(AD_SEARCH_TREE, search_filter=filt, search_scope=SUBTREE,
                                           attributes=ALL_ATTRIBUTES)
-    # await asyncio.sleep(5)
+
+    server = Server(AD_SERVER)
+    conn = Connection(server, user=AD_USER, password=AD_PASSWORD)
+    conn.bind()
+    print('Connection Bind Complete!')
     filt = f"(&(objectCategory=group)(CN=Администраторы компьютеров _*))"
     groups = conn.extend.standard.paged_search(AD_SEARCH_TREE, search_filter=filt, search_scope=SUBTREE,
                                                attributes=ALL_ATTRIBUTES)
-    # await asyncio.sleep(5)
     groups = list(groups)
     for t in g:
         department_user = t['attributes']['department']
