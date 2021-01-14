@@ -20,7 +20,7 @@ async def ad():
     conn.bind()
     print('Connection Bind Complete!')
     result = conn.extend.standard.paged_search(AD_SEARCH_TREE, search_filter='(objectCategory=computer)', search_scope=SUBTREE, attributes=ALL_ATTRIBUTES)
-    # rows = await sql_select(f"SELECT kod FROM zabbix")
+    rows = await sql_select(f"SELECT kod FROM zabbix")
     for entry in result:
         dn = entry['attributes']['distinguishedName']
         try:
@@ -30,14 +30,20 @@ async def ad():
         name = str(entry['attributes']['name'])
         result = re.findall(r'^vs\d', name.lower())
         if result:
-            print(name)
+
+            await move_group(name, conn, dn, namedns)
+        result = re.findall(r'^\d{4}', name.lower())
+        if result:
+
+            await move_group(name, conn, dn, namedns)
+        result = re.findall(r'^\d{3}', name.lower())
+        if result:
+
             await move_group(name, conn, dn, namedns)
         for d in dat:
             if d in name.lower()[0:3]:
-
                 result = re.findall(r'\w{3}\d', name)
                 if result:
-                    print(name)
 
                     await move_group(name, conn, dn, namedns)
 
